@@ -1,3 +1,7 @@
+package game;
+
+import board.Board;
+
 public class Game{
     private Player[] players;
     private Board board;
