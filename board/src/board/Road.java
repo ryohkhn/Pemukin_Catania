@@ -15,7 +15,7 @@ public class Road {
     Fonction qui remplit l'ArrayList de tile correspondant a ses voisins,
     de manière à pouvoir vérifier s'il y a bien une route voisine lors de la création d'une route.
      */
-    private void preciseAttributs(Tile[][] t,int x, int y) {
+    private void preciseAttributs(Tile[][] t,int x, int y) { //todo changer le nom de la fonction
         if(x==0){ //ligne du haut
             if(y==0){ //coin gauche
                 if(t[x][y].roads.lastIndexOf(this)==0) this.tileArrayList.add(t[x][y+1]);

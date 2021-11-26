@@ -5,7 +5,7 @@ import java.util.Random;
 
 public class Board{
     private Tile[][] tiles;
-    private HashMap<Integer,Integer> tilesId;
+    private HashMap<Integer,Integer> tilesId; //todo mettre dans la fonction et pas en attribut de classe
 
     public Board(int size){
         this.tilesId=new HashMap<>();
