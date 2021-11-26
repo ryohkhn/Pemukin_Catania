@@ -12,7 +12,7 @@ public class Board{
         fillMapId();
         this.tiles=new Tile[size][size];
         fillTiles();
-        createTileRoadAndVertex();
+        createTileRoadAndColony();
     }
 
     // fonction qui crée chaque case et remplit le tableau tiles
@@ -62,64 +62,64 @@ public class Board{
     }
 
     // fonction qui créé les routes et les sommets pour chaque case, en partageant le même objet pour les cases adjaceantes
-    private void createTileRoadAndVertex(){
+    private void createTileRoadAndColony(){ //todo changer l'objet vertex en colony
         Road left;
         Road top;
-        Vertex topL;
-        Vertex topR;
-        Vertex bottomL;
+        Colony topL;
+        Colony topR;
+        Colony bottomL;
         for(int x=0; x<tiles[0].length; x++){
             for(int y=0; y<tiles[0].length; y++){
                 if(x==0 && y==0){
                     for(int i=0; i<4; i++){
-                        tiles[x][y].roads.add(i,new Road());
-                        tiles[x][y].vertices.add(i,new Vertex());
+                        tiles[x][y].roads.add(i,new Road(tiles,x,y));
+                        tiles[x][y].colonies.add(i,new Colony());
                     }
                 }
                 else if(x==0){
                     for(int i=0; i<3; i++){
-                        tiles[x][y].roads.add(i,new Road());
+                        tiles[x][y].roads.add(i,new Road(tiles,x,y));
                     }
                     left=tiles[x][y-1].roads.get(1);
                     tiles[x][y].roads.add(3,left);
 
-                    topL=tiles[x][y-1].vertices.get(1);
-                    bottomL=tiles[x][y-1].vertices.get(2);
-                    tiles[x][y].vertices.add(0,topL);
-                    tiles[x][y].vertices.add(1,new Vertex());
-                    tiles[x][y].vertices.add(2,new Vertex());
-                    tiles[x][y].vertices.add(3,bottomL);
+                    topL=tiles[x][y-1].colonies.get(1);
+                    bottomL=tiles[x][y-1].colonies.get(2);
+                    tiles[x][y].colonies.add(0,topL);
+                    tiles[x][y].colonies.add(1,new Colony());
+                    tiles[x][y].colonies.add(2,new Colony());
+                    tiles[x][y].colonies.add(3,bottomL);
                 }
                 else if(y==0){
                     top=tiles[x-1][y].roads.get(2);
                     tiles[x][y].roads.add(0,top);
                     for(int i=1; i<4; i++){
-                        tiles[x][y].roads.add(i,new Road());
+                        tiles[x][y].roads.add(i,new Road(tiles,x,y));
                     }
 
-                    topL=tiles[x-1][y].vertices.get(3);
-                    topR=tiles[x-1][y].vertices.get(2);
-                    tiles[x][y].vertices.add(0,topL);
-                    tiles[x][y].vertices.add(1,topR);
-                    tiles[x][y].vertices.add(2,new Vertex());
-                    tiles[x][y].vertices.add(3,new Vertex());
+                    topL=tiles[x-1][y].colonies.get(3);
+                    topR=tiles[x-1][y].colonies.get(2);
+                    tiles[x][y].colonies.add(0,topL);
+                    tiles[x][y].colonies.add(1,topR);
+                    tiles[x][y].colonies.add(2,new Colony());
+                    tiles[x][y].colonies.add(3,new Colony());
                 }
                 else{
                     left=tiles[x][y-1].roads.get(1);
                     top=tiles[x-1][y].roads.get(2);
                     tiles[x][y].roads.add(0,top);
                     for(int i=1; i<3; i++){
-                        tiles[x][y].roads.add(i,new Road());
+                        tiles[x][y].roads.add(i,new Road(tiles,x,y));
                     }
                     tiles[x][y].roads.add(3,left);
 
-                    topL=tiles[x-1][y].vertices.get(3);
-                    topR=tiles[x-1][y].vertices.get(2);
-                    bottomL=tiles[x][y-1].vertices.get(2);
-                    tiles[x][y].vertices.add(0,topL);
-                    tiles[x][y].vertices.add(1,topR);
-                    tiles[x][y].vertices.add(2,new Vertex());
-                    tiles[x][y].vertices.add(3,bottomL);
+                    topL=tiles[x-1][y].colonies.get(3);
+                    topR=tiles[x-1][y].colonies.get(2);
+                    bottomL=tiles[x][y-1].colonies.get(2);
+                    tiles[x][y].colonies.add(0,topL);
+                    tiles[x][y].colonies.add(1,topR);
+                    tiles[x][y].colonies.add(2,new Colony());
+                    tiles[x][y].colonies.add(3,bottomL);
                 }
             }
         }
