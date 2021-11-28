@@ -1,5 +1,8 @@
 package board;
 
+import game.Player;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -13,6 +16,29 @@ public class Board{
         this.tiles=new Tile[size][size];
         fillTiles();
         createTileRoadAndColony();
+        this.preciseAttributs();
+    }
+    public void preciseAttributs(){ // TODO: 26/11/2021 changer nom
+        for(int i=0;i<tiles.length;i++){
+            for(int j=0;j<tiles[i].length;j++){
+                for(Road r: tiles[i][j].roads) {
+                    r.preciseAttributs(this.tiles,i,j);
+                }
+            }
+        }
+    }
+    public void afficher() { // TODO: 28/11/2021 Fonction de test, a supprimer avant le rendu 
+        for(Tile[] t:tiles){
+            System.out.println();
+            for(Tile t1: t){
+                System.out.print(t1.id + "  ");
+            }
+        }
+        System.out.println();
+    }
+
+    public Tile[][] getTiles() { // todo supprimer quand plus utile, sert juste a tester les fonctions
+        return tiles;
     }
 
     // fonction qui crée chaque case et remplit le tableau tiles
@@ -124,4 +150,5 @@ public class Board{
             }
         }
     }
+
 }
