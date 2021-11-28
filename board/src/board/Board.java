@@ -1,8 +1,5 @@
 package board;
 
-import game.Player;
-
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -16,8 +13,10 @@ public class Board{
         this.tiles=new Tile[size][size];
         fillTiles();
         createTileRoadAndColony();
-        this.preciseAttributs();
+        preciseAttributs();
+        addAdjacentRoadAndColony();
     }
+
     public void preciseAttributs(){ // TODO: 26/11/2021 changer nom
         for(int i=0;i<tiles.length;i++){
             for(int j=0;j<tiles[i].length;j++){
@@ -27,6 +26,17 @@ public class Board{
             }
         }
     }
+
+    public void addAdjacentRoadAndColony(){
+        for(int i=0;i<tiles.length;i++){
+            for(int j=0;j<tiles[i].length;j++){
+                for(Colony c: tiles[i][j].colonies) {
+                    c.addAdjacentColonyAndRoad(this.tiles,i,j);
+                }
+            }
+        }
+    }
+
     public void afficher() { // TODO: 28/11/2021 Fonction de test, a supprimer avant le rendu 
         for(Tile[] t:tiles){
             System.out.println();
@@ -88,7 +98,7 @@ public class Board{
     }
 
     // fonction qui créé les routes et les sommets pour chaque case, en partageant le même objet pour les cases adjaceantes
-    private void createTileRoadAndColony(){ //todo changer l'objet vertex en colony
+    private void createTileRoadAndColony(){
         Road left;
         Road top;
         Colony topL;
@@ -98,13 +108,13 @@ public class Board{
             for(int y=0; y<tiles[0].length; y++){
                 if(x==0 && y==0){
                     for(int i=0; i<4; i++){
-                        tiles[x][y].roads.add(i,new Road(tiles,x,y));
+                        tiles[x][y].roads.add(i,new Road());
                         tiles[x][y].colonies.add(i,new Colony());
                     }
                 }
                 else if(x==0){
                     for(int i=0; i<3; i++){
-                        tiles[x][y].roads.add(i,new Road(tiles,x,y));
+                        tiles[x][y].roads.add(i,new Road());
                     }
                     left=tiles[x][y-1].roads.get(1);
                     tiles[x][y].roads.add(3,left);
@@ -120,7 +130,7 @@ public class Board{
                     top=tiles[x-1][y].roads.get(2);
                     tiles[x][y].roads.add(0,top);
                     for(int i=1; i<4; i++){
-                        tiles[x][y].roads.add(i,new Road(tiles,x,y));
+                        tiles[x][y].roads.add(i,new Road());
                     }
 
                     topL=tiles[x-1][y].colonies.get(3);
@@ -135,7 +145,7 @@ public class Board{
                     top=tiles[x-1][y].roads.get(2);
                     tiles[x][y].roads.add(0,top);
                     for(int i=1; i<3; i++){
-                        tiles[x][y].roads.add(i,new Road(tiles,x,y));
+                        tiles[x][y].roads.add(i,new Road());
                     }
                     tiles[x][y].roads.add(3,left);
 

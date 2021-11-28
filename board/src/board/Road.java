@@ -6,7 +6,8 @@ import java.util.ArrayList;
 public class Road {
     protected Player player;
     protected ArrayList<Tile> roadArrayList=new ArrayList<>();
-    public Road(Tile[][] t,int x, int y) {
+
+    public Road() {
         this.player=null;
     }
 
