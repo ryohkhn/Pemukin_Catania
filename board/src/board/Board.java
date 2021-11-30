@@ -5,13 +5,10 @@ import java.util.Random;
 
 public class Board{
     private Tile[][] tiles;
-    private HashMap<Integer,Integer> tilesId; //todo mettre dans la fonction et pas en attribut de classe
 
     public Board(int size){
-        this.tilesId=new HashMap<>();
-        fillMapId();
         this.tiles=new Tile[size][size];
-        fillTiles();
+        fillTilesIdAndRessources();
         createTileRoadAndColony();
         preciseAttributs();
         addAdjacentRoadAndColony();
@@ -27,6 +24,7 @@ public class Board{
         }
     }
 
+    // applique la fonction addAdjacentColonyAndRoad à chaque colony se trouvant dans les cases
     public void addAdjacentRoadAndColony(){
         for(int i=0;i<tiles.length;i++){
             for(int j=0;j<tiles[i].length;j++){
@@ -51,26 +49,70 @@ public class Board{
         return tiles;
     }
 
-    // fonction qui crée chaque case et remplit le tableau tiles
-    private void fillTiles(){
+    // fonction qui crée chaque case et remplit le tableau tiles avec son identifiant respectif ainsi que la ressource attribuée
+    private void fillTilesIdAndRessources(){
+        HashMap<Integer,Integer> tilesId=new HashMap<>();
+        HashMap<String,Integer> tilesRessource=new HashMap<>();
         Random random=new Random();
         int randomId;
+        int randomRessource;
+        String ressource="";
+        tilesRessource.put("Clay",0);
+        tilesRessource.put("Ore",0);
+        tilesRessource.put("Wheat",0);
+        tilesRessource.put("Wood",0);
+        tilesRessource.put("Wool",0);
+        for(int i=2; i<=12; i++){
+            tilesId.put(i,0);
+        }
+        // on traite le cas du désert à part, il ne peut se trouver que dans les 4 cases au centre du plateau
+        // on l'attribue donc avant d'attribuer le reste des cases
+        randomId=random.nextInt(4);
+        switch(randomId){
+            case 0 -> tiles[1][1]=new Tile(7,"");
+            case 1 -> tiles[1][2]=new Tile(7,"");
+            case 2 -> tiles[2][1]=new Tile(7,"");
+            case 3 -> tiles[2][2]=new Tile(7,"");
+        }
         for(int i=0; i<tiles.length; i++){
             for(int j=0; j<tiles.length; j++){
-                do{
-                    randomId=random.nextInt(11)+2;
+                if(tiles[i][j]==null){
+                    do{
+                        randomId=random.nextInt(11)+2;
+                    }
+                    while(!generateTileId(randomId,tilesId));
+                    do{
+                        randomRessource=random.nextInt(5);
+                        switch(randomRessource){
+                            case 0 -> ressource="Clay";
+                            case 1 -> ressource="Ore";
+                            case 2 -> ressource="Wheat";
+                            case 3 -> ressource="Wood";
+                            case 4 -> ressource="Wool";
+                        }
+                    }
+                    while(!generateTileRessource(ressource,tilesRessource));
+                    tiles[i][j]=new Tile(randomId,ressource);
                 }
-                while(!generateTileId(randomId));
-                tiles[i][j]=new Tile(randomId);
             }
         }
     }
 
+    // fonction qui vérifie dans le hashmap de string-entier la ressource en argument si on a atteint la limite pour cette ressource (nombre d'apparitions sur le plateau)
+    // si oui on return false, sinon on incrémente la valeur et on return true
+    private boolean generateTileRessource(String ressource,HashMap<String,Integer> tilesRessource){
+        if(tilesRessource.get(ressource)==3){
+            return false;
+        }
+        tilesRessource.merge(ressource,1,Integer::sum);
+        return true;
+    }
+
     // fonction qui vérifie dans le hashmap d'entier les valeurs des cases et si on a atteint la limite pour cette valeur (nombre d'apparitions sur le plateau)
     // si oui on return false, sinon on incrémente la valeur et on return true
-    private boolean generateTileId(int key){
+    private boolean generateTileId(int key,HashMap<Integer,Integer> tilesId){
         switch(key){
-            case 2,3,4,7,11,12 ->{
+            case 2,3,4,11,12 ->{
                 if(tilesId.get(key)==1){
                     return false;
                 }
@@ -87,13 +129,6 @@ public class Board{
             default ->{
                 return false;
             }
-        }
-    }
-
-    // fonction qui remplit la hashmap avec les valeurs de 0 à 12 correspondant aux cases, et initialise leur compteur à 0
-    private void fillMapId(){
-        for(int i=2; i<=12; i++){
-            tilesId.put(i,0);
         }
     }
 

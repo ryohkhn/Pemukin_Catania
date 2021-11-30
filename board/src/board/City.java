@@ -1,4 +1,5 @@
 package board;
 
-public class City{
+public class City extends Colony{
+
 }

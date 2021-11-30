@@ -5,12 +5,14 @@ import game.Player;
 import java.util.LinkedList;
 public class Tile{
     protected final int id;
-    boolean thief=false;
+    protected boolean thief=false;
+    protected String ressource;
     protected LinkedList<Colony> colonies;
     protected LinkedList<Road> roads;
 
-    public Tile(int id){
+    public Tile(int id,String ressource){
         this.id=id;
+        this.ressource=ressource;
         this.roads=new LinkedList<>();
         this.colonies=new LinkedList<>();
         if(id==7){
@@ -19,7 +21,7 @@ public class Tile{
     }
 
     @Override
-    public String toString() {
+    public String toString() { // TODO supprimer quand plus nécessaire
         return "Tile{"+
                 "id="+id+
                 '}';
