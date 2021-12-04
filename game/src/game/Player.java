@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public abstract class Player{
     protected String color;
-    protected HashMap<String,Integer> ressources;res
+    protected HashMap<String,Integer> ressources;
     protected int victoryPoint=0;
 
     protected void fillRessourcesMap(){
