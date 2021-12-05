@@ -1,6 +1,7 @@
 package board;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Random;
 
 public class Board{
@@ -53,16 +54,11 @@ public class Board{
     // fonction qui crée chaque case et remplit le tableau tiles avec son identifiant respectif ainsi que la ressource attribuée
     private void fillTilesIdAndRessources(){
         HashMap<Integer,Integer> tilesId=new HashMap<>();
-        HashMap<String,Integer> tilesRessource=new HashMap<>();
+        HashMap<String,Integer> tilesRessource=generateHashMapRessource();
         Random random=new Random();
         int randomId;
         int randomRessource;
         String ressource="";
-        tilesRessource.put("Clay",0);
-        tilesRessource.put("Ore",0);
-        tilesRessource.put("Wheat",0);
-        tilesRessource.put("Wood",0);
-        tilesRessource.put("Wool",0);
         for(int i=2; i<=12; i++){
             tilesId.put(i,0);
         }
@@ -82,31 +78,22 @@ public class Board{
                         randomId=random.nextInt(11)+2;
                     }
                     while(!generateTileId(randomId,tilesId));
-                    do{
-                        randomRessource=random.nextInt(5);
-                        switch(randomRessource){
-                            case 0 -> ressource="Clay";
-                            case 1 -> ressource="Ore";
-                            case 2 -> ressource="Wheat";
-                            case 3 -> ressource="Wood";
-                            case 4 -> ressource="Wool";
-                        }
-                    }
-                    while(!generateTileRessource(ressource,tilesRessource));
+                    ressource=generateRessource(tilesRessource,3);
                     tiles[i][j]=new Tile(randomId,ressource);
                 }
             }
         }
     }
 
-    // fonction qui vérifie dans le hashmap de string-entier la ressource en argument si on a atteint la limite pour cette ressource (nombre d'apparitions sur le plateau)
-    // si oui on return false, sinon on incrémente la valeur et on return true
-    private boolean generateTileRessource(String ressource,HashMap<String,Integer> tilesRessource){
-        if(tilesRessource.get(ressource)==3){
-            return false;
+    // fonction qui cherche une ressource qui n'est pas à som maximum dans la hashmap et l'incrémente si ce n'est pas le cas(nombre d'apparitions sur le plateau)
+    private String generateRessource(HashMap<String,Integer> hashMapRessource,int max){
+        String ressource;
+        do{
+            ressource=generateRandomRessource();
         }
-        tilesRessource.merge(ressource,1,Integer::sum);
-        return true;
+        while(hashMapRessource.get(ressource)==max);
+        hashMapRessource.merge(ressource,1,Integer::sum);
+        return ressource;
     }
 
     // fonction qui vérifie dans le hashmap d'entier les valeurs des cases et si on a atteint la limite pour cette valeur (nombre d'apparitions sur le plateau)
@@ -197,39 +184,90 @@ public class Board{
         }
     }
 
-    public void addPorts(){
+    // fonction permettant de générer aléatoirement ports présents sur le plateau, et attribue aux colonies une référence à ce port
+    private void addPorts(){
+        Random random=new Random();
         Port tmp;
+        String ressource;
+        LinkedList<Integer> portNumber=new LinkedList<>();
+        LinkedList<Integer> specializedPortsNumber=new LinkedList<>();
+        HashMap<String,Integer> portRessource=generateHashMapRessource();
+        int compt=1;
+        int randomPortNumber;
+        // boucles qui génèrent quels ports seront des ports spécialisés parmi les 8 ports du plateau
+        for(int i=1; i<9; i++){
+            portNumber.push(i);
+        }
+        for(int i=0; i<5; i++){
+            do{
+                randomPortNumber=random.nextInt(8);
+            }
+            while(portNumber.get(randomPortNumber)==0);
+            specializedPortsNumber.push(portNumber.get(randomPortNumber));
+            portNumber.set(randomPortNumber,0);
+        }
         for(int x=0; x<tiles[0].length; x++){
             for(int y=0; y<tiles[0].length; y++){
-                if(x==0 && y%2==1){
-                    tiles[x][y].setAsPort();
-                    tmp=new Port();
-                    tiles[x][y].port=tmp;
-                    tiles[x][y].colonies.get(0).setLinkedPort(tmp);
-                    tiles[x][y].colonies.get(1).setLinkedPort(tmp);
-                }
-                else if(y==0 && x%2==0){
-                    tiles[x][y].setAsPort();
-                    tmp=new Port();
-                    tiles[x][y].port=tmp;
-                    tiles[x][y].colonies.get(0).setLinkedPort(tmp);
-                    tiles[x][y].colonies.get(3).setLinkedPort(tmp);
-                }
-                else if(x==tiles.length-1 && y%2==0){
-                    tiles[x][y].setAsPort();
-                    tmp=new Port();
-                    tiles[x][y].port=tmp;
-                    tiles[x][y].colonies.get(2).setLinkedPort(tmp);
-                    tiles[x][y].colonies.get(3).setLinkedPort(tmp);
-                }
-                else if(y==tiles.length-1 && x%2==1){
-                    tiles[x][y].setAsPort();
-                    tmp=new Port();
-                    tiles[x][y].port=tmp;
-                    tiles[x][y].colonies.get(1).setLinkedPort(tmp);
-                    tiles[x][y].colonies.get(2).setLinkedPort(tmp);
+                if(x==0 && y%2==1 || y==0 && x%2==0 || x==tiles.length-1 && y%2==0 || y==tiles.length-1 && x%2==1){
+                    if(specializedPortsNumber.contains(compt)){
+                        tmp=new Port(generateRessource(portRessource,1));
+                    }
+                    else{
+                        tmp=new Port();
+                    }
+                    if(x==0 && y%2==1){
+                        tiles[x][y].setAsPort();
+                        tiles[x][y].port=tmp;
+                        tiles[x][y].colonies.get(0).setLinkedPort(tmp);
+                        tiles[x][y].colonies.get(1).setLinkedPort(tmp);
+                    }
+                    else if(y==0 && x%2==0){
+                        tiles[x][y].setAsPort();
+                        tiles[x][y].port=tmp;
+                        tiles[x][y].colonies.get(0).setLinkedPort(tmp);
+                        tiles[x][y].colonies.get(3).setLinkedPort(tmp);
+                    }
+                    else if(x==tiles.length-1 && y%2==0){
+                        tiles[x][y].setAsPort();
+                        tiles[x][y].port=tmp;
+                        tiles[x][y].colonies.get(2).setLinkedPort(tmp);
+                        tiles[x][y].colonies.get(3).setLinkedPort(tmp);
+                    }
+                    else if(y==tiles.length-1 && x%2==1){
+                        tiles[x][y].setAsPort();
+                        tiles[x][y].port=tmp;
+                        tiles[x][y].colonies.get(1).setLinkedPort(tmp);
+                        tiles[x][y].colonies.get(2).setLinkedPort(tmp);
+                    }
+                    compt++;
                 }
             }
         }
+    }
+
+    // fonction permettant de générer un hashmap de <String,Integer> pré-rempli avec toutes les ressources présentes dans le jeu et initialisées à 0
+    public static HashMap<String,Integer> generateHashMapRessource(){
+        HashMap<String,Integer> res=new HashMap<>();
+        res.put("Clay",0);
+        res.put("Ore",0);
+        res.put("Wheat",0);
+        res.put("Wood",0);
+        res.put("Wool",0);
+        return res;
+    }
+
+    // fonction qui génère une ressource aléatoire et renvoi son String
+    private String generateRandomRessource(){
+        Random random=new Random();
+        String res="";
+        int randomNumber=random.nextInt(5);
+        switch(randomNumber){
+            case 0 -> res="Clay";
+            case 1 -> res="Ore";
+            case 2 -> res="Wheat";
+            case 3 -> res="Wood";
+            case 4 -> res="Wool";
+        }
+        return res;
     }
 }
