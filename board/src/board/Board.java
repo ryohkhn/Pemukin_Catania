@@ -12,6 +12,7 @@ public class Board{
         createTileRoadAndColony();
         preciseAttributs();
         addAdjacentRoadAndColony();
+        addPorts();
     }
 
     public void preciseAttributs(){ // TODO: 26/11/2021 changer nom
@@ -196,4 +197,39 @@ public class Board{
         }
     }
 
+    public void addPorts(){
+        Port tmp;
+        for(int x=0; x<tiles[0].length; x++){
+            for(int y=0; y<tiles[0].length; y++){
+                if(x==0 && y%2==1){
+                    tiles[x][y].setAsPort();
+                    tmp=new Port();
+                    tiles[x][y].port=tmp;
+                    tiles[x][y].colonies.get(0).setLinkedPort(tmp);
+                    tiles[x][y].colonies.get(1).setLinkedPort(tmp);
+                }
+                else if(y==0 && x%2==0){
+                    tiles[x][y].setAsPort();
+                    tmp=new Port();
+                    tiles[x][y].port=tmp;
+                    tiles[x][y].colonies.get(0).setLinkedPort(tmp);
+                    tiles[x][y].colonies.get(3).setLinkedPort(tmp);
+                }
+                else if(x==tiles.length-1 && y%2==0){
+                    tiles[x][y].setAsPort();
+                    tmp=new Port();
+                    tiles[x][y].port=tmp;
+                    tiles[x][y].colonies.get(2).setLinkedPort(tmp);
+                    tiles[x][y].colonies.get(3).setLinkedPort(tmp);
+                }
+                else if(y==tiles.length-1 && x%2==1){
+                    tiles[x][y].setAsPort();
+                    tmp=new Port();
+                    tiles[x][y].port=tmp;
+                    tiles[x][y].colonies.get(1).setLinkedPort(tmp);
+                    tiles[x][y].colonies.get(2).setLinkedPort(tmp);
+                }
+            }
+        }
+    }
 }

@@ -6,11 +6,13 @@ import java.util.HashSet;
 
 public class Colony{
     protected Player player;
+    protected Port linkedPort;
     protected HashSet<Colony> adjacentColonies=new HashSet<>();
     protected HashSet<Road> adjacentRoads=new HashSet<>();
 
     public Colony(){
         this.player=null;
+        this.linkedPort=null;
     }
 
     // fonction permettant d'ajouter à chaque colonie ses colonies adjacentes et les routes adjacentes à la colonie
@@ -42,5 +44,9 @@ public class Colony{
                 adjacentRoads.add(t[x][y].roads.get(3));
             }
         }
+    }
+
+    public void setLinkedPort(Port linkedPort){
+        this.linkedPort=linkedPort;
     }
 }

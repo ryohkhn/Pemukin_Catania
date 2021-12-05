@@ -9,6 +9,8 @@ public class Tile{
     protected String ressource;
     protected LinkedList<Colony> colonies;
     protected LinkedList<Road> roads;
+    protected boolean isPort=false; // pas sur de l'utilité, à voir si on l'efface dans le futur
+    protected Port port=null;
 
     public Tile(int id,String ressource){
         this.id=id;
@@ -18,6 +20,10 @@ public class Tile{
         if(id==7){
             thief=true;
         }
+    }
+
+    public void setAsPort(){
+        isPort=true;
     }
 
     @Override
