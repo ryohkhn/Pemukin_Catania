@@ -11,25 +11,19 @@ public class Board{
         this.tiles=new Tile[size][size];
         fillTilesIdAndRessources();
         createTileRoadAndColony();
-        preciseAttributs();
         addAdjacentRoadAndColony();
         addPorts();
     }
-
-    public void preciseAttributs(){ // TODO: 26/11/2021 changer nom
-        for(int i=0;i<tiles.length;i++){
-            for(int j=0;j<tiles[i].length;j++){
-                for(Road r: tiles[i][j].roads) {
-                    r.preciseAttributs(this.tiles,i,j);
-                }
-            }
-        }
-    }
-
-    // applique la fonction addAdjacentColonyAndRoad à chaque colony se trouvant dans les cases
+    // ajoute les Road et Colony adjacentes pour les Colony et les Road de toutes les cases du plateau
     public void addAdjacentRoadAndColony(){
         for(int i=0;i<tiles.length;i++){
             for(int j=0;j<tiles[i].length;j++){
+                // ajoute les Road et Colony adjacentes pour les objets Road
+                for(Road r: tiles[i][j].roads) {
+                    r.addAdjacentRoads(this.tiles,i,j);
+                    r.addAdjacentColonies(this.tiles,i,j);
+                }
+                // ajoute les Road et Colony adjacentes pour les objets Colony
                 for(Colony c: tiles[i][j].colonies) {
                     c.addAdjacentColonyAndRoad(this.tiles,i,j);
                 }

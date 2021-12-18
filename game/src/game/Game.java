@@ -23,7 +23,7 @@ public class Game{
                 j++;
                 x=0;
                 for(Road r : t1.getRoads()) {
-                    System.out.print("               Route "+x+" :");
+                    System.out.print("            "+r.checked+"   Route "+x+" :");
                     System.out.println(r);
                     x++;
                 }

@@ -9,10 +9,19 @@ public class Colony{
     protected Port linkedPort;
     protected HashSet<Colony> adjacentColonies=new HashSet<>();
     protected HashSet<Road> adjacentRoads=new HashSet<>();
+    protected boolean city=false;
 
     public Colony(){
         this.player=null;
         this.linkedPort=null;
+    }
+
+    public boolean isCity(){
+        return this.city;
+    }
+
+    public void setAsCity(){
+        this.city=true;
     }
 
     // fonction permettant d'ajouter à chaque colonie ses colonies adjacentes et les routes adjacentes à la colonie

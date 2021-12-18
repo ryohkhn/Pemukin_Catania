@@ -36,6 +36,7 @@ public class Tile{
     public LinkedList<Road> getRoads() { //todo supprimer quand plus tile : sert a tester les fonctions
         return roads;
     }
+    public LinkedList<Colony> getColonies(){ return colonies; }
 
     // TODO: 27/11/2021 Fonction qui return true, si il y a une ville/colonie (appartenant au joueur) adjacente a la route que l'ont veut construire
     public boolean isMyCityAround(Player player){
