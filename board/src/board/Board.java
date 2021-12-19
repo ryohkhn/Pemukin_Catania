@@ -5,10 +5,10 @@ import java.util.LinkedList;
 import java.util.Random;
 
 public class Board{
-    private Tile[][] tiles;
+    protected Tile[][] tiles;
 
-    public Board(int size){
-        this.tiles=new Tile[size][size];
+    public Board(){
+        this.tiles=new Tile[4][4];
         fillTilesIdAndRessources();
         createTileRoadAndColony();
         addAdjacentRoadAndColony();

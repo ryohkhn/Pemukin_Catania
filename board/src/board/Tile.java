@@ -26,6 +26,14 @@ public class Tile{
         isPort=true;
     }
 
+    public int getId(){
+        return id;
+    }
+
+    public String getRessource(){
+        return ressource;
+    }
+
     @Override
     public String toString() { // TODO supprimer quand plus nécessaire
         return "Tile{"+

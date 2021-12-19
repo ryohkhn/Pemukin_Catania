@@ -1,7 +1,7 @@
 package board;
+
 import game.Player;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 public class Road {
@@ -46,10 +46,18 @@ public class Road {
         }
     }
 
+    public boolean isOwned(){
+        return (player!=null);
+    }
+
+    public void setPlayer(Player player){
+        this.player=player;
+    }
+
     /*
-        Fonction qui remplit l'ArrayList de road correspondant a ses voisins,
-        de manière à pouvoir vérifier s'il y a bien une route voisine appartenant au joueur lors de la création d'une route.
-    */
+            Fonction qui remplit l'ArrayList de road correspondant a ses voisins,
+            de manière à pouvoir vérifier s'il y a bien une route voisine appartenant au joueur lors de la création d'une route.
+        */
     public void addAdjacentRoads(Tile[][] t,int x, int y) {
         this.checked=true;
         if(x==0) { //ligne du haut
@@ -229,6 +237,12 @@ public class Road {
     }
     // TODO: 27/11/2021 Fonction qui return true, si il y a une route (appartenant au joueur) adjacente a la route que l'ont veut construire
     public boolean isBuildable(Player player){
+        for(Road road:adjacentRoads){
+            if(road.player==player) return true;
+        }
+        for(Colony colony:adjacentColonies){
+            if(colony.player==player) return true;
+        }
         return false;
     }
 }

@@ -14,6 +14,7 @@ public abstract class Player{
     protected HashSet<Port> ports;
     protected int victoryPoint=0;
 
+    // constructeur qui initialise
     public Player(){
         propertiesCounter.put("City",0);
         propertiesCounter.put("Colony",0);
@@ -21,5 +22,28 @@ public abstract class Player{
         for(Card card : Card.values()){
             cards.put(card,0);
         }
+    }
+
+    // fonction qui incrémente les points de victoire d'un joueur en fonction de l'entier en argument
+    public void addVictoryPoint(int point){
+        this.victoryPoint+=point;
+    }
+
+    // fonction qui incrémente le compteur de construction de joueur en fonction du type de construction en argument
+    public void addPropertie(String propertie){
+        this.propertiesCounter.merge(propertie,1,Integer::sum);
+    }
+
+    // fonction qui diminue le compteur de colonie du joueur
+    public void removeColonyInCounter(){
+        this.propertiesCounter.merge("Colony",1,(a,b)->a-b);
+    }
+
+    // fonction qui vérifie si le joueur n'a pas dépassé la quantité maximum possible
+    public boolean canBuildPropertie(String propertie,int maxQuantity){
+        if(propertiesCounter.get(propertie)<maxQuantity){
+            return true;
+        }
+        return false;
     }
 }
