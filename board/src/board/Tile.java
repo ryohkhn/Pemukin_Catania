@@ -34,6 +34,10 @@ public class Tile{
         return ressource;
     }
 
+    public void setThief(boolean thief){
+        this.thief=thief;
+    }
+
     @Override
     public String toString() { // TODO supprimer quand plus nécessaire
         return "Tile{"+

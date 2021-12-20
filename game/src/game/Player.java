@@ -46,4 +46,16 @@ public abstract class Player{
         }
         return false;
     }
+
+    public void addPort(Port port){
+        this.ports.add(port);
+    }
+
+    public int ressourceCount(){
+        int compt=0;
+        for(int value:ressources.values()){
+            compt+=value;
+        }
+        return compt;
+    }
 }

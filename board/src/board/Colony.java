@@ -42,6 +42,14 @@ public class Colony{
         this.player=player;
     }
 
+    public boolean isPort(){
+        return this.linkedPort!=null;
+    }
+
+    public Port getLinkedPort(){
+        return this.linkedPort;
+    }
+
     // fonction permettant d'ajouter à chaque colonie ses colonies adjacentes et les routes adjacentes à la colonie
     public void addAdjacentColonyAndRoad(Tile[][] t,int x,int y){
         if(t[x][y].colonies.get(0)==this || t[x][y].colonies.get(2)==this){

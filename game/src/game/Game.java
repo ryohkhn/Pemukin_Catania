@@ -6,6 +6,8 @@ import board.Road;
 import board.Tile;
 import vue.Vues;
 
+import java.util.ArrayList;
+
 public class Game{
     private Player[] players;
     private Board board;
@@ -47,7 +49,8 @@ public class Game{
         return false;
     }
 
-    // fonction construisant une colonie pour un joueur aux coordonnées en argument
+    // fonction construisant une colonie pour un joueur aux coordonnées en argument.
+    // si la colonie est un port il est ajouté au hashmap du joueur
     public boolean buildColony(int line,int column,int colonyNumber,Player player){
         Colony choosedColony=board.getTiles()[line][column].getColonies().get(colonyNumber);
         if(choosedColony.isOwned()){
@@ -60,6 +63,9 @@ public class Game{
         if(clayStock>=1 && wheatStock>=1 && woodStock>=1 && woolStock>=1){
             if(player.canBuildPropertie("Colony",5)){
                 if(choosedColony.isBuildable(player)){
+                    if(choosedColony.isPort()){
+                        player.addPort(choosedColony.getLinkedPort());
+                    }
                     choosedColony.setPlayer(player);
                     player.ressources.replace("Clay",clayStock-1);
                     player.ressources.replace("Wheat",wheatStock-1);
@@ -128,6 +134,45 @@ public class Game{
                     }
                 }
             }
+        }
+    }
+
+    public void sevenAtDice(Player playerTurn){ // TODO: 20/12/2021 compléter avec les appels de fonction de Vue pour terminer la fonction
+        for(Player player:this.players){
+            if((player.ressourceCount())>7){
+                // appel de fonction de vue qui demande quelle ressource il doit défosser (quantité de ressource/2)
+            }
+        }
+
+        // appel fonction de vue pour récupérer la case ou placer le voleur
+        board.getThiefTile().setThief(false);
+        // setThief la nouvelle Tile
+        board.setThiefTile(null);
+        // mettre la nouvelle tile en thief=true
+
+
+        ArrayList<Colony> ownedColonies=new ArrayList<>();
+        for(Colony colony:board.getThiefTile().getColonies()){
+            if(colony.getPlayer()!=null){
+                ownedColonies.add(colony);
+            }
+        }
+
+        String ressource;
+        Player playerOfColony;
+        if(ownedColonies.size()==1){
+            playerOfColony=ownedColonies.get(0).getPlayer();
+            if(playerOfColony.ressourceCount()>0){
+                do{
+                    ressource=Board.generateRandomRessource();
+                }
+                while(playerOfColony.ressources.get(ressource)==0);
+                int ressourceStock=playerOfColony.ressources.get(ressource);
+                playerOfColony.ressources.replace(ressource,ressourceStock-1);
+                playerTurn.ressources.merge(ressource,1,Integer::sum);
+            }
+        }else if(ownedColonies.size()>=1){
+            // appel fonction de vue pour demander à quelle colonie le joueur veut-il voler une carte
         }
     }
 

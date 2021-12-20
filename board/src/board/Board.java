@@ -6,6 +6,7 @@ import java.util.Random;
 
 public class Board{
     protected Tile[][] tiles;
+    protected Tile thiefTile;
 
     public Board(){
         this.tiles=new Tile[4][4];
@@ -14,6 +15,15 @@ public class Board{
         addAdjacentRoadAndColony();
         addPorts();
     }
+
+    public Tile getThiefTile(){
+        return thiefTile;
+    }
+
+    public void setThiefTile(Tile thiefTile){
+        this.thiefTile=thiefTile;
+    }
+
     // ajoute les Road et Colony adjacentes pour les Colony et les Road de toutes les cases du plateau
     public void addAdjacentRoadAndColony(){
         for(int i=0;i<tiles.length;i++){
@@ -59,11 +69,13 @@ public class Board{
         // on traite le cas du désert à part, il ne peut se trouver que dans les 4 cases au centre du plateau
         // on l'attribue donc avant d'attribuer le reste des cases
         randomId=random.nextInt(4);
+        Tile desert=new Tile(7,"");
+        thiefTile=desert;
         switch(randomId){
-            case 0 -> tiles[1][1]=new Tile(7,"");
-            case 1 -> tiles[1][2]=new Tile(7,"");
-            case 2 -> tiles[2][1]=new Tile(7,"");
-            case 3 -> tiles[2][2]=new Tile(7,"");
+            case 0 -> tiles[1][1]=desert;
+            case 1 -> tiles[1][2]=desert;
+            case 2 -> tiles[2][1]=desert;
+            case 3 -> tiles[2][2]=desert;
         }
         for(int i=0; i<tiles.length; i++){
             for(int j=0; j<tiles.length; j++){
@@ -251,7 +263,7 @@ public class Board{
     }
 
     // fonction qui génère une ressource aléatoire et renvoi son String
-    private String generateRandomRessource(){
+    public static String generateRandomRessource(){
         Random random=new Random();
         String res="";
         int randomNumber=random.nextInt(5);
