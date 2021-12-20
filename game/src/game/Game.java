@@ -93,24 +93,20 @@ public class Game{
     public boolean buildCity(int line,int column,int colonyNumber,Player player){
         Colony choosedColony=board.getTiles()[line][column].getColonies().get(colonyNumber);
         if(!choosedColony.isOwned(player)){
+            System.out.println("La colonie ne vous appartient pas, vous ne pouvez pas constuire de ville ici.");
             return false;
         }
         int oreStock=player.ressources.get("Ore");
         int wheatStock=player.ressources.get("Wheat");
         if(wheatStock>=2 && oreStock>=3){
             if(player.canBuildPropertie("City",4)){
-                if(choosedColony.isOwned(player)){
-                    choosedColony.setAsCity();
-                    player.ressources.replace("Wheat",wheatStock-2);
-                    player.ressources.replace("Ore",oreStock-3);
-                    player.addPropertie("City");
-                    player.removeColonyInCounter();
-                    player.addVictoryPoint(2);
-                    return true;
-                }
-                else{
-                    System.out.println("La colonie ne vous appartient pas, vous ne pouvez pas constuire de ville ici.");
-                }
+                choosedColony.setAsCity();
+                player.ressources.replace("Wheat",wheatStock-2);
+                player.ressources.replace("Ore",oreStock-3);
+                player.addPropertie("City");
+                player.removeColonyInCounter();
+                player.addVictoryPoint(2);
+                return true;
             }
             else{
                 System.out.println("Vous ne pouvez pas constuire de ville, vous avez atteint la quantité maximum possible.");
@@ -143,13 +139,15 @@ public class Game{
                 // appel de fonction de vue qui demande quelle ressource il doit défosser (quantité de ressource/2)
             }
         }
+        setThiefAndSteal(playerTurn);
+    }
 
+    public void setThiefAndSteal(Player player){
         // appel fonction de vue pour récupérer la case ou placer le voleur
         board.getThiefTile().setThief(false);
         // setThief la nouvelle Tile
         board.setThiefTile(null);
         // mettre la nouvelle tile en thief=true
-
 
         ArrayList<Colony> ownedColonies=new ArrayList<>();
         for(Colony colony:board.getThiefTile().getColonies()){
@@ -169,11 +167,27 @@ public class Game{
                 while(playerOfColony.ressources.get(ressource)==0);
                 int ressourceStock=playerOfColony.ressources.get(ressource);
                 playerOfColony.ressources.replace(ressource,ressourceStock-1);
-                playerTurn.ressources.merge(ressource,1,Integer::sum);
+                player.ressources.merge(ressource,1,Integer::sum);
             }
         }else if(ownedColonies.size()>=1){
             // appel fonction de vue pour demander à quelle colonie le joueur veut-il voler une carte
         }
+    }
+
+    public void buyCard(Player player){
+        int oreStock=player.ressources.get("Ore");
+        int woolStock=player.ressources.get("Wool");
+        int wheatStock=player.ressources.get("Wheat");
+        if(oreStock>=1 && woolStock>=1 && wheatStock>=1){
+            player.cards.merge(Card.randomCard(),1,Integer::sum);
+        }
+        else{
+            System.out.println("Vous n'avez pas les ressources suffisantes pour acheter une carte de développement.");
+        }
+    }
+
+    public void useCard(Player player,String card){
+
     }
 
     public static void main(String[] args){
