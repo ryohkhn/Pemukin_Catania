@@ -51,11 +51,16 @@ public abstract class Player{
         this.ports.add(port);
     }
 
-    public int ressourceCount(){
+    public int ressourceCount() {
         int compt=0;
-        for(int value:ressources.values()){
+        for(int value : ressources.values()) {
             compt+=value;
         }
         return compt;
+    }
+
+    public boolean hasWin(){
+        if(this.victoryPoint>=10) return true;
+        return false;
     }
 }

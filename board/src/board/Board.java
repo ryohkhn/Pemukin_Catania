@@ -1,5 +1,7 @@
 package board;
 
+import game.Player;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
@@ -275,5 +277,9 @@ public class Board{
             case 4 -> res="Wool";
         }
         return res;
+    }
+
+    public void display(Player p) {
+
     }
 }

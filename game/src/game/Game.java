@@ -4,18 +4,32 @@ import board.Board;
 import board.Colony;
 import board.Road;
 import board.Tile;
-import vue.Vues;
+
+import java.util.Scanner;
+//import vue.Vues;
 
 import java.util.ArrayList;
 
 public class Game{
     private Player[] players;
     private Board board;
-    private Vues vueGenerale;
+    //private Vues vueGenerale;
 
-    public Game(){
+    public Game(int nb){
         board=new Board();
-        players=new Player[4];
+        players=new Player[nb];
+    }
+
+    public Board getBoard() {
+        return board;
+    }
+
+    public Player[] getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(int index,Player p) {
+        this.players[index]=p;
     }
 
     // fonction construisant une route pour un joueur aux coordonnées en argument
@@ -136,7 +150,7 @@ public class Game{
     public void sevenAtDice(Player playerTurn){ // TODO: 20/12/2021 compléter avec les appels de fonction de Vue pour terminer la fonction
         for(Player player:this.players){
             if((player.ressourceCount())>7){
-                // appel de fonction de vue qui demande quelle ressource il doit défosser (quantité de ressource/2)
+                // appel de fonction de vue qui demande quelle ressource il doit défausser (quantité de ressource/2)
             }
         }
         setThiefAndSteal(playerTurn);
@@ -188,31 +202,5 @@ public class Game{
 
     public void useCard(Player player,String card){
 
-    }
-
-    public static void main(String[] args){
-        Game game=new Game();
-        /*Board test=new Board();
-        test.afficher();
-        int u=0;
-        int j=0;
-        int x=0;
-        for(Tile[] t : test.getTiles()) {
-            System.out.println("x="+u+" :");
-            u++;
-            j=0;
-            for(Tile t1 : t) {
-                System.out.print("        ");
-                System.out.println("y="+j+" :");
-                j++;
-                x=0;
-                for(Road r : t1.getRoads()) {
-                    System.out.print("            "+r.checked+"   Route "+x+" :");
-                    System.out.println(r);
-                    x++;
-                }
-            }
-        }
-         */
     }
 }
