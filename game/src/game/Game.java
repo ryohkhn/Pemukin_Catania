@@ -1,9 +1,6 @@
 package game;
 
-import board.Board;
-import board.Colony;
-import board.Road;
-import board.Tile;
+import board.*;
 
 import java.util.ArrayList;
 
@@ -245,6 +242,48 @@ public class Game{
                 }
             }
             turnPlayer.removeCard(choosedCard);
+        }
+    }
+
+    public void tradeWithPort(Player player){
+        if(player.ports.size()==0){
+            System.out.println("Vous ne pouvez pas faire d'échange de ressources, vous ne possédez pas de port.");
+            return;
+        }
+        Port choosedPort=null;
+        if(player.ports.size()>1){
+            // afficher tous les ports via la vue (la ressource et si c'est du 3:1 ou 2:1) et en choisir un
+            choosedPort=new Port();
+        }
+        else{
+            for(Port p:player.ports){
+                choosedPort=p;
+            }
+        }
+        String ressource1="",ressource2="",ressource3="";
+
+        if(choosedPort.getRate()==2){
+            // appel fonction de vue qui demande quelles ressources le joueur veut échanger (2 ressources)
+            if(player.ressources.get(ressource1)>0 && player.ressources.get(ressource2)>0){
+                player.ressources.merge(ressource1,1,(a,b)->a-b);
+                player.ressources.merge(ressource2,1,(a,b)->a-b);
+                player.ressources.merge(choosedPort.getRessource(), 1,Integer::sum);
+            }
+            else{
+                System.out.println("Vous n'avez pas les ressources suffisantes pour faire l'échange.");
+            }
+        }
+        else{
+            // appel fonction de vue qui demande quelles ressources le joueur veut échanger (3 ressources)
+            if(player.ressources.get(ressource1)>0 && player.ressources.get(ressource2)>0 && player.ressources.get(ressource3)>0){
+                player.ressources.merge(ressource1,1,(a,b)->a-b);
+                player.ressources.merge(ressource2,1,(a,b)->a-b);
+                player.ressources.merge(ressource3,1,(a,b)->a-b);
+                player.ressources.merge(choosedPort.getRessource(), 1,Integer::sum);
+            }
+            else{
+                System.out.println("Vous n'avez pas les ressources suffisantes pour faire l'échange.");
+            }
         }
     }
 }

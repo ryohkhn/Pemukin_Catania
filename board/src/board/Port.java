@@ -12,4 +12,12 @@ public class Port{
     public Port(){
         this.rate=3;
     }
+
+    public String getRessource(){
+        return ressource;
+    }
+
+    public int getRate(){
+        return rate;
+    }
 }
