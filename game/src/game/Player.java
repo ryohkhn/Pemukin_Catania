@@ -63,4 +63,8 @@ public abstract class Player{
         if(this.victoryPoint>=10) return true;
         return false;
     }
+
+    public void removeCard(Card card){
+        this.cards.merge(card,1,(a,b)->a-b);
+    }
 }

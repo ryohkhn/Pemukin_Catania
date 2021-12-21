@@ -11,8 +11,4 @@ public enum Card{
         int index=random.nextInt(Card.values().length);
         return Card.values()[index];
     }
-
-    public void use(){
-
-    }
 }

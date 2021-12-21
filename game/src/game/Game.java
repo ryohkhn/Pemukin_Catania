@@ -5,9 +5,6 @@ import board.Colony;
 import board.Road;
 import board.Tile;
 
-import java.util.Scanner;
-//import vue.Vues;
-
 import java.util.ArrayList;
 
 public class Game{
@@ -147,13 +144,13 @@ public class Game{
         }
     }
 
-    public void sevenAtDice(Player playerTurn){ // TODO: 20/12/2021 compléter avec les appels de fonction de Vue pour terminer la fonction
+    public void sevenAtDice(Player turnPlayer){ // TODO: 20/12/2021 compléter avec les appels de fonction de Vue pour terminer la fonction
         for(Player player:this.players){
             if((player.ressourceCount())>7){
                 // appel de fonction de vue qui demande quelle ressource il doit défausser (quantité de ressource/2)
             }
         }
-        setThiefAndSteal(playerTurn);
+        setThiefAndSteal(turnPlayer);
     }
 
     public void setThiefAndSteal(Player player){
@@ -200,7 +197,54 @@ public class Game{
         }
     }
 
-    public void useCard(Player player,String card){
-
+    public void useCard(Player turnPlayer,String card){  // TODO: 21/12/2021 terminer la fonction avec des appels de vue
+        Card choosedCard;
+        try{
+            choosedCard=Card.valueOf(card);
+        }
+        catch(IllegalArgumentException e){
+            System.out.println("Cette carte n'existe pas.");
+            return;
+        }
+       if(turnPlayer.cards.get(choosedCard)>0){
+            switch(choosedCard){
+                case Knigth -> {
+                    setThiefAndSteal(turnPlayer);
+                }
+                case VictoryPoint -> {
+                    turnPlayer.addVictoryPoint(1);
+                }
+                case ProgressMonopoly -> {
+                    String ressource="";
+                    //appel à une fonction de vue qui désigne une ressource à récupérer à chaque joueur
+                    for(Player player:players){
+                        if(player.ressources.get(ressource)>0){
+                            player.ressources.merge(ressource,1,(a,b)->a-b);
+                            turnPlayer.ressources.merge(ressource,1,Integer::sum);
+                        }
+                    }
+                }
+                case ProgressRoadBuilding -> {
+                    int buildedRoad=0;
+                    turnPlayer.ressources.merge("Clay",2,Integer::sum);
+                    turnPlayer.ressources.merge("Wood",2,Integer::sum);
+                    while(buildedRoad<2){
+                        do{
+                            //appel à la fonction de vue qui demande les coordonnées pour construire une route
+                        }
+                        // mettre les coordonnées récupérées avec la vue
+                        while(!buildRoad(0,0,0,turnPlayer));
+                        buildedRoad++;
+                    }
+                }
+                case ProgressYearOfPlenty -> {
+                    // appel à la fonction de vue qui va demander 2 ressources au joueur
+                    String ressource1="",ressource2="";
+                    turnPlayer.ressources.merge(ressource1,1,Integer::sum);
+                    turnPlayer.ressources.merge(ressource2,1,Integer::sum);
+                }
+            }
+            turnPlayer.removeCard(choosedCard);
+        }
     }
 }
