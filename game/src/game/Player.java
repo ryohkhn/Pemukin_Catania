@@ -64,7 +64,9 @@ public abstract class Player{
         return false;
     }
 
-    public void removeCard(Card card){
-        this.cards.merge(card,1,(a,b)->a-b);
+    public void removeCard(Card card) {
+        this.cards.merge(card, 1, (a, b) -> a-b);
+    }
+    public void display() { // TODO: 21/12/2021 afficher ressources, couleurs etc
     }
 }

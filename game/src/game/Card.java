@@ -4,6 +4,7 @@ import java.util.Random;
 
 public enum Card{
     Knigth,VictoryPoint,ProgressRoadBuilding,ProgressYearOfPlenty,ProgressMonopoly;
+    public static boolean alreadyPlayedThisTurn=false;
 
     private static final Random random=new Random();
 

@@ -279,7 +279,7 @@ public class Board{
         return res;
     }
 
-    public void display(Player p) {
+    public void display() { // TODO: 22/12/2021  
 
     }
 }

@@ -1,17 +1,25 @@
 package game;
 
 import board.*;
+import vue.Vues;
+
+import java.util.HashMap;
+import java.util.Scanner;
 
 import java.util.ArrayList;
 
 public class Game{
     private Player[] players;
     private Board board;
-    //private Vues vueGenerale;
+    private Vues vueGenerale;
 
     public Game(int nb){
         board=new Board();
         players=new Player[nb];
+    }
+
+    public void setVueGenerale(Vues vueGenerale) {
+        this.vueGenerale=vueGenerale;
     }
 
     public Board getBoard() {
@@ -27,7 +35,11 @@ public class Game{
     }
 
     // fonction construisant une route pour un joueur aux coordonnées en argument
-    public boolean buildRoad(int line,int column,int roadNumber,Player player){
+    public boolean buildRoad(Player player){
+        int[] placement=vueGenerale.getRoadPlacement();
+        int line=placement[0];
+        int column=placement[1];
+        int roadNumber=placement[2];
         Road choosedRoad=board.getTiles()[line][column].getRoads().get(roadNumber);
         if(choosedRoad.isOwned()){
             return false;
@@ -59,7 +71,11 @@ public class Game{
 
     // fonction construisant une colonie pour un joueur aux coordonnées en argument.
     // si la colonie est un port il est ajouté au hashmap du joueur
-    public boolean buildColony(int line,int column,int colonyNumber,Player player){
+    public boolean buildColony(Player player){
+        int[] placement=vueGenerale.getColonyPlacement();
+        int line=placement[0];
+        int column=placement[1];
+        int colonyNumber=placement[2];
         Colony choosedColony=board.getTiles()[line][column].getColonies().get(colonyNumber);
         if(choosedColony.isOwned()){
             return false;
@@ -98,7 +114,11 @@ public class Game{
     }
 
     // fonction construisant une ville pour un joueur aux coordonnées en argument
-    public boolean buildCity(int line,int column,int colonyNumber,Player player){
+    public boolean buildCity(Player player){
+        int[] placement=vueGenerale.getCityPlacement();
+        int line=placement[0];
+        int column=placement[1];
+        int colonyNumber=placement[2];
         Colony choosedColony=board.getTiles()[line][column].getColonies().get(colonyNumber);
         if(!choosedColony.isOwned(player)){
             System.out.println("La colonie ne vous appartient pas, vous ne pouvez pas constuire de ville ici.");
@@ -141,10 +161,11 @@ public class Game{
         }
     }
 
-    public void sevenAtDice(Player turnPlayer){ // TODO: 20/12/2021 compléter avec les appels de fonction de Vue pour terminer la fonction
+    public void sevenAtDice(Player turnPlayer){
         for(Player player:this.players){
             if((player.ressourceCount())>7){
-                // appel de fonction de vue qui demande quelle ressource il doit défausser (quantité de ressource/2)
+                String ressource=vueGenerale.ressourceToBeDefaussed();
+                player.ressources.replace(ressource,player.ressources.get(ressource)/2);
             }
         }
         setThiefAndSteal(turnPlayer);
@@ -194,16 +215,10 @@ public class Game{
         }
     }
 
-    public void useCard(Player turnPlayer,String card){  // TODO: 21/12/2021 terminer la fonction avec des appels de vue
-        Card choosedCard;
-        try{
-            choosedCard=Card.valueOf(card);
-        }
-        catch(IllegalArgumentException e){
-            System.out.println("Cette carte n'existe pas.");
-            return;
-        }
-       if(turnPlayer.cards.get(choosedCard)>0){
+    public void useCard(Player turnPlayer){  // TODO: 21/12/2021 terminer la fonction avec des appels de vue
+        String card = vueGenerale.chooseCard();
+        Card choosedCard=Card.valueOf(card);
+        if(turnPlayer.cards.get(choosedCard)>0){
             switch(choosedCard){
                 case Knigth -> {
                     setThiefAndSteal(turnPlayer);
@@ -226,19 +241,18 @@ public class Game{
                     turnPlayer.ressources.merge("Clay",2,Integer::sum);
                     turnPlayer.ressources.merge("Wood",2,Integer::sum);
                     while(buildedRoad<2){
+                        boolean isBuild=false;
                         do{
-                            //appel à la fonction de vue qui demande les coordonnées pour construire une route
+                            isBuild=!buildRoad(turnPlayer);
                         }
-                        // mettre les coordonnées récupérées avec la vue
-                        while(!buildRoad(0,0,0,turnPlayer));
+                        while(!isBuild);
                         buildedRoad++;
                     }
                 }
                 case ProgressYearOfPlenty -> {
-                    // appel à la fonction de vue qui va demander 2 ressources au joueur
-                    String ressource1="",ressource2="";
-                    turnPlayer.ressources.merge(ressource1,1,Integer::sum);
-                    turnPlayer.ressources.merge(ressource2,1,Integer::sum);
+                    String[] ressources=vueGenerale.choose2Ressources();
+                    turnPlayer.ressources.merge(ressources[0],1,Integer::sum);
+                    turnPlayer.ressources.merge(ressources[1],1,Integer::sum);
                 }
             }
             turnPlayer.removeCard(choosedCard);
@@ -252,7 +266,7 @@ public class Game{
         }
         Port choosedPort=null;
         if(player.ports.size()>1){
-            // afficher tous les ports via la vue (la ressource et si c'est du 3:1 ou 2:1) et en choisir un
+            // TODO: 22/12/2021 faire qqch avec la vue j'ai oublié quoi et je peux pas faire ctrl z (j'arrive pas a comprendre il est 3h du matin mdr)
             choosedPort=new Port();
         }
         else{
@@ -285,5 +299,21 @@ public class Game{
                 System.out.println("Vous n'avez pas les ressources suffisantes pour faire l'échange.");
             }
         }
+    }
+
+    public void botsGetColor(HashMap<String, Boolean> color) {
+        for(int i=0;i<this.players.length;i++){
+            if(this.getPlayers()[i] instanceof Bot){
+                if(color.replace("blue", false, true)) ((Bot) this.players[i]).setColor("blue");
+                else if(color.replace("green", false, true)) ((Bot) this.players[i]).setColor("green");
+                else if(color.replace("yellow", false, true)) ((Bot) this.players[i]).setColor("yellow");
+                else if(color.replace("orange", false, true)) ((Bot) this.players[i]).setColor("orange");
+            }
+        }
+    }
+
+    public void display(Player p){
+        p.display();
+        this.board.display();
     }
 }

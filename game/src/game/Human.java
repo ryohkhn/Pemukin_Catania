@@ -6,6 +6,6 @@ public class Human extends Player{
         this.color=color;
     }
     public Human getPlayer(){
-        return (Human) this.getPlayer();
+        return this.getPlayer();
     }
 }
