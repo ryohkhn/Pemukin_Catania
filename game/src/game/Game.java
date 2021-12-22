@@ -227,8 +227,7 @@ public class Game{
                     turnPlayer.addVictoryPoint(1);
                 }
                 case ProgressMonopoly -> {
-                    String ressource="";
-                    //appel à une fonction de vue qui désigne une ressource à récupérer à chaque joueur
+                    String ressource=vueGenerale.choose1Ressource();
                     for(Player player:players){
                         if(player.ressources.get(ressource)>0){
                             player.ressources.merge(ressource,1,(a,b)->a-b);
@@ -256,12 +255,15 @@ public class Game{
                 }
             }
             turnPlayer.removeCard(choosedCard);
+            turnPlayer.alreadyPlayedCardThisTurn=true;
+        }else{
+            System.out.println("You do not have this card.");
         }
     }
 
     public void tradeWithPort(Player player){
         if(player.ports.size()==0){
-            System.out.println("Vous ne pouvez pas faire d'échange de ressources, vous ne possédez pas de port.");
+            System.out.println("You can't trade resources, you don't have a port.");
             return;
         }
         Port choosedPort=null;

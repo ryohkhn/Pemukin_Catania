@@ -17,5 +17,6 @@ public interface Vues{
     int[] getCityPlacement();
     String[] choose2Ressources();
     String chooseCard();
+    String choose1Ressource();
     void victory(Player p);
 }

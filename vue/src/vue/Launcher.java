@@ -4,7 +4,6 @@ import game.Game;
 import game.Human;
 import game.Player;
 
-import java.sql.SQLOutput;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
@@ -88,12 +87,13 @@ public class Launcher {
                 return false;
 
             case 6:
-                // TODO: 21/12/2021 fonction qui fait jouer une carte + qui va mettre true a l'attribut alreadyPlayedThisTurn de card, ne fais rien si deja true
+                game.useCard(p);
                 System.out.println("play a development card");
                 return false;
 
             case 7:
                 System.out.println("End of the round.");
+                p.alreadyPlayedCardThisTurn=false;
                 return true;
 
         }

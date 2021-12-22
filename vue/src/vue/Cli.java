@@ -187,6 +187,18 @@ public class Cli implements Vues{
     }
 
     @Override
+    public String choose1Ressource() {
+        scanner=new Scanner(System.in);
+        String[] ressources={"Clay", "Ore", "Wheat", "Wood", "Wool"};
+        System.out.println("choose a resource among :" + ressources.toString());
+        String x=scanner.next();
+        if(!x.equals("Clay") && !x.equals("Ore") && !x.equals("Wheat") && !x.equals("Wood") && !x.equals("Wool")){
+            return choose1Ressource();
+        }
+        return x;
+    }
+
+    @Override
     public void victory(Player p) {
         System.out.println(p.toString() + "has won the game!");
     }

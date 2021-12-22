@@ -13,6 +13,7 @@ public abstract class Player{
     protected HashMap<Card,Integer> cards=new HashMap<>();
     protected HashSet<Port> ports;
     protected int victoryPoint=0;
+    public boolean alreadyPlayedCardThisTurn=false;
 
     // constructeur qui initialise
     public Player(){
