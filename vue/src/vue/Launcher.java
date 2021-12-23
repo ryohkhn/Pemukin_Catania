@@ -1,9 +1,6 @@
 package vue;
-import game.Bot;
-import game.Game;
-import game.Human;
-import game.Player;
 
+import game.*;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;

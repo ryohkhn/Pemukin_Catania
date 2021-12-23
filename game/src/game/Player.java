@@ -97,4 +97,9 @@ public abstract class Player{
     public String firstLetter() {
         return String.valueOf(color.charAt(0)) + " ";
     }
+
+    @Override
+    public String toString(){
+        return "Player of color "+this.color;
+    }
 }

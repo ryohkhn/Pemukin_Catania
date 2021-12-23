@@ -3,10 +3,8 @@ package game;
 import board.*;
 import vue.Vues;
 
-import java.util.HashMap;
-import java.util.Scanner;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Game{
     private Player[] players;
@@ -34,7 +32,7 @@ public class Game{
         this.players[index]=p;
     }
 
-    // fonction construisant une route pour un joueur aux coordonnées en argument
+    // fonction construisant une route pour un joueur
     public boolean buildRoad(Player player){
         int[] placement=vueGenerale.getRoadPlacement();
         int line=placement[0];
@@ -69,7 +67,7 @@ public class Game{
         return false;
     }
 
-    // fonction construisant une colonie pour un joueur aux coordonnées en argument.
+    // fonction construisant une colonie pour un joueur
     // si la colonie est un port il est ajouté au hashmap du joueur
     public boolean buildColony(Player player){
         int[] placement=vueGenerale.getColonyPlacement();
@@ -151,10 +149,12 @@ public class Game{
         for(Tile[] tiles:board.getTiles()){
             for(Tile tile:tiles){
                 if(tile.getId()==diceNumber){
-                    String ressource=tile.getRessource();
-                    for(Colony colony:tile.getColonies()){
-                        int producedValue=colony.isCity()?2:1;
-                        colony.getPlayer().propertiesCounter.merge(ressource,producedValue,Integer::sum);
+                    if(!tile.hasThief()){
+                        String ressource=tile.getRessource();
+                        for(Colony colony:tile.getColonies()){
+                            int producedValue=colony.isCity()?2:1;
+                            colony.getPlayer().propertiesCounter.merge(ressource,producedValue,Integer::sum);
+                        }
                     }
                 }
             }
@@ -172,34 +172,41 @@ public class Game{
     }
 
     public void setThiefAndSteal(Player player){
-        // appel fonction de vue pour récupérer la case ou placer le voleur
+        // on set le voleur sur la nouvelle case
+        int[] placement=vueGenerale.getThiefPlacement();
+        int line=placement[0];
+        int column=placement[1];
+        Tile choosedTile=board.getTiles()[line][column];
         board.getThiefTile().setThief(false);
-        // setThief la nouvelle Tile
-        board.setThiefTile(null);
-        // mettre la nouvelle tile en thief=true
+        board.setThiefTile(choosedTile);
+        choosedTile.setThief(true);
 
         ArrayList<Colony> ownedColonies=new ArrayList<>();
-        for(Colony colony:board.getThiefTile().getColonies()){
+        for(Colony colony:choosedTile.getColonies()){
             if(colony.getPlayer()!=null){
                 ownedColonies.add(colony);
             }
         }
 
+        // on vole une ressource à une colonie étant sur la case ou se trouve le voleur, s'il y en a plusieurs colonies le joueur choisit laquelle
         String ressource;
         Player playerOfColony;
-        if(ownedColonies.size()==1){
-            playerOfColony=ownedColonies.get(0).getPlayer();
+        if(ownedColonies.size()!=0){
+            if(ownedColonies.size()>1){
+                playerOfColony=vueGenerale.choosePlayerFromColony(ownedColonies);
+            }
+            else{
+                playerOfColony=ownedColonies.get(0).getPlayer();
+            }
             if(playerOfColony.ressourceCount()>0){
                 do{
                     ressource=Board.generateRandomRessource();
                 }
                 while(playerOfColony.ressources.get(ressource)==0);
                 int ressourceStock=playerOfColony.ressources.get(ressource);
-                playerOfColony.ressources.replace(ressource,ressourceStock-1);
+                playerOfColony.ressources.merge(ressource,1,(a,b)->a-b);
                 player.ressources.merge(ressource,1,Integer::sum);
             }
-        }else if(ownedColonies.size()>=1){
-            // appel fonction de vue pour demander à quelle colonie le joueur veut-il voler une carte
         }
     }
 
@@ -215,7 +222,7 @@ public class Game{
         }
     }
 
-    public void useCard(Player turnPlayer){  // TODO: 21/12/2021 terminer la fonction avec des appels de vue
+    public void useCard(Player turnPlayer){
         String card = vueGenerale.chooseCard();
         Card choosedCard=Card.valueOf(card);
         if(turnPlayer.cards.get(choosedCard)>0){
@@ -227,7 +234,8 @@ public class Game{
                     turnPlayer.addVictoryPoint(1);
                 }
                 case ProgressMonopoly -> {
-                    String ressource=vueGenerale.choose1Ressource();
+                    String[] ressources=vueGenerale.chooseResource(1);
+                    String ressource=ressources[0];
                     for(Player player:players){
                         if(player.ressources.get(ressource)>0){
                             player.ressources.merge(ressource,1,(a,b)->a-b);
@@ -249,7 +257,7 @@ public class Game{
                     }
                 }
                 case ProgressYearOfPlenty -> {
-                    String[] ressources=vueGenerale.choose2Ressources();
+                    String[] ressources=vueGenerale.chooseResource(2);
                     turnPlayer.ressources.merge(ressources[0],1,Integer::sum);
                     turnPlayer.ressources.merge(ressources[1],1,Integer::sum);
                 }
@@ -268,7 +276,7 @@ public class Game{
         }
         Port choosedPort=null;
         if(player.ports.size()>1){
-            // TODO: 22/12/2021 faire qqch avec la vue j'ai oublié quoi et je peux pas faire ctrl z (j'arrive pas a comprendre il est 3h du matin mdr)
+            // TODO: 23/12/2021 appel fonction de vue qui demande quelles ressources le joueur veut échanger (3 ressources)
             choosedPort=new Port();
         }
         else{
@@ -276,13 +284,15 @@ public class Game{
                 choosedPort=p;
             }
         }
-        String ressource1="",ressource2="",ressource3="";
-
+        String resource1="",resource2="",resource3="";
+        String[] resources;
         if(choosedPort.getRate()==2){
-            // appel fonction de vue qui demande quelles ressources le joueur veut échanger (2 ressources)
-            if(player.ressources.get(ressource1)>0 && player.ressources.get(ressource2)>0){
-                player.ressources.merge(ressource1,1,(a,b)->a-b);
-                player.ressources.merge(ressource2,1,(a,b)->a-b);
+            resources=vueGenerale.chooseResource(2);
+            resource1=resources[0];
+            resource2=resources[1];
+            if(player.ressources.get(resource1)>0 && player.ressources.get(resource2)>0){
+                player.ressources.merge(resource1,1,(a,b)->a-b);
+                player.ressources.merge(resource2,1,(a,b)->a-b);
                 player.ressources.merge(choosedPort.getRessource(), 1,Integer::sum);
             }
             else{
@@ -290,11 +300,14 @@ public class Game{
             }
         }
         else{
-            // appel fonction de vue qui demande quelles ressources le joueur veut échanger (3 ressources)
-            if(player.ressources.get(ressource1)>0 && player.ressources.get(ressource2)>0 && player.ressources.get(ressource3)>0){
-                player.ressources.merge(ressource1,1,(a,b)->a-b);
-                player.ressources.merge(ressource2,1,(a,b)->a-b);
-                player.ressources.merge(ressource3,1,(a,b)->a-b);
+            resources=vueGenerale.chooseResource(3);
+            resource1=resources[0];
+            resource2=resources[1];
+            resource3=resources[2];
+            if(player.ressources.get(resource1)>0 && player.ressources.get(resource2)>0 && player.ressources.get(resource3)>0){
+                player.ressources.merge(resource1,1,(a,b)->a-b);
+                player.ressources.merge(resource2,1,(a,b)->a-b);
+                player.ressources.merge(resource3,1,(a,b)->a-b);
                 player.ressources.merge(choosedPort.getRessource(), 1,Integer::sum);
             }
             else{

@@ -12,4 +12,16 @@ public enum Card{
         int index=random.nextInt(Card.values().length);
         return Card.values()[index];
     }
+
+    public String toString(){
+        String res="Carte : ";
+        switch(this){
+            case ProgressMonopoly -> res+="Monopole";
+            case VictoryPoint -> res+="Point de Victoire";
+            case Knigth -> res+="Roi";
+            case ProgressYearOfPlenty -> res+= "Invention";
+            case ProgressRoadBuilding -> res+= "Construction de route";
+        }
+        return res;
+    }
 }

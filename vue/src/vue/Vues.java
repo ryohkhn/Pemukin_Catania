@@ -1,9 +1,10 @@
 package vue;
 
+import board.Colony;
 import game.Player;
 import game.Game;
-import board.Port;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public interface Vues{
@@ -16,10 +17,11 @@ public interface Vues{
     int[] getRoadPlacement();
     int[] getColonyPlacement();
     int[] getCityPlacement();
-    String[] choose2Ressources();
+    int[] getThiefPlacement();
     String chooseCard();
-    String choose1Ressource();
+    String[] chooseResource(int number);
     void victory(Player p);
     void displayBoard(Game game);
     void displayPlayer(Player p);
+    Player choosePlayerFromColony(ArrayList<Colony> ownedColonies);
 }

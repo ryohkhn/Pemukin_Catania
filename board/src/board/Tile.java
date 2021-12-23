@@ -44,6 +44,10 @@ public class Tile{
         return thief;
     }
 
+    public boolean hasThief(){
+        return thief;
+    }
+
     @Override
     public String toString() { // TODO supprimer quand plus nécessaire
         return "Tile{"+
