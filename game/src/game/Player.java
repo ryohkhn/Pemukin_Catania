@@ -4,7 +4,7 @@ import board.Board;
 import board.Port;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 
 public abstract class Player{
@@ -12,7 +12,7 @@ public abstract class Player{
     protected HashMap<String,Integer> ressources=Board.generateHashMapRessource();
     protected HashMap<String,Integer> propertiesCounter=new HashMap<>();
     protected HashMap<Card,Integer> cards=new HashMap<>();
-    protected HashSet<Port> ports;
+    protected LinkedList<Port> ports;
     protected int victoryPoint=0;
     public boolean alreadyPlayedCardThisTurn=false;
 
@@ -50,7 +50,9 @@ public abstract class Player{
     }
 
     public void addPort(Port port){
-        this.ports.add(port);
+        if(!this.ports.contains(port)){
+            this.ports.add(port);
+        }
     }
 
     public int ressourceCount() {
@@ -101,5 +103,9 @@ public abstract class Player{
     @Override
     public String toString(){
         return "Player of color "+this.color;
+    }
+
+    public LinkedList<Port> getPorts(){
+        return ports;
     }
 }

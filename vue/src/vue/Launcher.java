@@ -58,42 +58,42 @@ public class Launcher {
     }
 
     private static boolean getAction(Player p,Cli cli,Game game) {
-        switch(cli.getAction(p)) {
-            case 1:
-                // TODO: 21/12/2021 appeler fonction dans game que j'ai pas comprise et donc pas complétée
+        switch(cli.getAction(p)){
+            case 1 -> {
+                game.tradeWithPort(p);
                 System.out.println("exchange ressources bank");
                 return false;
-
-            case 2:
+            }
+            case 2 -> {
                 game.buildColony(p);
                 System.out.println("build a new colony");
                 return false;
-
-            case 3:
+            }
+            case 3 -> {
                 game.buildCity(p);
                 System.out.println("upgrade a colony into a city");
                 return false;
-
-            case 4:
+            }
+            case 4 -> {
                 game.buildRoad(p);
                 System.out.println("build a road");
                 return false;
-
-            case 5:
+            }
+            case 5 -> {
                 game.buyCard(p);
                 System.out.println("buy development cards");
                 return false;
-
-            case 6:
+            }
+            case 6 -> {
                 game.useCard(p);
                 System.out.println("play a development card");
                 return false;
-
-            default:
+            }
+            default -> {
                 System.out.println("End of the round.");
                 p.alreadyPlayedCardThisTurn=false;
                 return true;
-
+            }
         }
     }
 }

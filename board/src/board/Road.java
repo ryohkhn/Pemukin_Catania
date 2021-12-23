@@ -239,7 +239,7 @@ public class Road {
             }
         }
     }
-    // TODO: 27/11/2021 Fonction qui return true, si il y a une route (appartenant au joueur) adjacente a la route que l'ont veut construire
+
     public boolean isBuildable(Player player){
         for(Road road:adjacentRoads){
             if(road.player==player) return true;

@@ -1,12 +1,12 @@
 package vue;
-import board.*;
-
-import java.awt.*;
 
 import board.Colony;
+import board.Port;
+import board.Tile;
 import game.Game;
 import game.Player;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.InputMismatchException;
@@ -82,22 +82,31 @@ public class Cli implements Vues{
     }
 
     @Override
-    public String ressourceToBeDefaussed() { // TODO: 22/12/2021 pas bon : Tous les joueurs comptent les cartes matières premières qu’ils ont en main. Ceux qui en possèdent plus de 7 doivent en choisir la moitié et s’en défausser. On arrondit toujours à l’entier inférieur : celui qui possède 9 cartes matières premières doit en défausser 4.
+    public String[] ressourceToBeDiscarded(Player player,int quantity) {
         scanner=new Scanner(System.in);
-        System.out.println("choose a resource whose quantity you own will be divided by 2 among : Clay, Ore, Wheat, Wood, Wool");
-        try{
-            String x= scanner.next();
-            if(!x.equals("Clay") && !x.equals("Ore") && !x.equals("Wheat") && !x.equals("Wood") && !x.equals("Wool")){
-                return ressourceToBeDefaussed();
+        System.out.println(player.toString());
+        System.out.println("Choose "+quantity+" resources you need to discard among : Clay, Ore, Wheat, Wood, Wool");
+        String[] choosedResources=new String[quantity];
+        int compt=0;
+        while(compt<quantity){
+            try{
+                String ressource=scanner.next();
+                if(!ressource.equals("Clay") && !ressource.equals("Ore") && !ressource.equals("Wheat") && !ressource.equals("Wood") && !ressource.equals("Wool")){
+                    return ressourceToBeDiscarded(player, quantity);
+                }
+                choosedResources[compt]=ressource;
+            } catch(InputMismatchException e){
+                System.out.println("You need to input the ressources you want to discard among : Clay, Ore, Wheat, Wood, Wool");
+                return ressourceToBeDiscarded(player, quantity);
             }
-            return x;
-        }catch (InputMismatchException e) {
-            return ressourceToBeDefaussed();
+            compt++;
         }
+        return choosedResources;
     }
 
+
     @Override
-    public int[] getRoadPlacement() { // TODO: 22/12/2021 verifier si indexoutofbounds
+    public int[] getRoadPlacement() {
         scanner=new Scanner(System.in);
         try{
             System.out.println("Please enter the X-coordinates of the tile.");
@@ -130,7 +139,7 @@ public class Cli implements Vues{
     }
 
     @Override
-    public int[] getColonyPlacement() { // TODO: 22/12/2021 verifier si indexoutofbounds
+    public int[] getColonyPlacement() {
         scanner=new Scanner(System.in);
         try{
             System.out.println("Please enter the X-coordinates of the tile.");
@@ -158,7 +167,7 @@ public class Cli implements Vues{
         }
     }
     @Override
-    public int[] getCityPlacement() { // TODO: 22/12/2021 verifier si indexoutofbounds
+    public int[] getCityPlacement() {
         scanner=new Scanner(System.in);
         try{
             System.out.println("Please enter the X-coordinates of the tile.");
@@ -410,6 +419,25 @@ public class Cli implements Vues{
         }catch(InputMismatchException e){
             System.out.println("The number should be between 1 and "+compt);
             return this.choosePlayerFromColony(colonies);
+        }
+    }
+
+    @Override
+    public Port portSelection(Player player){
+        scanner=new Scanner(System.in);
+        int compt=1;
+        for(Port port:player.getPorts()){
+            System.out.println(compt+" - "+(port.getRate()==2?"Port de ressource spécialisée "+port.getRessource():"Port sans ressource spécialisée"));
+            compt++;
+        }
+        System.out.println("Choisissez un port parmi cette liste pour faire une échange.");
+        try{
+            int choosedPort=scanner.nextInt();
+            return player.getPorts().get(compt-1);
+        }
+        catch(InputMismatchException e){
+            System.out.println("Vous devez rentrer un chiffre entre 1 et "+compt);
+            return this.portSelection(player);
         }
     }
 

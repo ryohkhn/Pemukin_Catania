@@ -1,6 +1,7 @@
 package vue;
 
 import board.Colony;
+import board.Port;
 import game.Player;
 import game.Game;
 
@@ -13,7 +14,7 @@ public interface Vues{
     String chooseColor(HashMap<String, Boolean> color);
     void initialisation();
     int getAction(Player p);
-    String ressourceToBeDefaussed();
+    String[] ressourceToBeDiscarded(Player player,int quantity);
     int[] getRoadPlacement();
     int[] getColonyPlacement();
     int[] getCityPlacement();
@@ -24,4 +25,5 @@ public interface Vues{
     void displayBoard(Game game);
     void displayPlayer(Player p);
     Player choosePlayerFromColony(ArrayList<Colony> ownedColonies);
+    Port portSelection(Player player);
 }

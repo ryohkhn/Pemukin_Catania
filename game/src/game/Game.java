@@ -161,16 +161,20 @@ public class Game{
         }
     }
 
+    // fonction dans le cas d'un 7 aux dés, on défaussent les cartes des joueurs, et on change l'emplacement du brigand
     public void sevenAtDice(Player turnPlayer){
         for(Player player:this.players){
             if((player.ressourceCount())>7){
-                String ressource=vueGenerale.ressourceToBeDefaussed();
-                player.ressources.replace(ressource,player.ressources.get(ressource)/2);
+                String[] ressources=vueGenerale.ressourceToBeDiscarded(player,turnPlayer.ressourceCount()/2);
+                for(String ressource:ressources){
+                    player.ressources.merge(ressource,1,(a,b)->a-b);
+                }
             }
         }
         setThiefAndSteal(turnPlayer);
     }
 
+    // fonction pour réattribuer l'emplacement du brigand et voler les ressources de colonies présentes sur la nouvelle case
     public void setThiefAndSteal(Player player){
         // on set le voleur sur la nouvelle case
         int[] placement=vueGenerale.getThiefPlacement();
@@ -210,6 +214,7 @@ public class Game{
         }
     }
 
+    // fonction permettant d'acheter une carte de développement
     public void buyCard(Player player){
         int oreStock=player.ressources.get("Ore");
         int woolStock=player.ressources.get("Wool");
@@ -222,6 +227,7 @@ public class Game{
         }
     }
 
+    // fonction permettant d'utiliser une carte de développement
     public void useCard(Player turnPlayer){
         String card = vueGenerale.chooseCard();
         Card choosedCard=Card.valueOf(card);
@@ -269,22 +275,20 @@ public class Game{
         }
     }
 
+    // fonction qui permet de faire une échange avec un le port si le joueur en possède un
     public void tradeWithPort(Player player){
         if(player.ports.size()==0){
             System.out.println("You can't trade resources, you don't have a port.");
             return;
         }
-        Port choosedPort=null;
+        Port choosedPort;
         if(player.ports.size()>1){
-            // TODO: 23/12/2021 appel fonction de vue qui demande quelles ressources le joueur veut échanger (3 ressources)
-            choosedPort=new Port();
+            choosedPort=vueGenerale.portSelection(player);
         }
         else{
-            for(Port p:player.ports){
-                choosedPort=p;
-            }
+            choosedPort=player.ports.get(0);
         }
-        String resource1="",resource2="",resource3="";
+        String resource1,resource2,resource3;
         String[] resources;
         if(choosedPort.getRate()==2){
             resources=vueGenerale.chooseResource(2);

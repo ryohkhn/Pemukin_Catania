@@ -1,6 +1,6 @@
 package board;
 
-public class Port{ // TODO: 22/12/2021 est-ce que depuis la case 4 du schéma du projet, on peut acceder au port case 6 ? Est-ce que on peut acceder au port case 6 si on a une ville sur le coin 1 de la case 6 (il n'y a pas de coté ppoour un port)? 
+public class Port{
     protected int rate;
     protected String ressource;
 
