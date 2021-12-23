@@ -5,6 +5,7 @@ import board.Port;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 public abstract class Player{
     protected String color;
@@ -68,6 +69,32 @@ public abstract class Player{
     public void removeCard(Card card) {
         this.cards.merge(card, 1, (a, b) -> a-b);
     }
-    public void display() { // TODO: 21/12/2021 afficher ressources, couleurs etc
+
+    public String getColor() {
+        return color;
+    }
+
+    public int getVictoryPoint() {
+        return victoryPoint;
+    }
+
+    public String getCardsToString() {
+        String res="";
+        for(Map.Entry<Card,Integer> entry: this.cards.entrySet()) {
+            res+=entry.getKey().name() + ":"+ String.valueOf(entry.getValue())+ " ; ";
+        }
+        return res;
+    }
+
+    public String getRessourcesToString() {
+        String res="";
+        for(Map.Entry<String ,Integer> entry: this.ressources.entrySet()) {
+            res+=entry.getKey() + ":"+ String.valueOf(entry.getValue())+ " ; ";
+        }
+        return res;
+    }
+
+    public String firstLetter() {
+        return String.valueOf(color.charAt(0)) + " ";
     }
 }

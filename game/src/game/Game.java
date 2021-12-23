@@ -313,9 +313,4 @@ public class Game{
             }
         }
     }
-
-    public void display(Player p){
-        p.display();
-        this.board.display();
-    }
 }

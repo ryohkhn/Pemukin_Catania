@@ -1,6 +1,8 @@
 package vue;
 import game.*;
+import board.*;
 
+import java.awt.*;
 import java.sql.SQLOutput;
 import java.util.HashMap;
 import java.util.InputMismatchException;
@@ -77,7 +79,7 @@ public class Cli implements Vues{
     }
 
     @Override
-    public String ressourceToBeDefaussed() {
+    public String ressourceToBeDefaussed() { // TODO: 22/12/2021 pas bon : Tous les joueurs comptent les cartes matières premières qu’ils ont en main. Ceux qui en possèdent plus de 7 doivent en choisir la moitié et s’en défausser. On arrondit toujours à l’entier inférieur : celui qui possède 9 cartes matières premières doit en défausser 4.
         scanner=new Scanner(System.in);
         System.out.println("choose a resource whose quantity you own will be divided by 2 among : Clay, Ore, Wheat, Wood, Wool");
         try{
@@ -92,7 +94,7 @@ public class Cli implements Vues{
     }
 
     @Override
-    public int[] getRoadPlacement() {
+    public int[] getRoadPlacement() { // TODO: 22/12/2021 verifier si indexoutofbounds
         scanner=new Scanner(System.in);
         try{
             System.out.println("Please enter the X-coordinates of the tile.");
@@ -116,7 +118,7 @@ public class Cli implements Vues{
     }
 
     @Override
-    public int[] getColonyPlacement() {
+    public int[] getColonyPlacement() { // TODO: 22/12/2021 verifier si indexoutofbounds
         scanner=new Scanner(System.in);
         try{
             System.out.println("Please enter the X-coordinates of the tile.");
@@ -135,7 +137,7 @@ public class Cli implements Vues{
         }
     }
     @Override
-    public int[] getCityPlacement() {
+    public int[] getCityPlacement() { // TODO: 22/12/2021 verifier si indexoutofbounds
         scanner=new Scanner(System.in);
         try{
             System.out.println("Please enter the X-coordinates of the tile.");
@@ -201,6 +203,147 @@ public class Cli implements Vues{
     @Override
     public void victory(Player p) {
         System.out.println(p.toString() + "has won the game!");
+    }
+
+    @Override
+    public void displayBoard(Game game) {
+        Point thief=null;
+        Port[] tab=new Port[8];
+        int iter=0;
+        System.out.println("This board is cut in 4 rows and 4 columns, going from 0 to 3.");
+        System.out.println("c=colony, C=city, -=road, 7=desert, the tiles are numbered 1,2,3,4,5,6,7,8,9,A,B,Z (10=A, 11=B,12=C), port are -a-,-b- etc.");
+        System.out.println();
+        System.out.println("        a       b");
+        for(int i=0;i<4;i++){
+            for(int j=0;j<2;j++){
+                if(j==0) System.out.print("  ");
+                if(j==1){
+                    if(i==0) System.out.print("h ");
+                    else if(i==2) System.out.print("g ");
+                    else System.out.print("  ");
+                }
+                for(int x=0;x<4;x++){
+                    Tile t=game.getBoard().getTiles()[i][x];
+                    if(j==0){
+                        if(t.isThief()) thief=new Point(i,x);
+                        if(t.isPort()) {
+                            tab[iter]=t.getPort();
+                            iter++;
+                        }
+                        if(x==0) {
+                            System.out.print(t.getColonies().get(0).isCity()?"C ":"c ");
+                        }
+                        System.out.print("- ");
+                        System.out.print(t.getColonies().get(1).isCity()?"C ":"c ");
+                    }else{ //j==1
+                        String id="";
+                        if(t.getId()>9){
+                            if(t.getId()==10) id+="A ";
+                            if(t.getId()==11) id+="B ";
+                            if(t.getId()==12) id+="Z ";
+                        }else{
+                            id+=String.valueOf(t.getId() + " ");
+                        }
+                        if(x==0) {
+                            System.out.print("- ");
+                        }
+                        System.out.print(id);
+                        System.out.print("- ");
+                    }
+                }
+                if(j==1){
+                    if(i==1) System.out.print("z ");
+                    else if(i==3) System.out.print("d ");
+                }
+                System.out.println();
+            }
+        }
+        //derniere ligne
+        System.out.print("  ");
+        for(int x=0;x<4;x++) {
+            Tile t=game.getBoard().getTiles()[3][x];
+            if(x==0) {
+                System.out.print(t.getColonies().get(3).isCity()?"C ":"c ");
+            }
+            System.out.print("- ");
+            System.out.print(t.getColonies().get(2).isCity()?"C ":"c ");
+        }
+        System.out.println("\n    e       f\n");
+        System.out.println("On this 2nd table, the elements have been replaced by their owner when they have one.\n");
+        System.out.println("        a       b");
+        for(int i=0;i<4;i++){
+            for(int j=0;j<2;j++){
+                if(j==0) System.out.print("  ");
+                if(j==1){
+                    if(i==0) System.out.print("h ");
+                    else if(i==2) System.out.print("g ");
+                    else System.out.print("  ");
+                }
+                for(int x=0;x<4;x++){
+                    Tile t=game.getBoard().getTiles()[i][x];
+                    if(j==0){
+                        if(x==0) {
+                            if(t.getColonies().get(0).isOwned()) System.out.print(t.getColonies().get(0).getPlayer().firstLetter());
+                            else System.out.print(t.getColonies().get(0).isCity()?"C ":"c ");
+                            }
+                        if(t.getRoads().get(0).isOwned()) System.out.print(t.getRoads().get(0).getPlayer().firstLetter());
+                        else System.out.print("- ");
+                        if(t.getColonies().get(1).isOwned()) System.out.print(t.getColonies().get(1).getPlayer().firstLetter());
+                        else System.out.print(t.getColonies().get(1).isCity()?"C ":"c ");
+                    }else{ //j==1
+                        String id="";
+                        if(t.getId()>9){
+                            if(t.getId()==10) id+="A ";
+                            if(t.getId()==11) id+="B ";
+                            if(t.getId()==12) id+="Z ";
+                        }else{
+                            id+=String.valueOf(t.getId() + " ");
+                        }
+                        if(x==0) {
+                            System.out.print("- ");
+                            System.out.print(id);
+                            System.out.print("- ");
+                        }else{
+                            System.out.print(id);
+                            System.out.print("- ");
+                        }
+                    }
+                }
+                if(j==1){
+                    if(i==1) System.out.print("z ");
+                    else if(i==3) System.out.print("d ");
+                }
+                System.out.println();
+            }
+        }
+        //derniere ligne
+        System.out.print("  ");
+        for(int x=0;x<4;x++) {
+            Tile t=game.getBoard().getTiles()[3][x];
+            if(x==0) {
+                if(t.getColonies().get(3).isOwned()) System.out.print(t.getColonies().get(3).getPlayer().firstLetter());
+                else System.out.print(t.getColonies().get(3).isCity()?"C ":"c ");
+            }
+            if(t.getRoads().get(2).isOwned()) System.out.print(t.getRoads().get(2).getPlayer().firstLetter());
+            else System.out.print("- ");
+            if(t.getColonies().get(2).isOwned()) System.out.print(t.getColonies().get(2).getPlayer().firstLetter());
+            else System.out.print(t.getColonies().get(2).isCity()?"C ":"c ");
+        }
+        System.out.println("\n    e       f\n");
+        System.out.println("The thief is on the tile : (" + (int)thief.getX() + "," + (int)thief.getY() + ").");
+        System.out.print("   a=" + tab[1].toString() + "   b=" + tab[2].toString() + "   z=" + tab[3].toString() + "   d=" + tab[5].toString()
+                + "   e=" + tab[6].toString() + "   f=" + tab[7].toString() + "   g=" + tab[4].toString() + "   h=" + tab[0].toString() );
+        System.out.println("\n");
+
+    }
+
+    @Override
+    public void displayPlayer(Player p) {
+        System.out.println("Player     : " + p.getColor() + ", Victory Points : " + p.getVictoryPoint() );
+        System.out.println("Ressources : " + p.getRessourcesToString());
+        System.out.println("Cards      : " + p.getCardsToString());
+        System.out.println();
+
     }
 
 

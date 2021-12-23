@@ -1,6 +1,7 @@
 package vue;
 
 import game.Player;
+import game.Game;
 import board.Port;
 
 import java.util.HashMap;
@@ -19,4 +20,6 @@ public interface Vues{
     String chooseCard();
     String choose1Ressource();
     void victory(Player p);
+    void displayBoard(Game game);
+    void displayPlayer(Player p);
 }

@@ -30,7 +30,11 @@ public class Road {
         }
         return res;
     }
-    public void addAdjacentColonies(Tile[][] t,int x,int y){
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void addAdjacentColonies(Tile[][] t, int x, int y){
         if(t[x][y].getRoads().get(0)==this){
             adjacentColonies.add(t[x][y].colonies.get(0));
             adjacentColonies.add(t[x][y].colonies.get(1));

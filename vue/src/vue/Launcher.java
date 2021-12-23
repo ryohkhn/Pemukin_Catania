@@ -43,7 +43,8 @@ public class Launcher {
         boolean hasWon=false;
         while(!hasWon){
             for(Player p : game.getPlayers()){
-                game.display(p);
+                cli.displayPlayer(p);
+                cli.displayBoard(game);
                 boolean check=false;
                 int diceNumber=new Random(5).nextInt() + 1 + new Random(5).nextInt() + 1;
                 if(diceNumber==7) game.sevenAtDice(p);
@@ -63,7 +64,7 @@ public class Launcher {
         switch(cli.getAction(p)) {
             case 1:
                 // TODO: 21/12/2021 appeler fonction dans game que j'ai pas comprise et donc pas complétée
-                System.out.println("exchange resources bank");
+                System.out.println("exchange ressources bank");
                 return false;
 
             case 2:
@@ -91,12 +92,11 @@ public class Launcher {
                 System.out.println("play a development card");
                 return false;
 
-            case 7:
+            default:
                 System.out.println("End of the round.");
                 p.alreadyPlayedCardThisTurn=false;
                 return true;
 
         }
-        return true; //value that will never be reached
     }
 }

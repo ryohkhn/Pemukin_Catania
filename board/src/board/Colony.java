@@ -25,8 +25,7 @@ public class Colony{
     }
 
     public boolean isOwned(){
-        if(this.player!=null) return true;
-        else return false;
+        return player!=null;
     }
 
     public boolean isOwned(Player player){

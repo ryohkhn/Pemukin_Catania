@@ -43,16 +43,6 @@ public class Board{
         }
     }
 
-    public void afficher() { // TODO: 28/11/2021 Fonction de test, a supprimer avant le rendu 
-        for(Tile[] t:tiles){
-            System.out.println();
-            for(Tile t1: t){
-                System.out.print(t1.id + "  ");
-            }
-        }
-        System.out.println();
-    }
-
     public Tile[][] getTiles() { // todo supprimer quand plus utile, sert juste a tester les fonctions
         return tiles;
     }
@@ -224,25 +214,21 @@ public class Board{
                         tmp=new Port();
                     }
                     if(x==0 && y%2==1){
-                        tiles[x][y].setAsPort();
                         tiles[x][y].port=tmp;
                         tiles[x][y].colonies.get(0).setLinkedPort(tmp);
                         tiles[x][y].colonies.get(1).setLinkedPort(tmp);
                     }
                     else if(y==0 && x%2==0){
-                        tiles[x][y].setAsPort();
                         tiles[x][y].port=tmp;
                         tiles[x][y].colonies.get(0).setLinkedPort(tmp);
                         tiles[x][y].colonies.get(3).setLinkedPort(tmp);
                     }
                     else if(x==tiles.length-1 && y%2==0){
-                        tiles[x][y].setAsPort();
                         tiles[x][y].port=tmp;
                         tiles[x][y].colonies.get(2).setLinkedPort(tmp);
                         tiles[x][y].colonies.get(3).setLinkedPort(tmp);
                     }
                     else if(y==tiles.length-1 && x%2==1){
-                        tiles[x][y].setAsPort();
                         tiles[x][y].port=tmp;
                         tiles[x][y].colonies.get(1).setLinkedPort(tmp);
                         tiles[x][y].colonies.get(2).setLinkedPort(tmp);
@@ -277,9 +263,5 @@ public class Board{
             case 4 -> res="Wool";
         }
         return res;
-    }
-
-    public void display() { // TODO: 22/12/2021  
-
     }
 }
