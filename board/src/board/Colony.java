@@ -98,4 +98,13 @@ public class Colony{
         }
         return false;
     }
+
+    public boolean isBuildableInitialization(Player player){
+        for(Colony colony:adjacentColonies){
+            if(colony.isOwned()){
+                return false;
+            }
+        }
+        return true;
+    }
 }

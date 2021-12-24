@@ -161,11 +161,11 @@ public class Game{
         }
     }
 
-    // fonction dans le cas d'un 7 aux dés, on défaussent les cartes des joueurs, et on change l'emplacement du brigand
+    // fonction dans le cas d'un 7 aux dés, on défausse les cartes des joueurs et on change l'emplacement du brigand
     public void sevenAtDice(Player turnPlayer){
         for(Player player:this.players){
             if((player.ressourceCount())>7){
-                String[] ressources=vueGenerale.ressourceToBeDiscarded(player,turnPlayer.ressourceCount()/2);
+                String[] ressources=vueGenerale.ressourceToBeDiscarded(player,player.ressourceCount()/2);
                 for(String ressource:ressources){
                     player.ressources.merge(ressource,1,(a,b)->a-b);
                 }
@@ -329,5 +329,111 @@ public class Game{
                 else if(color.replace("orange", false, true)) ((Bot) this.players[i]).setColor("orange");
             }
         }
+    }
+
+    public Colony buildColonyInitialization(Player player){
+        int[] placement=vueGenerale.getColonyPlacement();
+        int line=placement[0];
+        int column=placement[1];
+        int colonyNumber=placement[2];
+        Colony choosedColony=board.getTiles()[line][column].getColonies().get(colonyNumber);
+        if(choosedColony.isOwned()){
+            return null;
+        }
+        if(choosedColony.isBuildableInitialization(player)){
+            if(choosedColony.isPort()){
+                player.addPort(choosedColony.getLinkedPort());
+            }
+            choosedColony.setPlayer(player);
+            player.addPropertie("Colony");
+            player.addVictoryPoint(1);
+            return choosedColony;
+        }
+        else{
+            System.out.println("Vous ne pouvez pas constuire de colonie ici, la règle de distance n'est pas respectée.");
+        }
+        return null;
+    }
+
+    // fonction construisant une route pour un joueur
+    public boolean buildRoadInitialization(Player player,Colony colony){
+        int[] placement=vueGenerale.getRoadPlacement();
+        int line=placement[0];
+        int column=placement[1];
+        int roadNumber=placement[2];
+        Road choosedRoad=board.getTiles()[line][column].getRoads().get(roadNumber);
+        if(choosedRoad.isOwned()){
+            return false;
+        }
+        if(choosedRoad.isBuildable(player)){
+            choosedRoad.setPlayer(player);
+            player.addPropertie("Road");
+            return true;
+        }
+        else{
+            System.out.println("Vous ne pouvez pas constuire de route ici.");
+        }
+        return false;
+    }
+
+    // fonction d'initialisation: tous les joueurs construisent deux colonies et deux routes
+    // on donne ensuite les ressources des cases autour des colonies construites aux joueurs
+    public void initialization(){
+        System.out.println("Phase d'initialisation :\nTous les joueurs construisent deux colonies et deux routes, la deuxième colonie peut se trouver éloignée de la première à condition que la règle de distance soit respectée.");
+        Colony buildedColony;
+        boolean buildedRoad;
+        HashMap<Colony,Player> secondRoundBuildedColonies=new HashMap<>();
+        for(int i=0; i<players.length; i++){
+            do{
+                buildedColony=buildColonyInitialization(players[i]);
+            }
+            while(buildedColony==null);
+            do{
+                buildedRoad=buildRoadInitialization(players[i], buildedColony);
+            }
+            while(!buildedRoad);
+        }
+        for(int i=players.length-1; i>=0; i--){
+            do{
+                buildedColony=buildColonyInitialization(players[i]);
+            }
+            while(buildedColony==null);
+            secondRoundBuildedColonies.put(buildedColony,players[i]);
+            do{
+                buildedRoad=buildRoadInitialization(players[i], buildedColony);
+            }
+            while(!buildedRoad);
+        }
+        coloniesProduction(secondRoundBuildedColonies);
+    }
+
+    // fonction qui parcourt le tableau et donne les ressources aux joueurs de toutes les cases autour des colonies
+    public void coloniesProduction(HashMap<Colony, Player> secondRoundBuildedColonies){
+        HashMap<Colony,ArrayList<String>> result=new HashMap<>();
+        for(int x=0; x<board.getTiles().length; x++){
+            for(int y=0; y<board.getTiles().length; y++){
+                for(Colony colony:board.getTiles()[x][y].getColonies()){
+                    if(secondRoundBuildedColonies.containsKey(colony)){
+                        String resource=board.getTiles()[x][y].getRessource();
+                        ArrayList<String> resources;
+                        if(result.containsKey(colony)){
+                            resources=result.get(colony);
+                            resources.add(resource);
+                            result.replace(colony,resources);
+                        }
+                        else{
+                            resources=new ArrayList<>();
+                            resources.add(resource);
+                            result.put(colony,resources);
+                        }
+                    }
+                }
+            }
+        }
+        result.forEach((a,b)->{
+            for(String resource:b){
+                a.getPlayer().ressources.merge(resource,1,Integer::sum);
+            }
+        });
     }
 }
