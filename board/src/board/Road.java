@@ -8,7 +8,6 @@ public class Road {
     protected Player player;
     protected HashSet<Road> adjacentRoads=new HashSet<>();
     protected HashSet<Colony> adjacentColonies=new HashSet<>();
-    public boolean checked=false;
 
     public Road() {
         this.player=null;
@@ -63,7 +62,6 @@ public class Road {
             de manière à pouvoir vérifier s'il y a bien une route voisine appartenant au joueur lors de la création d'une route.
         */
     public void addAdjacentRoads(Tile[][] t,int x, int y) {
-        this.checked=true;
         if(x==0) { //ligne du haut
             if(y==0) { //coin gauche
                 if(t[x][y].roads.get(0)==this){

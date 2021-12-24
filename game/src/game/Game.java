@@ -2,7 +2,6 @@ package game;
 
 import board.*;
 import vue.Vues;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -153,7 +152,9 @@ public class Game{
                         String ressource=tile.getRessource();
                         for(Colony colony:tile.getColonies()){
                             int producedValue=colony.isCity()?2:1;
-                            colony.getPlayer().propertiesCounter.merge(ressource,producedValue,Integer::sum);
+                            if(colony.isOwned()) {
+                                colony.getPlayer().propertiesCounter.merge(ressource, producedValue, Integer::sum);
+                            }
                         }
                     }
                 }
@@ -332,12 +333,15 @@ public class Game{
     }
 
     public Colony buildColonyInitialization(Player player){
+        this.vueGenerale.displayPlayer(player);
+        this.vueGenerale.displayBoard(this);
         int[] placement=vueGenerale.getColonyPlacement();
         int line=placement[0];
         int column=placement[1];
         int colonyNumber=placement[2];
         Colony choosedColony=board.getTiles()[line][column].getColonies().get(colonyNumber);
         if(choosedColony.isOwned()){
+            System.out.println("Cette colonie appartient deja a quelqu'un.");
             return null;
         }
         if(choosedColony.isBuildableInitialization(player)){
@@ -357,12 +361,15 @@ public class Game{
 
     // fonction construisant une route pour un joueur
     public boolean buildRoadInitialization(Player player,Colony colony){
+        this.vueGenerale.displayPlayer(player);
+        this.vueGenerale.displayBoard(this);
         int[] placement=vueGenerale.getRoadPlacement();
         int line=placement[0];
         int column=placement[1];
         int roadNumber=placement[2];
         Road choosedRoad=board.getTiles()[line][column].getRoads().get(roadNumber);
         if(choosedRoad.isOwned()){
+            System.out.println("Cette route appartient deja a quelqu'un."); // TODO: 24/12/2021 mettre tous les messages dans une fonction error de la vue, avec en argument un int qui represente le message a afficher (par exemple 1 = cette route appartient deja a quelqu'un)
             return false;
         }
         if(choosedRoad.isBuildable(player)){
@@ -410,18 +417,17 @@ public class Game{
     // fonction qui parcourt le tableau et donne les ressources aux joueurs de toutes les cases autour des colonies
     public void coloniesProduction(HashMap<Colony, Player> secondRoundBuildedColonies){
         HashMap<Colony,ArrayList<String>> result=new HashMap<>();
-        for(int x=0; x<board.getTiles().length; x++){
-            for(int y=0; y<board.getTiles().length; y++){
-                for(Colony colony:board.getTiles()[x][y].getColonies()){
-                    if(secondRoundBuildedColonies.containsKey(colony)){
+        for(int x=0; x<board.getTiles().length; x++) {
+            for(int y=0; y<board.getTiles().length; y++) {
+                for(Colony colony : board.getTiles()[x][y].getColonies()) {
+                    if(secondRoundBuildedColonies.containsKey(colony)) {
                         String resource=board.getTiles()[x][y].getRessource();
                         ArrayList<String> resources;
-                        if(result.containsKey(colony)){
+                        if(result.containsKey(colony)) {
                             resources=result.get(colony);
                             resources.add(resource);
-                            result.replace(colony,resources);
-                        }
-                        else{
+                            result.replace(colony, resources);
+                        } else{
                             resources=new ArrayList<>();
                             resources.add(resource);
                             result.put(colony,resources);
@@ -436,4 +442,72 @@ public class Game{
             }
         });
     }
+
+
 }
+
+/*
+
+Tentative de calcul de la route la plus longue, je laisse au cas ou on en ait encore besoin.
+
+
+    public void addPointsForLongestRoad(Player p){
+        this.removeLongestRoad();
+        p.victoryPoint+=2;
+        p.longestRoad=true;
+    }
+
+    private void removeLongestRoad() {
+        for(Player p : this.players){
+            if(p.longestRoad){
+                p.victoryPoint-=2;
+                p.longestRoad=false;
+            }
+        }
+    }
+
+    public void longestRoad(){
+        int[] roadLength=new int[this.players.length];
+        for(int i=0;i<this.players.length;i++){
+            roadLength[i]=this.longestRoad(this.players[i]);
+        }
+        int index=0;
+        boolean equalLength=false;
+        for(int j=1;j<roadLength.length;j++){
+            if(roadLength[j]>roadLength[index]) {
+                index=j;
+                if(equalLength) equalLength=false;
+            }else if(roadLength[j]==roadLength[index]){
+                if(this.players[j].longestRoad) {
+                    index=j;
+                    if(equalLength) equalLength=false;
+                }
+                else if(!this.players[index].longestRoad) equalLength=true;
+            }
+        }
+        if(!equalLength){
+            addPointsForLongestRoad(this.players[index]);
+        }
+    }
+
+    public int longestRoad(Player p){
+        int res=0;
+        for(int x=0;x<4;x++){ //line index
+            for(int y=0;y<4;y++){ //column index
+                for(int i=0;i<4;i++){ //road index
+                    if(this.board.getTiles()[x][y].getRoads().get(i).getPlayer().equals(p)) {
+                        LinkedList<Road> list=new LinkedList<>();
+                        list.add(this.board.getTiles()[x][y].getRoads().get(i));
+                        res=Math.max(res, this.roadLength(p, x, y, i,list));
+                    }
+                }
+            }
+        }
+        return res;
+    }
+
+    private int roadLength(Player p, int x, int y, int i, LinkedList<Road> list) {
+
+    }
+
+ */

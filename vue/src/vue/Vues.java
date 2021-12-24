@@ -12,7 +12,6 @@ public interface Vues{
     int chooseNbPlayers();
     boolean chooseHuman();
     String chooseColor(HashMap<String, Boolean> color);
-    void initialisation();
     int getAction(Player p);
     String[] ressourceToBeDiscarded(Player player,int quantity);
     int[] getRoadPlacement();
@@ -26,4 +25,5 @@ public interface Vues{
     void displayPlayer(Player p);
     Player choosePlayerFromColony(ArrayList<Colony> ownedColonies);
     Port portSelection(Player player);
+    void displayDiceNumber(int diceNumber);
 }

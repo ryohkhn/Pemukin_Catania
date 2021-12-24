@@ -241,11 +241,11 @@ public class Board{
     // fonction permettant de générer un hashmap de <String,Integer> pré-rempli avec toutes les ressources présentes dans le jeu et initialisées à 0
     public static HashMap<String,Integer> generateHashMapRessource(){
         HashMap<String,Integer> res=new HashMap<>();
-        res.put("Clay",0);
-        res.put("Ore",0);
-        res.put("Wheat",0);
-        res.put("Wood",0);
-        res.put("Wool",0);
+        res.put("Clay",100); // TODO: 24/12/2021 remettre value à 0 
+        res.put("Ore",100);
+        res.put("Wheat",100);
+        res.put("Wood",100);
+        res.put("Wool",100);
         return res;
     }
 

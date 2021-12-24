@@ -107,6 +107,7 @@ public class Cli implements Vues{
 
     @Override
     public int[] getRoadPlacement() {
+        System.out.println("To build a road :");
         scanner=new Scanner(System.in);
         try{
             System.out.println("Please enter the X-coordinates of the tile.");
@@ -135,11 +136,8 @@ public class Cli implements Vues{
     }
 
     @Override
-    public void initialisation() { // TODO: 21/12/2021 méthode pour initialiser la partie (2 routes 2 colonies par joueurs)
-    }
-
-    @Override
     public int[] getColonyPlacement() {
+        System.out.println("To build a colony :");
         scanner=new Scanner(System.in);
         try{
             System.out.println("Please enter the X-coordinates of the tile.");
@@ -168,6 +166,7 @@ public class Cli implements Vues{
     }
     @Override
     public int[] getCityPlacement() {
+        System.out.println("To build a city :");
         scanner=new Scanner(System.in);
         try{
             System.out.println("Please enter the X-coordinates of the tile.");
@@ -268,7 +267,7 @@ public class Cli implements Vues{
         Port[] tab=new Port[8];
         int iter=0;
         System.out.println("This board is cut in 4 rows and 4 columns, going from 0 to 3.");
-        System.out.println("c=colony, C=city, -=road, 7=desert, the tiles are numbered 1,2,3,4,5,6,7,8,9,A,B,Z (10=A, 11=B,12=C), port are -a-,-b- etc.");
+        System.out.println("c=colony, C=city, -=road, 7=desert, the tiles are numbered 1,2,3,4,5,6,7,8,9,A,B,Z (10=A, 11=B,12=Z), port are -a-,-b- etc.");
         System.out.println();
         System.out.println("        a       b");
         for(int i=0;i<4;i++){
@@ -387,6 +386,12 @@ public class Cli implements Vues{
             else System.out.print(t.getColonies().get(2).isCity()?"C ":"c ");
         }
         System.out.println("\n    e       f\n");
+        for(int x=0;x<4;x++){
+            for(int y=0;y<4;y++){
+                System.out.print("tile(" + x +"," + y + ")=" + game.getBoard().getTiles()[x][y].getRessource());
+            }
+            System.out.println();
+        }
         System.out.println("The thief is on the tile : (" + (int)thief.getX() + "," + (int)thief.getY() + ").");
         System.out.print("   a=" + tab[1].toString() + "   b=" + tab[2].toString() + "   z=" + tab[3].toString() + "   d=" + tab[5].toString()
                 + "   e=" + tab[6].toString() + "   f=" + tab[7].toString() + "   g=" + tab[4].toString() + "   h=" + tab[0].toString() );
@@ -439,6 +444,11 @@ public class Cli implements Vues{
             System.out.println("Vous devez rentrer un chiffre entre 1 et "+compt);
             return this.portSelection(player);
         }
+    }
+
+    @Override
+    public void displayDiceNumber(int diceNumber) {
+        System.out.println("Dices = " + diceNumber);
     }
 
     @Override

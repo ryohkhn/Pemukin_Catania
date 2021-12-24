@@ -36,14 +36,16 @@ public class Launcher {
             }
         }
         game.botsGetColor(color);
-        cli.initialisation(); // TODO: 21/12/2021 méthode pour initialiser la partie (2 routes 2 colonies par joueurs)
+        game.initialization();
         boolean hasWon=false;
         while(!hasWon){
             for(Player p : game.getPlayers()){
                 cli.displayPlayer(p);
                 cli.displayBoard(game);
                 boolean check=false;
-                int diceNumber=new Random(5).nextInt() + 1 + new Random(5).nextInt() + 1;
+                Random rand=(new Random());
+                int diceNumber=rand.nextInt(6) + 1 + rand.nextInt(6) + 1;
+                cli.displayDiceNumber(diceNumber);
                 if(diceNumber==7) game.sevenAtDice(p);
                 game.diceProduction(diceNumber);
                 while(!check) {

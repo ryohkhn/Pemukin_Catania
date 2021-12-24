@@ -12,9 +12,10 @@ public abstract class Player{
     protected HashMap<String,Integer> ressources=Board.generateHashMapRessource();
     protected HashMap<String,Integer> propertiesCounter=new HashMap<>();
     protected HashMap<Card,Integer> cards=new HashMap<>();
-    protected LinkedList<Port> ports;
+    protected LinkedList<Port> ports=new LinkedList<>();
     protected int victoryPoint=0;
     public boolean alreadyPlayedCardThisTurn=false;
+    public boolean longestRoad;
 
     // constructeur qui initialise
     public Player(){
