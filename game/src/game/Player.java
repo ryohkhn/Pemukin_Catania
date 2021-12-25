@@ -56,7 +56,7 @@ public abstract class Player{
         }
     }
 
-    public int ressourceCount() {
+    public int resourceCount() {
         int compt=0;
         for(int value : ressources.values()) {
             compt+=value;
@@ -108,5 +108,28 @@ public abstract class Player{
 
     public LinkedList<Port> getPorts(){
         return ports;
+    }
+
+    public boolean hasResources(String[] resources){
+        int clayCount=0,oreCount=0,wheatCount=0,woodCount=0,woolCount=0;
+        for(String resource:resources){
+            switch(resource){
+                case "Clay" : clayCount++;
+                case "Ore" : oreCount++;
+                case "Wheat" : wheatCount++;
+                case "Wood" : woodCount++;
+                case "Wool" : woolCount++;
+            }
+        }
+        for(String resource:this.ressources.keySet()){
+            switch(resource){
+                case "Clay" : if(this.ressources.get(resource)<clayCount) return false;
+                case "Ore" : if(this.ressources.get(resource)<oreCount) return false;
+                case "Wheat" : if(this.ressources.get(resource)<wheatCount) return false;
+                case "Wood" : if(this.ressources.get(resource)<woodCount) return false;
+                case "Wool" : if(this.ressources.get(resource)<woolCount) return false;
+            }
+        }
+        return true;
     }
 }

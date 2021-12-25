@@ -47,9 +47,10 @@ public class Game{
             if(player.canBuildPropertie("Road",15)){
                 if(choosedRoad.isBuildable(player)){
                     choosedRoad.setPlayer(player);
-                    player.ressources.replace("Clay", clayStock-1);
-                    player.ressources.replace("Wood", woodStock-1);
+                    player.ressources.merge("Clay",1,(resourceStock,decreasedValue)->resourceStock-decreasedValue);
+                    player.ressources.merge("Wood",1,(resourceStock,decreasedValue)->resourceStock-decreasedValue);
                     player.addPropertie("Road");
+                    System.out.println("Route construite.");
                     return true;
                 }
                 else{
@@ -88,12 +89,13 @@ public class Game{
                         player.addPort(choosedColony.getLinkedPort());
                     }
                     choosedColony.setPlayer(player);
-                    player.ressources.replace("Clay",clayStock-1);
-                    player.ressources.replace("Wheat",wheatStock-1);
-                    player.ressources.replace("Wood",woodStock-1);
-                    player.ressources.replace("Wool",woolStock-1);
+                    player.ressources.merge("Clay",1,(resourceStock,valueDecreased)->resourceStock-valueDecreased);
+                    player.ressources.merge("Wood",1,(resourceStock,valueDecreased)->resourceStock-valueDecreased);
+                    player.ressources.merge("Wheat",1,(resourceStock,valueDecreased)->resourceStock-valueDecreased);
+                    player.ressources.merge("Wool",1,(resourceStock,valueDecreased)->resourceStock-valueDecreased);
                     player.addPropertie("Colony");
                     player.addVictoryPoint(1);
+                    System.out.println("Colonie construite.");
                     return true;
                 }
                 else{
@@ -131,6 +133,7 @@ public class Game{
                 player.addPropertie("City");
                 player.removeColonyInCounter();
                 player.addVictoryPoint(2);
+                System.out.println("Ville construite.");
                 return true;
             }
             else{
@@ -148,12 +151,13 @@ public class Game{
         for(Tile[] tiles:board.getTiles()){
             for(Tile tile:tiles){
                 if(tile.getId()==diceNumber){
-                    if(!tile.hasThief()){
+                    if(!tile.hasThief() && !tile.getRessource().equals("")){
                         String ressource=tile.getRessource();
                         for(Colony colony:tile.getColonies()){
                             int producedValue=colony.isCity()?2:1;
                             if(colony.isOwned()) {
-                                colony.getPlayer().propertiesCounter.merge(ressource, producedValue, Integer::sum);
+                                System.out.println(colony.getPlayer()+" : "+ressource+" + 1");
+                                colony.getPlayer().ressources.merge(ressource, producedValue, Integer::sum);
                             }
                         }
                     }
@@ -164,11 +168,17 @@ public class Game{
 
     // fonction dans le cas d'un 7 aux dés, on défausse les cartes des joueurs et on change l'emplacement du brigand
     public void sevenAtDice(Player turnPlayer){
+        String[] choosedResources;
         for(Player player:this.players){
-            if((player.ressourceCount())>7){
-                String[] ressources=vueGenerale.ressourceToBeDiscarded(player,player.ressourceCount()/2);
-                for(String ressource:ressources){
-                    player.ressources.merge(ressource,1,(a,b)->a-b);
+            int quantity=player.resourceCount()/2;
+            if(quantity>7){
+                System.out.println(player+" you have to discard "+quantity+" cards of your hand.");
+                do{
+                    choosedResources=vueGenerale.ressourceToBeDiscarded(player,quantity);
+                }
+                while(player.hasResources(choosedResources));
+                for(String resource:choosedResources){
+                    player.ressources.merge(resource,1,(initialValue,decreasedValue)->initialValue-decreasedValue);
                 }
             }
         }
@@ -177,6 +187,7 @@ public class Game{
 
     // fonction pour réattribuer l'emplacement du brigand et voler les ressources de colonies présentes sur la nouvelle case
     public void setThiefAndSteal(Player player){
+        // TODO: 25/12/2021 dire quel joueur doit déplacer le voleur 
         // on set le voleur sur la nouvelle case
         int[] placement=vueGenerale.getThiefPlacement();
         int line=placement[0];
@@ -194,7 +205,7 @@ public class Game{
         }
 
         // on vole une ressource à une colonie étant sur la case ou se trouve le voleur, s'il y en a plusieurs colonies le joueur choisit laquelle
-        String ressource;
+        String resource;
         Player playerOfColony;
         if(ownedColonies.size()!=0){
             if(ownedColonies.size()>1){
@@ -203,14 +214,13 @@ public class Game{
             else{
                 playerOfColony=ownedColonies.get(0).getPlayer();
             }
-            if(playerOfColony.ressourceCount()>0){
+            if(playerOfColony.resourceCount()>0){
                 do{
-                    ressource=Board.generateRandomRessource();
+                    resource=Board.generateRandomRessource();
                 }
-                while(playerOfColony.ressources.get(ressource)==0);
-                int ressourceStock=playerOfColony.ressources.get(ressource);
-                playerOfColony.ressources.merge(ressource,1,(a,b)->a-b);
-                player.ressources.merge(ressource,1,Integer::sum);
+                while(playerOfColony.ressources.get(resource)==0);
+                playerOfColony.ressources.merge(resource,1,(initialValue,decreasedValue)->initialValue-decreasedValue);
+                player.ressources.merge(resource,1,Integer::sum);
             }
         }
     }
@@ -284,7 +294,7 @@ public class Game{
         }
         Port choosedPort;
         if(player.ports.size()>1){
-            choosedPort=vueGenerale.portSelection(player);
+            choosedPort=player.getPorts().get(vueGenerale.portSelection(player));
         }
         else{
             choosedPort=player.ports.get(0);
@@ -292,6 +302,7 @@ public class Game{
         String resource1,resource2,resource3;
         String[] resources;
         if(choosedPort.getRate()==2){
+            // TODO: 25/12/2021 prendre directement dans le stock du joueur la ressource du port au lieu de demander quelle ressource le joueur veut enlever de ses mains 
             resources=vueGenerale.chooseResource(2);
             resource1=resources[0];
             resource2=resources[1];
@@ -333,8 +344,6 @@ public class Game{
     }
 
     public Colony buildColonyInitialization(Player player){
-        this.vueGenerale.displayPlayer(player);
-        this.vueGenerale.displayBoard(this);
         int[] placement=vueGenerale.getColonyPlacement();
         int line=placement[0];
         int column=placement[1];
@@ -361,8 +370,6 @@ public class Game{
 
     // fonction construisant une route pour un joueur
     public boolean buildRoadInitialization(Player player,Colony colony){
-        this.vueGenerale.displayPlayer(player);
-        this.vueGenerale.displayBoard(this);
         int[] placement=vueGenerale.getRoadPlacement();
         int line=placement[0];
         int column=placement[1];
@@ -372,7 +379,7 @@ public class Game{
             System.out.println("Cette route appartient deja a quelqu'un."); // TODO: 24/12/2021 mettre tous les messages dans une fonction error de la vue, avec en argument un int qui represente le message a afficher (par exemple 1 = cette route appartient deja a quelqu'un)
             return false;
         }
-        if(choosedRoad.isBuildable(player)){
+        if(choosedRoad.isBuildableInitialization(player,colony)){
             choosedRoad.setPlayer(player);
             player.addPropertie("Road");
             return true;
@@ -386,26 +393,34 @@ public class Game{
     // fonction d'initialisation: tous les joueurs construisent deux colonies et deux routes
     // on donne ensuite les ressources des cases autour des colonies construites aux joueurs
     public void initialization(){
-        System.out.println("Phase d'initialisation :\nTous les joueurs construisent deux colonies et deux routes, la deuxième colonie peut se trouver éloignée de la première à condition que la règle de distance soit respectée.");
+        System.out.println("Phase d'initialisation :\nTous les joueurs construisent deux colonies et deux routes, la deulineième colonie peut se trouver éloignée de la première à condition que la règle de distance soit respectée.");
         Colony buildedColony;
         boolean buildedRoad;
         HashMap<Colony,Player> secondRoundBuildedColonies=new HashMap<>();
         for(int i=0; i<players.length; i++){
+            this.vueGenerale.displayPlayer(players[i]);
+            this.vueGenerale.displayBoard(this);
             do{
                 buildedColony=buildColonyInitialization(players[i]);
             }
             while(buildedColony==null);
+            this.vueGenerale.displayPlayer(players[i]);
+            this.vueGenerale.displayBoard(this);
             do{
                 buildedRoad=buildRoadInitialization(players[i], buildedColony);
             }
             while(!buildedRoad);
         }
         for(int i=players.length-1; i>=0; i--){
+            this.vueGenerale.displayPlayer(players[i]);
+            this.vueGenerale.displayBoard(this);
             do{
                 buildedColony=buildColonyInitialization(players[i]);
             }
             while(buildedColony==null);
             secondRoundBuildedColonies.put(buildedColony,players[i]);
+            this.vueGenerale.displayPlayer(players[i]);
+            this.vueGenerale.displayBoard(this);
             do{
                 buildedRoad=buildRoadInitialization(players[i], buildedColony);
             }
@@ -417,11 +432,11 @@ public class Game{
     // fonction qui parcourt le tableau et donne les ressources aux joueurs de toutes les cases autour des colonies
     public void coloniesProduction(HashMap<Colony, Player> secondRoundBuildedColonies){
         HashMap<Colony,ArrayList<String>> result=new HashMap<>();
-        for(int x=0; x<board.getTiles().length; x++) {
-            for(int y=0; y<board.getTiles().length; y++) {
-                for(Colony colony : board.getTiles()[x][y].getColonies()) {
+        for(int line=0; line<board.getTiles().length; line++) {
+            for(int column=0; column<board.getTiles().length; column++) {
+                for(Colony colony : board.getTiles()[line][column].getColonies()) {
                     if(secondRoundBuildedColonies.containsKey(colony)) {
-                        String resource=board.getTiles()[x][y].getRessource();
+                        String resource=board.getTiles()[line][column].getRessource();
                         ArrayList<String> resources;
                         if(result.containsKey(colony)) {
                             resources=result.get(colony);
@@ -436,9 +451,11 @@ public class Game{
                 }
             }
         }
-        result.forEach((a,b)->{
-            for(String resource:b){
-                a.getPlayer().ressources.merge(resource,1,Integer::sum);
+        result.forEach((colony,ressources)->{
+            for(String resource:ressources){
+                if(!resource.equals("")){
+                    colony.getPlayer().ressources.merge(resource,1,Integer::sum);
+                }
             }
         });
     }

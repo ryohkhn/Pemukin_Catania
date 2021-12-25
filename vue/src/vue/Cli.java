@@ -21,7 +21,7 @@ public class Cli implements Vues{
     public int chooseNbPlayers() { //launcher of cli version
         System.out.println("If you want to be 3 players type 3. \nElse you'll be 4.");
         scanner=new Scanner(System.in);
-        if(scanner.next().equals("3")) {
+        if(scanner.nextLine().equals("3")) {
             return 3;
         } else {
             return 4;
@@ -31,7 +31,7 @@ public class Cli implements Vues{
     public boolean chooseHuman() {
         System.out.println("Type 1 to initialize a human player.\n Else this player will be a bot.");
         scanner=new Scanner(System.in);
-        if(scanner.next().equals("1")) return true;
+        if(scanner.nextLine().equals("1")) return true;
         return false;
     }
 
@@ -44,10 +44,10 @@ public class Cli implements Vues{
 
     @Override
     public int getAction(Player p) {
-        System.out.println("Please select an action : \n -exchange ressources with bank=1"+
-                " \n -build a new colony=2 \n"+" -upgrade a colony into a city=3 \n"+
-                " -build a road=4 \n"+" -buy development cards=5 \n"+
-                " -play a development card=6 \n"+" -End the round=else");
+        System.out.println("Please select an action : \n 1 - exchange ressources with bank"+
+                " \n 2 - build a new colony\n"+" 3 - upgrade a colony into a city\n"+
+                " 4 - build a road\n"+" 5 - buy development cards\n"+
+                " 6 - play a development card\n"+" 7 - display player information\n"+" else - end the round");
         scanner=new Scanner(System.in);
         switch(scanner.next()) {
             case "1":
@@ -73,11 +73,12 @@ public class Cli implements Vues{
             case "6":
                 System.out.println("play a development card");
                 return 6;
-
+            case "7":
+                System.out.println("display player information");
+                return 7;
             default:
                 System.out.println("End of the round.");
-                return 7;
-
+                return 8;
         }
     }
 
@@ -96,7 +97,7 @@ public class Cli implements Vues{
                 }
                 choosedResources[compt]=ressource;
             } catch(InputMismatchException e){
-                System.out.println("You need to input the ressources you want to discard among : Clay, Ore, Wheat, Wood, Wool");
+                System.out.println("You need to input the resources you want to discard among : Clay, Ore, Wheat, Wood, Wool");
                 return ressourceToBeDiscarded(player, quantity);
             }
             compt++;
@@ -110,26 +111,26 @@ public class Cli implements Vues{
         System.out.println("To build a road :");
         scanner=new Scanner(System.in);
         try{
-            System.out.println("Please enter the X-coordinates of the tile.");
-            int x=scanner.nextInt();
-            if(x>3 || x<0){
+            System.out.println("Please enter the line of the tile.");
+            int line=scanner.nextInt();
+            if(line>3 || line<0){
                 throw new InputMismatchException();
             }
-            System.out.println("Please enter the Y-coordinates of the tile.");
-            int y=scanner.nextInt();
-            if(y>3 || y<0){
+            System.out.println("Please enter the column of the tile.");
+            int column=scanner.nextInt();
+            if(column>3 || column<0){
                 throw new InputMismatchException();
             }
             System.out.println("Please enter the placement-coordinates of the road. It is a number between 0-3. 0 is the top road.");
-            int z=scanner.nextInt();
-            if(z<0 || z>3){
+            int roadPosition=scanner.nextInt();
+            if(roadPosition<0 || roadPosition>3){
                 throw new InputMismatchException();
             }
-            int[] co={x,y,z};
+            int[] co={line,column,roadPosition};
             return co;
         }catch (InputMismatchException e) {
-            System.out.println("x-coordinates of the tile should be an Integer between 0-3");
-            System.out.println("y-coordinates of the tile should be an Integer between 0-3");
+            System.out.println("the line of the tile should be an Integer between 0-3");
+            System.out.println("the column of the tile should be an Integer between 0-3");
             System.out.println("placement-coordinates of the road should be an Integer between 0-3");
             return this.getRoadPlacement();
         }
@@ -140,26 +141,26 @@ public class Cli implements Vues{
         System.out.println("To build a colony :");
         scanner=new Scanner(System.in);
         try{
-            System.out.println("Please enter the X-coordinates of the tile.");
-            int x=scanner.nextInt();
-            if(x>3 || x<0){
+            System.out.println("Please enter the line of the tile.");
+            int line=scanner.nextInt();
+            if(line>3 || line<0){
                 throw new InputMismatchException();
             }
-            System.out.println("Please enter the Y-coordinates of the tile.");
-            int y=scanner.nextInt();
-            if(y>3 || y<0){
+            System.out.println("Please enter the column of the tile.");
+            int column=scanner.nextInt();
+            if(column>3 || column<0){
                 throw new InputMismatchException();
             }
             System.out.println("Please enter the placement-coordinates of the future colony. It is a number between 0-3. 0 is the top-left corner.");
-            int z=scanner.nextInt();
-            if(z<0 || z>3){
+            int colonyPosition=scanner.nextInt();
+            if(colonyPosition<0 || colonyPosition>3){
                 throw new InputMismatchException();
             }
-            int[] co={x,y,z};
+            int[] co={line,column,colonyPosition};
             return co;
         }catch (InputMismatchException e) {
-            System.out.println("x-coordinates of the tile should be an Integer between 0-3");
-            System.out.println("y-coordinates of the tile should be an Integer between 0-3");
+            System.out.println("the line of the tile should be an Integer between 0-3");
+            System.out.println("the column of the tile should be an Integer between 0-3");
             System.out.println("placement-coordinates of the future colony should be an Integer between 0-3");
             return this.getColonyPlacement();
         }
@@ -169,26 +170,26 @@ public class Cli implements Vues{
         System.out.println("To build a city :");
         scanner=new Scanner(System.in);
         try{
-            System.out.println("Please enter the X-coordinates of the tile.");
-            int x=scanner.nextInt();
-            if(x>3 || x<0){
+            System.out.println("Please enter the line of the tile.");
+            int line=scanner.nextInt();
+            if(line>3 || line<0){
                 throw new InputMismatchException();
             }
-            System.out.println("Please enter the Y-coordinates of the tile.");
-            int y=scanner.nextInt();
-            if(y>3 || y<0){
+            System.out.println("Please enter the column of the tile.");
+            int column=scanner.nextInt();
+            if(column>3 || column<0){
                 throw new InputMismatchException();
             }
             System.out.println("Please enter the placement-coordinates of the future city. It is a number between 0-3. 0 is the top-left corner.");
-            int z=scanner.nextInt();
-            int[] co={x,y,z};
-            if(z<0 || z>3){
+            int cityPosition=scanner.nextInt();
+            int[] co={line,column,cityPosition};
+            if(cityPosition<0 || cityPosition>3){
                 throw new InputMismatchException();
             }
             return co;
         }catch (InputMismatchException e) {
-            System.out.println("x-coordinates of the tile should be an Integer between 0-3");
-            System.out.println("y-coordinates of the tile should be an Integer between 0-3");
+            System.out.println("the line of the tile should be an Integer between 0-3");
+            System.out.println("the column of the tile should be an Integer between 0-3");
             System.out.println("placement-coordinates of the future city should be an Integer between 0-3");
             return this.getColonyPlacement();
         }
@@ -220,11 +221,11 @@ public class Cli implements Vues{
         String ressources="Clay,Ore,Wheat,Wood,Wool";
         while(compt<number){
             System.out.println("Choose the resource number"+compt+" among : "+ressources);
-            String x=scanner.next();
-            if(!x.equals("Clay") && !x.equals("Ore") && !x.equals("Wheat") && !x.equals("Wood") && !x.equals("Wool")){
+            String resourceInput=scanner.next();
+            if(!resourceInput.equals("Clay") && !resourceInput.equals("Ore") && !resourceInput.equals("Wheat") && !resourceInput.equals("Wood") && !resourceInput.equals("Wool")){
                 return chooseResource(number);
             }
-            res[compt]=x;
+            res[compt]=resourceInput;
             compt++;
         }
         return res;
@@ -234,11 +235,11 @@ public class Cli implements Vues{
     public String chooseCard() {
         scanner=new Scanner(System.in);
         System.out.println("choose a card among : Knigth,VictoryPoint,ProgressRoadBuilding,ProgressYearOfPlenty,ProgressMonopoly;");
-        String x=scanner.next();
-        if(!x.equals("Knigth") && !x.equals("VictoryPoint") && !x.equals("ProgressRoadBuilding") && !x.equals("ProgressYearOfPlenty") && !x.equals("ProgressMonopoly")){
+        String cardInput=scanner.next();
+        if(!cardInput.equals("Knigth") && !cardInput.equals("VictoryPoint") && !cardInput.equals("ProgressRoadBuilding") && !cardInput.equals("ProgressYearOfPlenty") && !cardInput.equals("ProgressMonopoly")){
             return chooseCard();
         }
-        else return x;
+        else return cardInput;
     }
 
     // j'ai ajouté une méthode générale au lieu de devoir refaire la fonction pour chaque quantité de ressource
@@ -388,7 +389,7 @@ public class Cli implements Vues{
         System.out.println("\n    e       f\n");
         for(int x=0;x<4;x++){
             for(int y=0;y<4;y++){
-                System.out.print("tile(" + x +"," + y + ")=" + game.getBoard().getTiles()[x][y].getRessource());
+                System.out.print("tile(" + x +"," + y + ")=" + game.getBoard().getTiles()[x][y].getRessource()+" ");
             }
             System.out.println();
         }
@@ -428,17 +429,20 @@ public class Cli implements Vues{
     }
 
     @Override
-    public Port portSelection(Player player){
+    public int portSelection(Player player){
         scanner=new Scanner(System.in);
         int compt=1;
         for(Port port:player.getPorts()){
-            System.out.println(compt+" - "+(port.getRate()==2?"Port de ressource spécialisée "+port.getRessource():"Port sans ressource spécialisée"));
+            System.out.println(compt+" - "+(port.getRate()==2?"Port de ressource spécialisée "+port.getRessource()+", taux de 2:1":"Port sans ressource spécialisée, taux de 3:1"));
             compt++;
         }
         System.out.println("Choisissez un port parmi cette liste pour faire une échange.");
         try{
             int choosedPort=scanner.nextInt();
-            return player.getPorts().get(compt-1);
+            if(choosedPort>compt || choosedPort<1){
+                throw new InputMismatchException();
+            }
+            return choosedPort-1;
         }
         catch(InputMismatchException e){
             System.out.println("Vous devez rentrer un chiffre entre 1 et "+compt);
@@ -455,22 +459,28 @@ public class Cli implements Vues{
     public int[] getThiefPlacement(){
         scanner=new Scanner(System.in);
         try{
-            System.out.println("Please enter the X-coordinates of the tile.");
-            int x=scanner.nextInt();
-            if(x>3 || x<0){
+            System.out.println("Please enter the line of the tile.");
+            int line=scanner.nextInt();
+            if(line>3 || line<0){
                 throw new InputMismatchException();
             }
-            System.out.println("Please enter the Y-coordinates of the tile.");
-            int y=scanner.nextInt();
-            if(y>3 || y<0){
+            System.out.println("Please enter the column of the tile.");
+            int column=scanner.nextInt();
+            if(column>3 || column<0){
                 throw new InputMismatchException();
             }
-            int[] co={x,y};
+            int[] co={line,column};
             return co;
         }catch (InputMismatchException e) {
-            System.out.println("x-coordinates of the tile should be an Integer between 0-3");
-            System.out.println("y-coordinates of the tile should be an Integer between 0-3");
+            System.out.println("the line of the tile should be an Integer between 0-3");
+            System.out.println("the column of the tile should be an Integer between 0-3");
             return this.getThiefPlacement();
+        }
+    }
+
+    public static void printBlankLines(){
+        for(int i=0; i<50; i++){
+            System.out.println();
         }
     }
 }

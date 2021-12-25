@@ -10,7 +10,8 @@ public class Launcher {
     public static void main(String[] args){
         System.out.println("If you want to play on GUI, type 1.\nElse you'll play on console.");
         Scanner sc2=new Scanner(System.in);
-        if(sc2.next().equals("1")) System.exit(0); //lancer la version GUI
+        String input=sc2.nextLine();
+        if(input.equals("1")) System.exit(0); //lancer la version GUI
         else launchCli();
     }
 
@@ -36,18 +37,20 @@ public class Launcher {
             }
         }
         game.botsGetColor(color);
+        Cli.printBlankLines();
         game.initialization();
+        Cli.printBlankLines();
         boolean hasWon=false;
         while(!hasWon){
             for(Player p : game.getPlayers()){
-                cli.displayPlayer(p);
                 cli.displayBoard(game);
                 boolean check=false;
-                Random rand=(new Random());
+                Random rand=new Random();
                 int diceNumber=rand.nextInt(6) + 1 + rand.nextInt(6) + 1;
                 cli.displayDiceNumber(diceNumber);
                 if(diceNumber==7) game.sevenAtDice(p);
                 game.diceProduction(diceNumber);
+                cli.displayPlayer(p);
                 while(!check) {
                     check=getAction(p,cli,game);
                 }
@@ -63,36 +66,40 @@ public class Launcher {
         switch(cli.getAction(p)){
             case 1 -> {
                 game.tradeWithPort(p);
-                System.out.println("exchange ressources bank");
+                //System.out.println("exchange ressources bank");
                 return false;
             }
             case 2 -> {
                 game.buildColony(p);
-                System.out.println("build a new colony");
+                //System.out.println("build a new colony");
                 return false;
             }
             case 3 -> {
                 game.buildCity(p);
-                System.out.println("upgrade a colony into a city");
+                //System.out.println("upgrade a colony into a city");
                 return false;
             }
             case 4 -> {
                 game.buildRoad(p);
-                System.out.println("build a road");
+                //System.out.println("build a road");
                 return false;
             }
             case 5 -> {
                 game.buyCard(p);
-                System.out.println("buy development cards");
+                //System.out.println("buy development cards");
                 return false;
             }
             case 6 -> {
                 game.useCard(p);
-                System.out.println("play a development card");
+                //System.out.println("play a development card");
+                return false;
+            }
+            case 7 -> {
+                cli.displayPlayer(p);
                 return false;
             }
             default -> {
-                System.out.println("End of the round.");
+                //System.out.println("End of the round.");
                 p.alreadyPlayedCardThisTurn=false;
                 return true;
             }

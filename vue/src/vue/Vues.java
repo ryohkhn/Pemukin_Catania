@@ -1,7 +1,6 @@
 package vue;
 
 import board.Colony;
-import board.Port;
 import game.Player;
 import game.Game;
 
@@ -24,6 +23,6 @@ public interface Vues{
     void displayBoard(Game game);
     void displayPlayer(Player p);
     Player choosePlayerFromColony(ArrayList<Colony> ownedColonies);
-    Port portSelection(Player player);
+    int portSelection(Player player);
     void displayDiceNumber(int diceNumber);
 }
