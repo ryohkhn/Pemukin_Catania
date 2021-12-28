@@ -4,6 +4,7 @@ import board.Colony;
 import game.Player;
 import game.Game;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -25,4 +26,13 @@ public interface Vues{
     Player choosePlayerFromColony(ArrayList<Colony> ownedColonies);
     int portSelection(Player player);
     void displayDiceNumber(int diceNumber);
+
+    class Gui{
+        private JButton button1;
+        private JPanel panel1;
+
+        private void createUIComponents(){
+            // TODO: place custom component creation code here
+        }
+    }
 }

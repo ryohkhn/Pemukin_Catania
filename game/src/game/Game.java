@@ -2,6 +2,7 @@ package game;
 
 import board.*;
 import vue.Vues;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -39,6 +40,7 @@ public class Game{
         int roadNumber=placement[2];
         Road choosedRoad=board.getTiles()[line][column].getRoads().get(roadNumber);
         if(choosedRoad.isOwned()){
+            System.out.println("La route est déjà occupée.");
             return false;
         }
         int clayStock=player.ressources.get("Clay");
@@ -47,8 +49,8 @@ public class Game{
             if(player.canBuildPropertie("Road",15)){
                 if(choosedRoad.isBuildable(player)){
                     choosedRoad.setPlayer(player);
-                    player.ressources.merge("Clay",1,(resourceStock,decreasedValue)->resourceStock-decreasedValue);
-                    player.ressources.merge("Wood",1,(resourceStock,decreasedValue)->resourceStock-decreasedValue);
+                    player.ressources.merge("Clay",1,(initialValue,valueRemoved)->initialValue-valueRemoved);
+                    player.ressources.merge("Wood",1,(initialValue,valueRemoved)->initialValue-valueRemoved);
                     player.addPropertie("Road");
                     System.out.println("Route construite.");
                     return true;
@@ -76,6 +78,7 @@ public class Game{
         int colonyNumber=placement[2];
         Colony choosedColony=board.getTiles()[line][column].getColonies().get(colonyNumber);
         if(choosedColony.isOwned()){
+            System.out.println("Cette colonie appartient déjà à quelqu'un.");
             return false;
         }
         int clayStock=player.ressources.get("Clay");
@@ -89,10 +92,10 @@ public class Game{
                         player.addPort(choosedColony.getLinkedPort());
                     }
                     choosedColony.setPlayer(player);
-                    player.ressources.merge("Clay",1,(resourceStock,valueDecreased)->resourceStock-valueDecreased);
-                    player.ressources.merge("Wood",1,(resourceStock,valueDecreased)->resourceStock-valueDecreased);
-                    player.ressources.merge("Wheat",1,(resourceStock,valueDecreased)->resourceStock-valueDecreased);
-                    player.ressources.merge("Wool",1,(resourceStock,valueDecreased)->resourceStock-valueDecreased);
+                    player.ressources.merge("Clay",1,(initialValue,valueRemoved)->initialValue-valueRemoved);
+                    player.ressources.merge("Wood",1,(initialValue,valueRemoved)->initialValue-valueRemoved);
+                    player.ressources.merge("Wheat",1,(initialValue,valueRemoved)->initialValue-valueRemoved);
+                    player.ressources.merge("Wool",1,(initialValue,valueRemoved)->initialValue-valueRemoved);
                     player.addPropertie("Colony");
                     player.addVictoryPoint(1);
                     System.out.println("Colonie construite.");
@@ -176,9 +179,9 @@ public class Game{
                 do{
                     choosedResources=vueGenerale.ressourceToBeDiscarded(player,quantity);
                 }
-                while(player.hasResources(choosedResources));
+                while(!player.hasResources(choosedResources));
                 for(String resource:choosedResources){
-                    player.ressources.merge(resource,1,(initialValue,decreasedValue)->initialValue-decreasedValue);
+                    player.ressources.merge(resource,1,(initialValue,valueRemoved)->initialValue-valueRemoved);
                 }
             }
         }
@@ -187,7 +190,7 @@ public class Game{
 
     // fonction pour réattribuer l'emplacement du brigand et voler les ressources de colonies présentes sur la nouvelle case
     public void setThiefAndSteal(Player player){
-        // TODO: 25/12/2021 dire quel joueur doit déplacer le voleur 
+        System.out.println(player+" you have to change the location of the thief, input the coordinates. You can then steal a resource from a player if one of his colonies are on the tile.");
         // on set le voleur sur la nouvelle case
         int[] placement=vueGenerale.getThiefPlacement();
         int line=placement[0];
@@ -199,16 +202,17 @@ public class Game{
 
         ArrayList<Colony> ownedColonies=new ArrayList<>();
         for(Colony colony:choosedTile.getColonies()){
-            if(colony.getPlayer()!=null){
+            if(colony.getPlayer()!=null && colony.getPlayer()!=player && !ownedColonies.contains(colony)){
                 ownedColonies.add(colony);
             }
         }
 
-        // on vole une ressource à une colonie étant sur la case ou se trouve le voleur, s'il y en a plusieurs colonies le joueur choisit laquelle
+        // on vole une ressource à une colonie étant sur la case ou se trouve le voleur, s'il y a plusieurs colonies le joueur choisit laquelle
         String resource;
         Player playerOfColony;
         if(ownedColonies.size()!=0){
             if(ownedColonies.size()>1){
+                System.out.println("Choose a player to steal the resource from.");
                 playerOfColony=vueGenerale.choosePlayerFromColony(ownedColonies);
             }
             else{
@@ -219,8 +223,9 @@ public class Game{
                     resource=Board.generateRandomRessource();
                 }
                 while(playerOfColony.ressources.get(resource)==0);
-                playerOfColony.ressources.merge(resource,1,(initialValue,decreasedValue)->initialValue-decreasedValue);
+                playerOfColony.ressources.merge(resource,1,(initialValue,valueRemoved)->initialValue-valueRemoved);
                 player.ressources.merge(resource,1,Integer::sum);
+                System.out.println(player+" stole 1 "+resource+" from "+playerOfColony);
             }
         }
     }
@@ -231,6 +236,11 @@ public class Game{
         int woolStock=player.ressources.get("Wool");
         int wheatStock=player.ressources.get("Wheat");
         if(oreStock>=1 && woolStock>=1 && wheatStock>=1){
+            player.ressources.merge("Ore",1,(initialValue,valueRemoved)->initialValue-valueRemoved);
+            player.ressources.merge("Wool",1,(initialValue,valueRemoved)->initialValue-valueRemoved);
+            player.ressources.merge("Wheat",1,(initialValue,valueRemoved)->initialValue-valueRemoved);
+            Card randomCard=Card.randomCard();
+            System.out.println("You draw a "+randomCard);
             player.cards.merge(Card.randomCard(),1,Integer::sum);
         }
         else{
@@ -245,6 +255,7 @@ public class Game{
         if(turnPlayer.cards.get(choosedCard)>0){
             switch(choosedCard){
                 case Knigth -> {
+                    turnPlayer.knightPlayed+=1;
                     setThiefAndSteal(turnPlayer);
                 }
                 case VictoryPoint -> {
@@ -255,7 +266,7 @@ public class Game{
                     String ressource=ressources[0];
                     for(Player player:players){
                         if(player.ressources.get(ressource)>0){
-                            player.ressources.merge(ressource,1,(a,b)->a-b);
+                            player.ressources.merge(ressource,1,(initialValue,valueRemoved)->initialValue-valueRemoved);
                             turnPlayer.ressources.merge(ressource,1,Integer::sum);
                         }
                     }
@@ -300,16 +311,13 @@ public class Game{
             choosedPort=player.ports.get(0);
         }
         String resource1,resource2,resource3;
-        String[] resources;
+        String[] resources,portResource;
         if(choosedPort.getRate()==2){
-            // TODO: 25/12/2021 prendre directement dans le stock du joueur la ressource du port au lieu de demander quelle ressource le joueur veut enlever de ses mains 
-            resources=vueGenerale.chooseResource(2);
-            resource1=resources[0];
-            resource2=resources[1];
-            if(player.ressources.get(resource1)>0 && player.ressources.get(resource2)>0){
-                player.ressources.merge(resource1,1,(a,b)->a-b);
-                player.ressources.merge(resource2,1,(a,b)->a-b);
-                player.ressources.merge(choosedPort.getRessource(), 1,Integer::sum);
+            resource1=choosedPort.getRessource();
+            if(player.ressources.get(resource1)>=2){
+                player.ressources.merge(resource1,2,(initialValue,valueRemoved)->initialValue-valueRemoved);
+                portResource=vueGenerale.chooseResource(1);
+                player.ressources.merge(portResource[0],1,Integer::sum);
             }
             else{
                 System.out.println("Vous n'avez pas les ressources suffisantes pour faire l'échange.");
@@ -321,10 +329,12 @@ public class Game{
             resource2=resources[1];
             resource3=resources[2];
             if(player.ressources.get(resource1)>0 && player.ressources.get(resource2)>0 && player.ressources.get(resource3)>0){
-                player.ressources.merge(resource1,1,(a,b)->a-b);
-                player.ressources.merge(resource2,1,(a,b)->a-b);
-                player.ressources.merge(resource3,1,(a,b)->a-b);
-                player.ressources.merge(choosedPort.getRessource(), 1,Integer::sum);
+                player.ressources.merge(resource1,1,(initialValue,valueRemoved)->initialValue-valueRemoved);
+                player.ressources.merge(resource2,1,(initialValue,valueRemoved)->initialValue-valueRemoved);
+                player.ressources.merge(resource3,1,(initialValue,valueRemoved)->initialValue-valueRemoved);
+                System.out.println("Choose a resource you want to get from the port.");
+                portResource=vueGenerale.chooseResource(1);
+                player.ressources.merge(portResource[0],1,Integer::sum);
             }
             else{
                 System.out.println("Vous n'avez pas les ressources suffisantes pour faire l'échange.");
@@ -350,7 +360,7 @@ public class Game{
         int colonyNumber=placement[2];
         Colony choosedColony=board.getTiles()[line][column].getColonies().get(colonyNumber);
         if(choosedColony.isOwned()){
-            System.out.println("Cette colonie appartient deja a quelqu'un.");
+            System.out.println("Cette colonie appartient déjà à quelqu'un.");
             return null;
         }
         if(choosedColony.isBuildableInitialization(player)){
@@ -460,7 +470,44 @@ public class Game{
         });
     }
 
-
+    public void checkLongestArmy(){
+        boolean cardOwned=false;
+        int knightPlayedCount=0;
+        Player playerOwningCard=null;
+        Player nextPlayer=null;
+        for(Player player:players){
+            if(player.cards.get(Card.LargestArmy)>0){
+                cardOwned=true;
+                knightPlayedCount=player.knightPlayed;
+                playerOwningCard=player;
+            }
+        }
+        for(Player player:players){
+            if(cardOwned){
+                if(player.knightPlayed>knightPlayedCount){
+                    nextPlayer=player;
+                    knightPlayedCount=nextPlayer.knightPlayed;
+                }
+            }
+            else{
+                if(player.knightPlayed>=3){
+                    nextPlayer=player;
+                }
+            }
+        }
+        if(playerOwningCard!=nextPlayer){
+            if(playerOwningCard!=null){
+                System.out.println(playerOwningCard+"has lost the longest army card. He lost his two victory points.");
+                playerOwningCard.removeCard(Card.LargestArmy);
+                playerOwningCard.victoryPoint-=2;
+            }
+            if(nextPlayer!=null){
+                System.out.println(nextPlayer+"has won the longest army card. He won 2 victory points.");
+                nextPlayer.addCard(Card.LargestArmy);
+                nextPlayer.victoryPoint+=2;
+            }
+        }
+    }
 }
 
 /*

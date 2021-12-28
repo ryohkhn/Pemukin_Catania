@@ -44,14 +44,14 @@ public class Cli implements Vues{
 
     @Override
     public int getAction(Player p) {
-        System.out.println("Please select an action : \n 1 - exchange ressources with bank"+
+        System.out.println("\nPlease select an action : \n 1 - exchange ressources with bank"+
                 " \n 2 - build a new colony\n"+" 3 - upgrade a colony into a city\n"+
                 " 4 - build a road\n"+" 5 - buy development cards\n"+
-                " 6 - play a development card\n"+" 7 - display player information\n"+" else - end the round");
+                " 6 - play a development card\n"+" 7 - display player information\n"+" 8 - show building costs\n"+" else - end the round\n");
         scanner=new Scanner(System.in);
         switch(scanner.next()) {
             case "1":
-                System.out.println("exchange resources bank");
+                System.out.println("trade resources with port");
                 return 1;
 
             case "2":
@@ -76,21 +76,26 @@ public class Cli implements Vues{
             case "7":
                 System.out.println("display player information");
                 return 7;
+            case "8":
+                System.out.println("show building costs");
+                return 8;
             default:
                 System.out.println("End of the round.");
-                return 8;
+                return 9;
         }
     }
 
     @Override
     public String[] ressourceToBeDiscarded(Player player,int quantity) {
         scanner=new Scanner(System.in);
-        System.out.println(player.toString());
         System.out.println("Choose "+quantity+" resources you need to discard among : Clay, Ore, Wheat, Wood, Wool");
+        System.out.println("Resources of "+player+" :");
+        System.out.println(player.getRessourcesToString());
         String[] choosedResources=new String[quantity];
         int compt=0;
         while(compt<quantity){
             try{
+                System.out.println("Enter the resource number "+(compt+1)+" you want to discard.");
                 String ressource=scanner.next();
                 if(!ressource.equals("Clay") && !ressource.equals("Ore") && !ressource.equals("Wheat") && !ressource.equals("Wood") && !ressource.equals("Wool")){
                     return ressourceToBeDiscarded(player, quantity);
@@ -165,6 +170,7 @@ public class Cli implements Vues{
             return this.getColonyPlacement();
         }
     }
+
     @Override
     public int[] getCityPlacement() {
         System.out.println("To build a city :");
@@ -195,32 +201,13 @@ public class Cli implements Vues{
         }
     }
 
-    /*@Override
-    public String[] choose2Resources() {
-        scanner=new Scanner(System.in);
-        String ressources="Clay,Ore,Wheat,Wood,Wool";
-        System.out.println("Choose the first resource among : "+ressources);
-        String x=scanner.next();
-        if(!x.equals("Clay") && !x.equals("Ore") && !x.equals("Wheat") && !x.equals("Wood") && !x.equals("Wool")){
-            return choose2Resources();
-        }
-        System.out.println("Choose the second resource among : " + ressources);
-        String x2=scanner.next();
-        if(!x2.equals("Clay") && !x2.equals("Ore") && !x2.equals("Wheat") && !x2.equals("Wood") && !x2.equals("Wool")){
-            return choose2Resources();
-        }
-        String[] res={x,x2};
-        return res;
-    }
-     */
-
     public String[] chooseResource(int number){
         int compt=0;
         String[] res=new String[number];
         scanner = new Scanner(System.in);
-        String ressources="Clay,Ore,Wheat,Wood,Wool";
+        String ressources="Clay, Ore, Wheat, Wood, Wool.";
         while(compt<number){
-            System.out.println("Choose the resource number"+compt+" among : "+ressources);
+            System.out.println("Choose the resource number "+(compt+1)+" among : "+ressources);
             String resourceInput=scanner.next();
             if(!resourceInput.equals("Clay") && !resourceInput.equals("Ore") && !resourceInput.equals("Wheat") && !resourceInput.equals("Wood") && !resourceInput.equals("Wool")){
                 return chooseResource(number);
@@ -242,28 +229,15 @@ public class Cli implements Vues{
         else return cardInput;
     }
 
-    // j'ai ajouté une méthode générale au lieu de devoir refaire la fonction pour chaque quantité de ressource
-    // je sais pas si la méthode que j'ai fait fonctionne je peux pas tester donc je laisse les méthodes qu'elle remplace en commentaire au cas ou
-    /*@Override
-    public String choose1Resource() {
-        scanner=new Scanner(System.in);
-        String ressources="Clay,Ore,Wheat,Wood,Wool";
-        System.out.println("Choose a resource among :" + ressources);
-        String x=scanner.next();
-        if(!x.equals("Clay") && !x.equals("Ore") && !x.equals("Wheat") && !x.equals("Wood") && !x.equals("Wool")){
-            return choose1Resource();
-        }
-        return x;
-    }
-     */
-
     @Override
     public void victory(Player p) {
         System.out.println(p.toString() + "has won the game!");
+        System.exit(0);
     }
 
     @Override
     public void displayBoard(Game game) {
+        // TODO: 27/12/2021 ports qui n'affichent pas les bonnes valeurs régler l'affichage des routes
         Point thief=null;
         Port[] tab=new Port[8];
         int iter=0;
@@ -389,7 +363,9 @@ public class Cli implements Vues{
         System.out.println("\n    e       f\n");
         for(int x=0;x<4;x++){
             for(int y=0;y<4;y++){
-                System.out.print("tile(" + x +"," + y + ")=" + game.getBoard().getTiles()[x][y].getRessource()+" ");
+                String resource=game.getBoard().getTiles()[x][y].getRessource();
+                resource=resource.equals("")?"Desert":resource;
+                System.out.print("tile(" + x +"," + y + ")=" + resource +" ");
             }
             System.out.println();
         }
@@ -482,5 +458,12 @@ public class Cli implements Vues{
         for(int i=0; i<50; i++){
             System.out.println();
         }
+    }
+
+    public void showBuildCost(){
+        System.out.println("Road : 1x Clay, 1x Wood. 0 Victory Point");
+        System.out.println("Colony: 1x Clay, 1x Wood, 1x Wheat, 1x Wool. 1 Victory Point");
+        System.out.println("City : 2x Wheat, 3x Ore. 2 Victory Points");
+        System.out.println("Card : 1x Wool, 1x Wheat, 1x Ore. 0 Victory Point");
     }
 }

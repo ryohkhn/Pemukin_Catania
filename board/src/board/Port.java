@@ -24,6 +24,6 @@ public class Port{
     @Override
     public String toString() {
         if(rate==3) return "3:1";
-        else return "2:1->" + ressource;
+        else return ressource+" -> 2:1";
     }
 }

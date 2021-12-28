@@ -3,13 +3,13 @@ package game;
 import java.util.Random;
 
 public enum Card{
-    Knigth,VictoryPoint,ProgressRoadBuilding,ProgressYearOfPlenty,ProgressMonopoly;
+    Knigth,VictoryPoint,ProgressRoadBuilding,ProgressYearOfPlenty,ProgressMonopoly,LargestArmy;
 
 
     private static final Random random=new Random();
 
     public static Card randomCard(){
-        int index=random.nextInt(Card.values().length);
+        int index=random.nextInt(Card.values().length-1);
         return Card.values()[index];
     }
 

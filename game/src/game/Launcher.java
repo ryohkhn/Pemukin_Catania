@@ -1,6 +1,8 @@
-package vue;
+package game;
 
-import game.*;
+import vue.Cli;
+import vue.Gui;
+
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
@@ -11,7 +13,7 @@ public class Launcher {
         System.out.println("If you want to play on GUI, type 1.\nElse you'll play on console.");
         Scanner sc2=new Scanner(System.in);
         String input=sc2.nextLine();
-        if(input.equals("1")) System.exit(0); //lancer la version GUI
+        if(input.equals("1")) launchGui();
         else launchCli();
     }
 
@@ -43,14 +45,15 @@ public class Launcher {
         boolean hasWon=false;
         while(!hasWon){
             for(Player p : game.getPlayers()){
+                game.checkLongestArmy();
+                cli.displayPlayer(p);
                 cli.displayBoard(game);
                 boolean check=false;
                 Random rand=new Random();
                 int diceNumber=rand.nextInt(6) + 1 + rand.nextInt(6) + 1;
                 cli.displayDiceNumber(diceNumber);
-                if(diceNumber==7) game.sevenAtDice(p);
+                //if(diceNumber==7) game.sevenAtDice(p);
                 game.diceProduction(diceNumber);
-                cli.displayPlayer(p);
                 while(!check) {
                     check=getAction(p,cli,game);
                 }
@@ -60,6 +63,10 @@ public class Launcher {
                 }
             }
         }
+    }
+
+    public static void launchGui(){
+        Gui gui=new Gui();
     }
 
     private static boolean getAction(Player p,Cli cli,Game game) {
@@ -96,6 +103,10 @@ public class Launcher {
             }
             case 7 -> {
                 cli.displayPlayer(p);
+                return false;
+            }
+            case 8 -> {
+                cli.showBuildCost();
                 return false;
             }
             default -> {

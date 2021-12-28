@@ -14,6 +14,7 @@ public abstract class Player{
     protected HashMap<Card,Integer> cards=new HashMap<>();
     protected LinkedList<Port> ports=new LinkedList<>();
     protected int victoryPoint=0;
+    protected int knightPlayed=0;
     public boolean alreadyPlayedCardThisTurn=false;
     public boolean longestRoad;
 
@@ -70,7 +71,11 @@ public abstract class Player{
     }
 
     public void removeCard(Card card) {
-        this.cards.merge(card, 1, (a, b) -> a-b);
+        this.cards.merge(card, 1, (initialValue, decreasedValue) -> initialValue-decreasedValue);
+    }
+
+    public void addCard(Card card){
+        this.cards.merge(card,1,Integer::sum);
     }
 
     public String getColor() {
@@ -92,7 +97,7 @@ public abstract class Player{
     public String getRessourcesToString() {
         String res="";
         for(Map.Entry<String ,Integer> entry: this.ressources.entrySet()) {
-            res+=entry.getKey() + ":"+ String.valueOf(entry.getValue())+ " ; ";
+            res+=entry.getKey() + ":"+ entry.getValue()+ " ; ";
         }
         return res;
     }
@@ -103,7 +108,7 @@ public abstract class Player{
 
     @Override
     public String toString(){
-        return "Player of color "+this.color;
+        return "Player "+this.color;
     }
 
     public LinkedList<Port> getPorts(){
@@ -114,20 +119,30 @@ public abstract class Player{
         int clayCount=0,oreCount=0,wheatCount=0,woodCount=0,woolCount=0;
         for(String resource:resources){
             switch(resource){
-                case "Clay" : clayCount++;
-                case "Ore" : oreCount++;
-                case "Wheat" : wheatCount++;
-                case "Wood" : woodCount++;
-                case "Wool" : woolCount++;
+                case "Clay" -> clayCount++;
+                case "Ore" -> oreCount++;
+                case "Wheat" -> wheatCount++;
+                case "Wood" -> woodCount++;
+                case "Wool" -> woolCount++;
             }
         }
         for(String resource:this.ressources.keySet()){
             switch(resource){
-                case "Clay" : if(this.ressources.get(resource)<clayCount) return false;
-                case "Ore" : if(this.ressources.get(resource)<oreCount) return false;
-                case "Wheat" : if(this.ressources.get(resource)<wheatCount) return false;
-                case "Wood" : if(this.ressources.get(resource)<woodCount) return false;
-                case "Wool" : if(this.ressources.get(resource)<woolCount) return false;
+                case "Clay" -> {
+                    if(this.ressources.get(resource)<clayCount) return false;
+                }
+                case "Ore" -> {
+                    if(this.ressources.get(resource)<oreCount) return false;
+                }
+                case "Wheat" -> {
+                    if(this.ressources.get(resource)<wheatCount) return false;
+                }
+                case "Wood" -> {
+                    if(this.ressources.get(resource)<woodCount) return false;
+                }
+                case "Wool" -> {
+                    if(this.ressources.get(resource)<woolCount) return false;
+                }
             }
         }
         return true;
