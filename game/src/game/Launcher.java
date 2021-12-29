@@ -11,7 +11,8 @@ public class Launcher {
     Game game;
 
     public static void main(String[] args){
-        //launchGui();
+        Launcher launcher=new Launcher();
+        launcher.launchGui();
         System.out.println("If you want to play on GUI, type 1.\nElse you'll play on console.");
         Scanner sc2=new Scanner(System.in);
         String input=sc2.nextLine();
@@ -28,7 +29,7 @@ public class Launcher {
         color.put("yellow", false);
         color.put("green", false);
         color.put("orange", false);
-        for(int i=0; i<nbPlayer; i++) {
+        for(int i=0; i<game.getPlayers().length; i++) {
             if(cli.chooseHuman()){
                 String colorChoice= cli.chooseColor(color);
                 while(!color.replace(colorChoice, false, true)) {
@@ -36,7 +37,7 @@ public class Launcher {
                 }
                 game.setPlayers(i,new Human(colorChoice));
             }else{
-                game.setPlayers(i,new Bot());
+                game.setPlayers(i,new Bot(null));
             }
         }
         game.botsGetColor(color);
@@ -67,15 +68,8 @@ public class Launcher {
     }
 
     public void launchGui(){
-        Gui gui=new Gui();
-        int val=gui.getNbplayer();
-        while(val==0){
-        }
-        System.out.println(val);
-        Game game=new Game(val);
+        Gui gui=new Gui(this);
     }
-
-     */
 
     private static boolean getAction(Player p,Cli cli,Game game) {
         switch(cli.getAction(p)){
@@ -125,7 +119,9 @@ public class Launcher {
         }
     }
 
-    public void createGame(int nbPlayers){
-        this.game=new Game(nbPlayers);
+    public Game createGame(int nbPlayers){
+        Game game=new Game(nbPlayers);
+        this.game=game;
+        return game;
     }
 }

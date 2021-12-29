@@ -19,13 +19,14 @@ public abstract class Player{
     public boolean longestRoad;
 
     // constructeur qui initialise
-    public Player(){
+    public Player(String color){
         propertiesCounter.put("City",0);
         propertiesCounter.put("Colony",0);
         propertiesCounter.put("Road",0);
         for(Card card : Card.values()){
             cards.put(card,0);
         }
+        this.color=color;
     }
 
     // fonction qui incrémente les points de victoire d'un joueur en fonction de l'entier en argument
@@ -80,6 +81,10 @@ public abstract class Player{
 
     public String getColor() {
         return color;
+    }
+
+    public void setColor(String color){
+        this.color=color;
     }
 
     public int getVictoryPoint() {

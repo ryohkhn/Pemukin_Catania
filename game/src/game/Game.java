@@ -508,6 +508,21 @@ public class Game{
             }
         }
     }
+
+    public void setPlayers(String[] playersType){
+        for(int i=0; i<this.players.length; i++){
+            switch(playersType[i]){
+                case "Human" -> this.players[i]=new Human(null);
+                case "Bot" -> this.players[i]=new Bot(null);
+            }
+        }
+    }
+
+    public void setColors(String[] playersColor){
+        for(int i=0; i<this.players.length; i++){
+            this.players[i].setColor(playersColor[i]);
+        }
+    }
 }
 
 /*
