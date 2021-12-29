@@ -8,19 +8,20 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Launcher {
+    Game game;
 
     public static void main(String[] args){
+        //launchGui();
         System.out.println("If you want to play on GUI, type 1.\nElse you'll play on console.");
         Scanner sc2=new Scanner(System.in);
         String input=sc2.nextLine();
-        if(input.equals("1")) launchGui();
-        else launchCli();
+        //if(input.equals("1")) launchGui();
+        //else launchCli();
     }
 
-    public static void launchCli(){
+    public void launchCli(){
         Cli cli=new Cli();
-        int nbPlayer=cli.chooseNbPlayers();
-        Game game=new Game(nbPlayer);
+        cli.choosePlayers();
         game.setVueGenerale(cli);
         HashMap<String, Boolean> color=new HashMap<>();
         color.put("blue", false);
@@ -65,11 +66,16 @@ public class Launcher {
         }
     }
 
-    public static void launchGui(){
+    public void launchGui(){
         Gui gui=new Gui();
-        int nbPlayers=gui.chooseNbPlayers();
-        Game game=new Game(nbPlayers);
+        int val=gui.getNbplayer();
+        while(val==0){
+        }
+        System.out.println(val);
+        Game game=new Game(val);
     }
+
+     */
 
     private static boolean getAction(Player p,Cli cli,Game game) {
         switch(cli.getAction(p)){
@@ -117,5 +123,9 @@ public class Launcher {
                 return true;
             }
         }
+    }
+
+    public void createGame(int nbPlayers){
+        this.game=new Game(nbPlayers);
     }
 }

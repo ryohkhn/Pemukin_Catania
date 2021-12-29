@@ -1,17 +1,11 @@
 package vue;
 
-import board.Colony;
-import game.Game;
-import game.Player;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.HashMap;
 
-public class Gui extends JFrame implements Vues{
+public class Gui extends JFrame{
     private GuiBoard guiBoard;
     private GuiSideBar guiSideBar;
     private int nbplayer;
@@ -22,26 +16,16 @@ public class Gui extends JFrame implements Vues{
         setUpGui();
     }
 
+    public int getNbplayer(){
+        return nbplayer;
+    }
+
     public void setUpGui(){
         setTitle("Pemukin Catania");
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setSize(screenSize.width-700, screenSize.height-300);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-//        getContentPane().setLayout(new GridLayout());
-        guiSideBar.setBackground(Color.red);
-        this.add(guiBoard);
-        this.add(guiSideBar);
-        guiSideBar.setVisible(false);
-        guiBoard.setVisible(false);
-
-        setVisible(true);
-    }
-
-    // marche pas encore il faut trouver une solution
-    // ça return la valeur avant même de prendre l'input de la comboBox
-    @Override
-    public int chooseNbPlayers(){
         JPanel playerSelection=new JPanel();
         playerSelection.add(new JLabel("Choose how many players you want in the game."),CENTER_ALIGNMENT);
         String[] values={"3","4"};
@@ -54,91 +38,26 @@ public class Gui extends JFrame implements Vues{
         ActionListener buttonListener=new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e){
-                returnedValue[0]=Integer.parseInt(comboBox.getActionCommand());
+                returnedValue[0]=Integer.parseInt((String)comboBox.getSelectedItem());
+                nbplayer=returnedValue[0];
             }
         };
         next.addActionListener(buttonListener);
 
-        return returnedValue[0];
+        /*getContentPane().setLayout(new GridLayout());
+        guiSideBar.setBackground(Color.red);
+        this.add(guiBoard);
+        this.add(guiSideBar);
+        guiSideBar.setVisible(false);
+        guiBoard.setVisible(false);
+         */
+
+
+        setVisible(true);
     }
 
-    @Override
-    public boolean chooseHuman(){
-        return false;
-    }
+    public int chooseNbPlayers(){
 
-    @Override
-    public String chooseColor(HashMap<String, Boolean> color){
-        return null;
-    }
-
-    @Override
-    public int getAction(Player p){
         return 0;
-    }
-
-    @Override
-    public String[] ressourceToBeDiscarded(Player player, int quantity){
-        return new String[0];
-    }
-
-    @Override
-    public int[] getRoadPlacement(){
-        return new int[0];
-    }
-
-    @Override
-    public int[] getColonyPlacement(){
-        return new int[0];
-    }
-
-    @Override
-    public int[] getCityPlacement(){
-        return new int[0];
-    }
-
-    @Override
-    public int[] getThiefPlacement(){
-        return new int[0];
-    }
-
-    @Override
-    public String chooseCard(){
-        return null;
-    }
-
-    @Override
-    public String[] chooseResource(int number){
-        return new String[0];
-    }
-
-    @Override
-    public void victory(Player p){
-
-    }
-
-    @Override
-    public void displayBoard(Game game){
-
-    }
-
-    @Override
-    public void displayPlayer(Player p){
-
-    }
-
-    @Override
-    public Player choosePlayerFromColony(ArrayList<Colony> ownedColonies){
-        return null;
-    }
-
-    @Override
-    public int portSelection(Player player){
-        return 0;
-    }
-
-    @Override
-    public void displayDiceNumber(int diceNumber){
-
     }
 }

@@ -3,6 +3,7 @@ package vue;
 import board.Colony;
 import board.Port;
 import board.Tile;
+import game.Controller;
 import game.Game;
 import game.Player;
 
@@ -14,12 +15,13 @@ import java.util.Scanner;
 
 
 public class Cli implements Vues{
+    Controller controller=new Controller();
     Scanner scanner;
-    Game game;
 
     @Override
     public int chooseNbPlayers() { //launcher of cli version
         System.out.println("If you want to be 3 players type 3. \nElse you'll be 4.");
+        controller.chooseNbPlayers();
         scanner=new Scanner(System.in);
         if(scanner.nextLine().equals("3")) {
             return 3;
@@ -27,6 +29,7 @@ public class Cli implements Vues{
             return 4;
         }
     }
+
     @Override
     public boolean chooseHuman() {
         System.out.println("Type 1 to initialize a human player.\n Else this player will be a bot.");
@@ -465,5 +468,10 @@ public class Cli implements Vues{
         System.out.println("Colony: 1x Clay, 1x Wood, 1x Wheat, 1x Wool. 1 Victory Point");
         System.out.println("City : 2x Wheat, 3x Ore. 2 Victory Points");
         System.out.println("Card : 1x Wool, 1x Wheat, 1x Ore. 0 Victory Point");
+    }
+
+    @Override
+    public void choosePlayers(){
+        System.out.println("If you want to be 3 players type 3. \nElse you'll be 4.");
     }
 }
