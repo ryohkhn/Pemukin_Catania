@@ -52,7 +52,7 @@ public class Launcher {
                 Random rand=new Random();
                 int diceNumber=rand.nextInt(6) + 1 + rand.nextInt(6) + 1;
                 cli.displayDiceNumber(diceNumber);
-                //if(diceNumber==7) game.sevenAtDice(p);
+                if(diceNumber==7) game.sevenAtDice(p);
                 game.diceProduction(diceNumber);
                 while(!check) {
                     check=getAction(p,cli,game);
@@ -67,6 +67,8 @@ public class Launcher {
 
     public static void launchGui(){
         Gui gui=new Gui();
+        int nbPlayers=gui.chooseNbPlayers();
+        Game game=new Game(nbPlayers);
     }
 
     private static boolean getAction(Player p,Cli cli,Game game) {
