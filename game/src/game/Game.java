@@ -258,7 +258,7 @@ public class Game{
                     turnPlayer.addVictoryPoint(1);
                 }
                 case ProgressMonopoly -> {
-                    String[] ressources=vueGenerale.chooseResource(1);
+                    /*String[] ressources=vueGenerale.chooseResource(1);
                     String ressource=ressources[0];
                     for(Player player:players){
                         if(player.ressources.get(ressource)>0){
@@ -266,6 +266,8 @@ public class Game{
                             turnPlayer.ressources.merge(ressource,1,Integer::sum);
                         }
                     }
+
+                     */
                 }
                 case ProgressRoadBuilding -> {
                     int buildedRoad=0;
@@ -281,9 +283,11 @@ public class Game{
                     }
                 }
                 case ProgressYearOfPlenty -> {
-                    String[] ressources=vueGenerale.chooseResource(2);
+                    /*String[] ressources=vueGenerale.chooseResource(2);
                     turnPlayer.ressources.merge(ressources[0],1,Integer::sum);
                     turnPlayer.ressources.merge(ressources[1],1,Integer::sum);
+
+                     */
                 }
             }
             turnPlayer.removeCard(choosedCard);
@@ -294,46 +298,31 @@ public class Game{
     }
 
     // fonction qui permet de faire une échange avec un le port si le joueur en possède un
-    public void tradeWithPort(Player player){
-        if(player.ports.size()==0){
-            System.out.println("You can't trade resources, you don't have a port.");
-            return;
-        }
-        Port choosedPort;
-        if(player.ports.size()>1){
-            choosedPort=player.getPorts().get(vueGenerale.portSelection(player));
-        }
-        else{
-            choosedPort=player.ports.get(0);
-        }
-        String resource1,resource2,resource3;
-        String[] resources,portResource;
-        if(choosedPort.getRate()==2){
-            resource1=choosedPort.getRessource();
-            if(player.ressources.get(resource1)>=2){
-                player.ressources.merge(resource1,2,(initialValue,valueRemoved)->initialValue-valueRemoved);
-                portResource=vueGenerale.chooseResource(1);
-                player.ressources.merge(portResource[0],1,Integer::sum);
+    public void trade(Player player,Port choosedPort, String portResource, String[] playerResource){
+        if(choosedPort==null){
+            if(player.ressources.get(playerResource) >= 4){
+                player.ressources.merge(playerResource[0], 4, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+                player.ressources.merge(portResource, 1, Integer::sum);
+            }else{
+                System.out.println("Vous n'avez pas les ressources suffisantes pour faire l'échange");
             }
-            else{
-                System.out.println("Vous n'avez pas les ressources suffisantes pour faire l'échange.");
+        }else if(choosedPort.getRate()==2){
+            if(player.ressources.get(playerResource) >= 2){
+                if(choosedPort.getRessource().equals(portResource)) {
+                    player.ressources.merge(choosedPort.getRessource(), 2, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+                    player.ressources.merge(portResource, 1, Integer::sum);
+                }else{
+                    System.out.println("Ce port n'échange pas cette ressource");
+                }
+            }else{
+                System.out.println("Vous n'avez pas les ressources suffisantes pour faire l'échange");
             }
-        }
-        else{
-            resources=vueGenerale.chooseResource(3);
-            resource1=resources[0];
-            resource2=resources[1];
-            resource3=resources[2];
-            if(player.ressources.get(resource1)>0 && player.ressources.get(resource2)>0 && player.ressources.get(resource3)>0){
-                player.ressources.merge(resource1,1,(initialValue,valueRemoved)->initialValue-valueRemoved);
-                player.ressources.merge(resource2,1,(initialValue,valueRemoved)->initialValue-valueRemoved);
-                player.ressources.merge(resource3,1,(initialValue,valueRemoved)->initialValue-valueRemoved);
-                System.out.println("Choose a resource you want to get from the port.");
-                portResource=vueGenerale.chooseResource(1);
-                player.ressources.merge(portResource[0],1,Integer::sum);
-            }
-            else{
-                System.out.println("Vous n'avez pas les ressources suffisantes pour faire l'échange.");
+        }else{ //cas ou le port echange en 3:1
+            if(player.ressources.get(playerResource) >= 3){
+                player.ressources.merge(playerResource[0], 3, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+                player.ressources.merge(portResource, 1, Integer::sum);
+            }else{
+                System.out.println("Vous n'avez pas les ressources suffisantes pour faire l'échange");
             }
         }
     }

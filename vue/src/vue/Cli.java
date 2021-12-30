@@ -16,7 +16,7 @@ public class Cli implements Vues{
 
     public Cli(Launcher launcher){
         this.launcher=launcher;
-        this.controller=new Controller(launcher);
+        this.controller=new Controller(launcher,this);
     }
 
     @Override
@@ -39,48 +39,7 @@ public class Cli implements Vues{
     }
 
 
-    @Override
-    public int getAction(Player p) {
-        System.out.println("\nPlease select an action : \n 1 - exchange ressources with bank"+
-                " \n 2 - build a new colony\n"+" 3 - upgrade a colony into a city\n"+
-                " 4 - build a road\n"+" 5 - buy development cards\n"+
-                " 6 - play a development card\n"+" 7 - display player information\n"+" 8 - show building costs\n"+" else - end the round\n");
-        scanner=new Scanner(System.in);
-        switch(scanner.next()) {
-            case "1":
-                System.out.println("trade resources with port");
-                return 1;
 
-            case "2":
-                System.out.println("build a new colony");
-                return 2;
-
-            case "3":
-                System.out.println("upgrade a colony into a city");
-                return 3;
-
-            case "4":
-                System.out.println("build a road");
-                return 4;
-
-            case "5":
-                System.out.println("buy development cards");
-                return 5;
-
-            case "6":
-                System.out.println("play a development card");
-                return 6;
-            case "7":
-                System.out.println("display player information");
-                return 7;
-            case "8":
-                System.out.println("show building costs");
-                return 8;
-            default:
-                System.out.println("End of the round.");
-                return 9;
-        }
-    }
 
     @Override
     public String[] ressourceToBeDiscarded(Player player,int quantity) {
@@ -168,21 +127,8 @@ public class Cli implements Vues{
         }
     }
 
-    public String[] chooseResource(int number){
-        int compt=0;
-        String[] res=new String[number];
-        scanner = new Scanner(System.in);
-        String ressources="Clay, Ore, Wheat, Wood, Wool.";
-        while(compt<number){
-            System.out.println("Choose the resource number "+(compt+1)+" among : "+ressources);
-            String resourceInput=scanner.next();
-            if(!resourceInput.equals("Clay") && !resourceInput.equals("Ore") && !resourceInput.equals("Wheat") && !resourceInput.equals("Wood") && !resourceInput.equals("Wool")){
-                return chooseResource(number);
-            }
-            res[compt]=resourceInput;
-            compt++;
-        }
-        return res;
+    public void chooseResource(){
+        System.out.println("Please choose a ressource among : Clay, Ore, Wheat, Wood, Wool.");
     }
 
     @Override
@@ -327,7 +273,7 @@ public class Cli implements Vues{
             if(t.getColonies().get(2).isOwned()) System.out.print(t.getColonies().get(2).getPlayer().firstLetter());
             else System.out.print(t.getColonies().get(2).isCity()?"C ":"c ");
         }
-        System.out.println("\n    e       f\n");
+        System.out.println("\n    f       e\n");
         for(int x=0;x<4;x++){
             for(int y=0;y<4;y++){
                 String resource=game.getBoard().getTiles()[x][y].getRessource();
@@ -372,25 +318,14 @@ public class Cli implements Vues{
     }
 
     @Override
-    public int portSelection(Player player){
-        scanner=new Scanner(System.in);
+    public void portSelection(Player player){
         int compt=1;
+        System.out.println("0 - Pas de port : echange en 4:1");
         for(Port port:player.getPorts()){
             System.out.println(compt+" - "+(port.getRate()==2?"Port de ressource spécialisée "+port.getRessource()+", taux de 2:1":"Port sans ressource spécialisée, taux de 3:1"));
             compt++;
         }
         System.out.println("Choisissez un port parmi cette liste pour faire une échange.");
-        try{
-            int choosedPort=scanner.nextInt();
-            if(choosedPort>compt || choosedPort<1){
-                throw new InputMismatchException();
-            }
-            return choosedPort-1;
-        }
-        catch(InputMismatchException e){
-            System.out.println("Vous devez rentrer un chiffre entre 1 et "+compt);
-            return this.portSelection(player);
-        }
     }
 
     @Override
@@ -430,21 +365,21 @@ public class Cli implements Vues{
             this.displayBoard(game);
             this.displayPlayer(p);
             System.out.println("Please select coordinates for your first colony.");
-            this.getFirstColonyPlacement(p, this, game, false);
+            this.getFirstColonyPlacement(p,  game, false);
         }
         while(!stack.isEmpty()){
             Player p=p=stack.pop();
             this.displayBoard(game);
             this.displayPlayer(p);
             System.out.println("Please select coordinates for your second colony.");
-            this.getFirstColonyPlacement(p, this, game, true);
+            this.getFirstColonyPlacement(p, game, true);
         }
         game.coloniesProduction();
     }
 
 
-    public void getFirstColonyPlacement(Player p, Cli cli, Game game, boolean secondRound) {
-        this.controller.getFirstColonyPlacement(p,cli,game,secondRound);
+    public void getFirstColonyPlacement(Player p,Game game, boolean secondRound) {
+        this.controller.getFirstColonyPlacement(p,game,secondRound);
     }
     public void getFirstRoadPlacement(Player p, Colony colony, Game game){
         this.displayBoard(game);
@@ -465,6 +400,18 @@ public class Cli implements Vues{
         return scanner.next();
     }
 
+    @Override
+    public void getAction(Player p) {
+        System.out.println("\nPlease select an action : \n 1 - exchange ressources with bank"+
+                " \n 2 - build a new colony\n"+" 3 - upgrade a colony into a city\n"+
+                " 4 - build a road\n"+" 5 - buy development cards\n"+
+                " 6 - play a development card\n"+" 7 - display player information\n"+" 8 - show building costs\n"+" 9 - end the round\n");
+        controller.getAction(p);
+    }
+    @Override
+    public void getPortResource(){
+        System.out.println("Please choose the resource you want to trade among \"Clay, Ore, Wheat, Wood, Wool.\" ");
+    }
 
     @Override
     public int[] getColonyPlacement() {

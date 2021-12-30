@@ -1,9 +1,7 @@
 package game;
 
-import board.Colony;
-import board.Road;
+import board.*;
 import vue.Cli;
-import vue.Vues;
 
 import java.util.HashMap;
 import java.util.InputMismatchException;
@@ -11,12 +9,14 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class Controller{
-    Launcher launcher;
+    private Launcher launcher;
+    private Cli cli;
     private Game game;
     private Scanner scanner=new Scanner(System.in);
 
-    public Controller(Launcher launcher){
+    public Controller(Launcher launcher, Cli cli){
         this.launcher=launcher;
+        this.cli=cli;
     }
 
     public void chooseNbPlayers() { //launcher of cli version
@@ -32,56 +32,96 @@ public class Controller{
         if(scanner.nextLine().equals("1")) return true;
         return false;
     }
-    public boolean getAction(Player p, Vues vue) {
-        switch(vue.getAction(p)){
+
+    public void getAction(Player p) {
+        switch(scanner.nextInt()){
             case 1 -> {
-                game.tradeWithPort(p);
-                //System.out.println("exchange ressources bank");
-                return false;
+                game.trade(p, this.portSelection(p), this.getPortResource(), this.chooseResource(1));
+                cli.getAction(p);
             }
             case 2 -> {
-                game.buildColony(p,vue.getColonyPlacement());
-                //System.out.println("build a new colony");
-                return false;
+                game.buildColony(p,cli.getColonyPlacement());
+                cli.getAction(p);
             }
             case 3 -> {
                 game.buildCity(p);
-                //System.out.println("upgrade a colony into a city");
-                return false;
+                cli.getAction(p);
             }
             case 4 -> {
                 game.buildRoad(p);
-                //System.out.println("build a road");
-                return false;
+                cli.getAction(p);
             }
             case 5 -> {
                 game.buyCard(p);
-                //System.out.println("buy development cards");
-                return false;
+                cli.getAction(p);
             }
             case 6 -> {
                 game.useCard(p);
-                //System.out.println("play a development card");
-                return false;
+                cli.getAction(p);
+
             }
             case 7 -> {
-                vue.displayPlayer(p);
-                return false;
+                cli.displayPlayer(p);
+                cli.getAction(p);
+
             }
             case 8 -> {
-                vue.showBuildCost();
-                return false;
+                cli.showBuildCost();
+                cli.getAction(p);
+            }
+            case 9 -> {
+                p.alreadyPlayedCardThisTurn=false;
             }
             default -> {
-                //System.out.println("End of the round.");
-                p.alreadyPlayedCardThisTurn=false;
-                return true;
+                System.out.println("Please enter an Integer between 1-9");
+                cli.getAction(p);
             }
         }
     }
 
+    private String[] chooseResource(int number) {
+        int compt=0;
+        String[] res=new String[number];
+        while(compt<number){
+            cli.chooseResource();
+            String resourceInput=scanner.next();
+            if(!resourceInput.equals("Clay") && !resourceInput.equals("Ore") && !resourceInput.equals("Wheat") && !resourceInput.equals("Wood") && !resourceInput.equals("Wool")){
+                return chooseResource(number);
+            }
+            res[compt]=resourceInput;
+            compt++;
+        }
+        return res;
+    }
 
-    public void getFirstColonyPlacement(Player p, Cli cli,Game game, Boolean secondRound) {
+    private String getPortResource() {
+        cli.getPortResource();
+        String resourceInput=scanner.next();
+        if(!resourceInput.equals("Clay") && !resourceInput.equals("Ore") && !resourceInput.equals("Wheat") && !resourceInput.equals("Wood") && !resourceInput.equals("Wool")){
+            return getPortResource();
+        }
+        return resourceInput;
+    }
+
+    private Port portSelection(Player p) {
+        cli.portSelection(p);
+        int compt=p.getPorts().size();
+        try{
+            int choosedPort=scanner.nextInt();
+            if(choosedPort>compt || choosedPort<0){
+                throw new InputMismatchException();
+            }
+            if(choosedPort==0) return null;
+            return p.getPorts().get(choosedPort-1);
+        }
+        catch(InputMismatchException e){
+            System.out.println("Vous devez rentrer un chiffre entre 0 et "+compt);
+            return this.portSelection(p);
+        }
+    }
+
+
+    public void getFirstColonyPlacement(Player p,Game game, Boolean secondRound) {
         System.out.println("To build a colony :");
         try{
             System.out.println("Please enter the line of the tile.");
@@ -101,14 +141,14 @@ public class Controller{
             }
             int[] co={line,column,colonyPosition};
             Colony colony=this.game.buildColonyInitialization(p,co);
-            if(colony==null) getFirstColonyPlacement(p,cli,game,secondRound);
+            if(colony==null) getFirstColonyPlacement(p,game,secondRound);
             if(secondRound) game.secondRoundBuildedColonies.put(colony,p);
             cli.getFirstRoadPlacement(p,colony,game);
         }catch (InputMismatchException e) {
             System.out.println("the line of the tile should be an Integer between 0-3");
             System.out.println("the column of the tile should be an Integer between 0-3");
             System.out.println("placement-coordinates of the future colony should be an Integer between 0-3");
-            this.getFirstColonyPlacement(p,cli,game,secondRound);
+            this.getFirstColonyPlacement(p,game,secondRound);
         }
     }
 
@@ -162,7 +202,7 @@ public class Controller{
                     System.out.println("please choose a color between :" + color.toString());
                     String s=scanner.nextLine();
                     for(Map.Entry<String, Boolean> entry : color.entrySet()) {
-                        if(color.replace(s,true,false)) {
+                        if(color.replace(s,false,true)) {
                             playersColor[i]=entry.getKey();
                             verif=true;
                         }
@@ -172,6 +212,7 @@ public class Controller{
             i++;
         }
         game.setPlayers(playersType);
+        game.setColors(playersColor);
         game.botsGetColor(color);
     }
 }
