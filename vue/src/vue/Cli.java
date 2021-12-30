@@ -3,47 +3,41 @@ package vue;
 import board.Colony;
 import board.Port;
 import board.Tile;
-import game.Controller;
-import game.Game;
-import game.Player;
+import game.*;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
 
 
 public class Cli implements Vues{
-    Controller controller=new Controller();
+    Launcher launcher;
+    Controller controller;
     Scanner scanner;
 
+    public Cli(Launcher launcher){
+        this.launcher=launcher;
+        this.controller=new Controller(launcher);
+    }
+
     @Override
-    public int chooseNbPlayers() { //launcher of cli version
+    public void chooseNbPlayers() { //launcher of cli version
         System.out.println("If you want to be 3 players type 3. \nElse you'll be 4.");
         controller.chooseNbPlayers();
-        scanner=new Scanner(System.in);
-        if(scanner.nextLine().equals("3")) {
-            return 3;
-        } else {
-            return 4;
-        }
     }
 
     @Override
     public boolean chooseHuman() {
-        System.out.println("Type 1 to initialize a human player.\n Else this player will be a bot.");
-        scanner=new Scanner(System.in);
-        if(scanner.nextLine().equals("1")) return true;
         return false;
     }
 
     @Override
-    public String chooseColor(HashMap<String, Boolean> color) {
-        System.out.println("choose a color between :"+color.toString());
-        scanner=new Scanner(System.in);
-        return scanner.next();
+    public void showBuildCost(){
+        System.out.println("Road : 1x Clay, 1x Wood. 0 Victory Point");
+        System.out.println("Colony: 1x Clay, 1x Wood, 1x Wheat, 1x Wool. 1 Victory Point");
+        System.out.println("City : 2x Wheat, 3x Ore. 2 Victory Points");
+        System.out.println("Card : 1x Wool, 1x Wheat, 1x Ore. 0 Victory Point");
     }
+
 
     @Override
     public int getAction(Player p) {
@@ -141,36 +135,6 @@ public class Cli implements Vues{
             System.out.println("the column of the tile should be an Integer between 0-3");
             System.out.println("placement-coordinates of the road should be an Integer between 0-3");
             return this.getRoadPlacement();
-        }
-    }
-
-    @Override
-    public int[] getColonyPlacement() {
-        System.out.println("To build a colony :");
-        scanner=new Scanner(System.in);
-        try{
-            System.out.println("Please enter the line of the tile.");
-            int line=scanner.nextInt();
-            if(line>3 || line<0){
-                throw new InputMismatchException();
-            }
-            System.out.println("Please enter the column of the tile.");
-            int column=scanner.nextInt();
-            if(column>3 || column<0){
-                throw new InputMismatchException();
-            }
-            System.out.println("Please enter the placement-coordinates of the future colony. It is a number between 0-3. 0 is the top-left corner.");
-            int colonyPosition=scanner.nextInt();
-            if(colonyPosition<0 || colonyPosition>3){
-                throw new InputMismatchException();
-            }
-            int[] co={line,column,colonyPosition};
-            return co;
-        }catch (InputMismatchException e) {
-            System.out.println("the line of the tile should be an Integer between 0-3");
-            System.out.println("the column of the tile should be an Integer between 0-3");
-            System.out.println("placement-coordinates of the future colony should be an Integer between 0-3");
-            return this.getColonyPlacement();
         }
     }
 
@@ -457,21 +421,53 @@ public class Cli implements Vues{
         }
     }
 
-    public static void printBlankLines(){
-        for(int i=0; i<50; i++){
-            System.out.println();
+    @Override
+    public void initialization(Game game){
+        Stack<Player> stack=new Stack<>();
+        System.out.println("Phase d'initialisation :\nTous les joueurs construisent deux colonies et deux routes, la deulineième colonie peut se trouver éloignée de la première à condition que la règle de distance soit respectée.");
+        for(Player p : game.getPlayers()){
+            stack.push(p);
+            this.displayBoard(game);
+            this.displayPlayer(p);
+            System.out.println("Please select coordinates for your first colony.");
+            this.getFirstColonyPlacement(p, this, game, false);
         }
+        while(!stack.isEmpty()){
+            Player p=p=stack.pop();
+            this.displayBoard(game);
+            this.displayPlayer(p);
+            System.out.println("Please select coordinates for your second colony.");
+            this.getFirstColonyPlacement(p, this, game, true);
+        }
+        game.coloniesProduction();
     }
 
-    public void showBuildCost(){
-        System.out.println("Road : 1x Clay, 1x Wood. 0 Victory Point");
-        System.out.println("Colony: 1x Clay, 1x Wood, 1x Wheat, 1x Wool. 1 Victory Point");
-        System.out.println("City : 2x Wheat, 3x Ore. 2 Victory Points");
-        System.out.println("Card : 1x Wool, 1x Wheat, 1x Ore. 0 Victory Point");
+
+    public void getFirstColonyPlacement(Player p, Cli cli, Game game, boolean secondRound) {
+        this.controller.getFirstColonyPlacement(p,cli,game,secondRound);
+    }
+    public void getFirstRoadPlacement(Player p, Colony colony, Game game){
+        this.displayBoard(game);
+        this.displayPlayer(p);
+        System.out.println("Please select coordinates for your road. She is next to the colony you just achieved.");
+        this.controller.getFirstRoadPlacement(p,colony);
+
+    }
+    @Override
+    public void setPlayers() {
+        controller.setPlayers();
     }
 
     @Override
-    public void choosePlayers(){
-        System.out.println("If you want to be 3 players type 3. \nElse you'll be 4.");
+    public String chooseColor(HashMap<String, Boolean> color) {
+        System.out.println("choose a color between :"+color.toString());
+        scanner=new Scanner(System.in);
+        return scanner.next();
+    }
+
+
+    @Override
+    public int[] getColonyPlacement() {
+        return new int[0];
     }
 }

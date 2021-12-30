@@ -8,13 +8,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public interface Vues{
-    int chooseNbPlayers();
+    void chooseNbPlayers();
     boolean chooseHuman();
     String chooseColor(HashMap<String, Boolean> color);
     int getAction(Player p);
     String[] ressourceToBeDiscarded(Player player,int quantity);
     int[] getRoadPlacement();
-    int[] getColonyPlacement();
     int[] getCityPlacement();
     int[] getThiefPlacement();
     String chooseCard();
@@ -25,7 +24,11 @@ public interface Vues{
     Player choosePlayerFromColony(ArrayList<Colony> ownedColonies);
     int portSelection(Player player);
     void displayDiceNumber(int diceNumber);
+    void showBuildCost();
 
-    // nouvelles fonction à implémenter pour juste l'affichage
-    void choosePlayers();
+    void setPlayers();
+
+    void initialization(Game game);
+    int[] getColonyPlacement();
+
 }

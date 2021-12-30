@@ -1,85 +1,65 @@
 package game;
 
-import vue.Cli;
-import vue.Gui;
+import vue.*;
 
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
 
 public class Launcher {
-    Game game;
+    private Game game;
 
     public static void main(String[] args){
         Launcher launcher=new Launcher();
-        launcher.launchGui();
         System.out.println("If you want to play on GUI, type 1.\nElse you'll play on console.");
         Scanner sc2=new Scanner(System.in);
         String input=sc2.nextLine();
-        //if(input.equals("1")) launchGui();
-        //else launchCli();
+        if(input.equals("1")) launcher.launch(new Gui(launcher));
+        else launcher.launch(new Cli(launcher));
     }
 
-    public void launchCli(){
-        Cli cli=new Cli();
-        cli.choosePlayers();
-        game.setVueGenerale(cli);
-        HashMap<String, Boolean> color=new HashMap<>();
-        color.put("blue", false);
-        color.put("yellow", false);
-        color.put("green", false);
-        color.put("orange", false);
-        for(int i=0; i<game.getPlayers().length; i++) {
-            if(cli.chooseHuman()){
-                String colorChoice= cli.chooseColor(color);
-                while(!color.replace(colorChoice, false, true)) {
-                    colorChoice= cli.chooseColor(color);
-                }
-                game.setPlayers(i,new Human(colorChoice));
-            }else{
-                game.setPlayers(i,new Bot(null));
-            }
-        }
-        game.botsGetColor(color);
-        Cli.printBlankLines();
-        game.initialization();
-        Cli.printBlankLines();
+
+
+    public void launch(Vues vue){
+        vue.chooseNbPlayers();
+        game.setVueGenerale(vue);
+        vue.setPlayers();
+        vue.initialization(game); // je me suis arreté la
         boolean hasWon=false;
         while(!hasWon){
             for(Player p : game.getPlayers()){
                 game.checkLongestArmy();
-                cli.displayPlayer(p);
-                cli.displayBoard(game);
+                vue.displayPlayer(p);
+                vue.displayBoard(game);
                 boolean check=false;
                 Random rand=new Random();
                 int diceNumber=rand.nextInt(6) + 1 + rand.nextInt(6) + 1;
-                cli.displayDiceNumber(diceNumber);
+                vue.displayDiceNumber(diceNumber);
                 if(diceNumber==7) game.sevenAtDice(p);
                 game.diceProduction(diceNumber);
                 while(!check) {
-                    check=getAction(p,cli,game);
+                    //check=vue.getAction(p);
                 }
                 if(p.hasWin()){
-                    cli.victory(p);
+                    vue.victory(p);
                     hasWon=true;
                 }
             }
         }
     }
-
     public void launchGui(){
         Gui gui=new Gui(this);
     }
 
-    private static boolean getAction(Player p,Cli cli,Game game) {
-        switch(cli.getAction(p)){
+    private static boolean getAction(Player p,Vues vue,Game game) {
+        switch(vue.getAction(p)){
             case 1 -> {
                 game.tradeWithPort(p);
                 //System.out.println("exchange ressources bank");
                 return false;
             }
             case 2 -> {
-                game.buildColony(p);
+                game.buildColony(p,vue.getColonyPlacement());
                 //System.out.println("build a new colony");
                 return false;
             }
@@ -104,11 +84,11 @@ public class Launcher {
                 return false;
             }
             case 7 -> {
-                cli.displayPlayer(p);
+                vue.displayPlayer(p);
                 return false;
             }
             case 8 -> {
-                cli.showBuildCost();
+                vue.showBuildCost();
                 return false;
             }
             default -> {

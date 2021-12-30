@@ -10,6 +10,7 @@ public class Game{
     private Player[] players;
     private Board board;
     private Vues vueGenerale;
+    public HashMap<Colony, Player> secondRoundBuildedColonies=new HashMap<>();
 
     public Game(int nb){
         board=new Board();
@@ -26,10 +27,6 @@ public class Game{
 
     public Player[] getPlayers() {
         return players;
-    }
-
-    public void setPlayers(int index,Player p) {
-        this.players[index]=p;
     }
 
     // fonction construisant une route pour un joueur
@@ -71,8 +68,7 @@ public class Game{
 
     // fonction construisant une colonie pour un joueur
     // si la colonie est un port il est ajouté au hashmap du joueur
-    public boolean buildColony(Player player){
-        int[] placement=vueGenerale.getColonyPlacement();
+    public boolean buildColony(Player player, int[] placement){
         int line=placement[0];
         int column=placement[1];
         int colonyNumber=placement[2];
@@ -342,19 +338,7 @@ public class Game{
         }
     }
 
-    public void botsGetColor(HashMap<String, Boolean> color) {
-        for(int i=0;i<this.players.length;i++){
-            if(this.getPlayers()[i] instanceof Bot){
-                if(color.replace("blue", false, true)) ((Bot) this.players[i]).setColor("blue");
-                else if(color.replace("green", false, true)) ((Bot) this.players[i]).setColor("green");
-                else if(color.replace("yellow", false, true)) ((Bot) this.players[i]).setColor("yellow");
-                else if(color.replace("orange", false, true)) ((Bot) this.players[i]).setColor("orange");
-            }
-        }
-    }
-
-    public Colony buildColonyInitialization(Player player){
-        int[] placement=vueGenerale.getColonyPlacement();
+    public Colony buildColonyInitialization(Player player,int[] placement){
         int line=placement[0];
         int column=placement[1];
         int colonyNumber=placement[2];
@@ -379,8 +363,7 @@ public class Game{
     }
 
     // fonction construisant une route pour un joueur
-    public boolean buildRoadInitialization(Player player,Colony colony){
-        int[] placement=vueGenerale.getRoadPlacement();
+    public boolean buildRoadInitialization(Player player,Colony colony, int[] placement){
         int line=placement[0];
         int column=placement[1];
         int roadNumber=placement[2];
@@ -402,8 +385,8 @@ public class Game{
 
     // fonction d'initialisation: tous les joueurs construisent deux colonies et deux routes
     // on donne ensuite les ressources des cases autour des colonies construites aux joueurs
+    /*
     public void initialization(){
-        System.out.println("Phase d'initialisation :\nTous les joueurs construisent deux colonies et deux routes, la deulineième colonie peut se trouver éloignée de la première à condition que la règle de distance soit respectée.");
         Colony buildedColony;
         boolean buildedRoad;
         HashMap<Colony,Player> secondRoundBuildedColonies=new HashMap<>();
@@ -439,11 +422,13 @@ public class Game{
         coloniesProduction(secondRoundBuildedColonies);
     }
 
+     */
+
     // fonction qui parcourt le tableau et donne les ressources aux joueurs de toutes les cases autour des colonies
-    public void coloniesProduction(HashMap<Colony, Player> secondRoundBuildedColonies){
+    public void coloniesProduction(){
         HashMap<Colony,ArrayList<String>> result=new HashMap<>();
         for(int line=0; line<board.getTiles().length; line++) {
-            for(int column=0; column<board.getTiles().length; column++) {
+            for(int column=0; column<board.getTiles()[line].length; column++) {
                 for(Colony colony : board.getTiles()[line][column].getColonies()) {
                     if(secondRoundBuildedColonies.containsKey(colony)) {
                         String resource=board.getTiles()[line][column].getRessource();
@@ -512,14 +497,24 @@ public class Game{
     public void setPlayers(String[] playersType){
         for(int i=0; i<this.players.length; i++){
             switch(playersType[i]){
-                case "Human" -> this.players[i]=new Human(null);
-                case "Bot" -> this.players[i]=new Bot(null);
+                case "1" -> this.players[i]=new Human(null);
+                default -> this.players[i]=new Bot(null);
+            }
+        }
+    }
+    public void botsGetColor(HashMap<String, Boolean> color) {
+        for(int i=0;i<this.players.length;i++){
+            if(this.getPlayers()[i] instanceof Bot){
+                if(color.replace("blue", false, true)) ((Bot) this.players[i]).setColor("blue");
+                else if(color.replace("green", false, true)) ((Bot) this.players[i]).setColor("green");
+                else if(color.replace("yellow", false, true)) ((Bot) this.players[i]).setColor("yellow");
+                else if(color.replace("orange", false, true)) ((Bot) this.players[i]).setColor("orange");
             }
         }
     }
 
-    public void setColors(String[] playersColor){
-        for(int i=0; i<this.players.length; i++){
+    public void setColors(String[] playersColor) {
+        for(int i=0; i<this.players.length; i++) {
             this.players[i].setColor(playersColor[i]);
         }
     }

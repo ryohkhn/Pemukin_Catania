@@ -2,6 +2,8 @@ package vue;
 
 import game.Game;
 import game.Launcher;
+import board.Colony;
+import game.Player;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,7 +12,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Gui extends JFrame{
+public class Gui extends JFrame implements Vues{
     private GuiBoard guiBoard;
     private GuiSideBar guiSideBar;
     private Game game;
@@ -124,5 +126,104 @@ public class Gui extends JFrame{
                 }
             }
         });
+    }
+
+    @Override
+    public void chooseNbPlayers() {
+    }
+
+    @Override
+    public boolean chooseHuman() {
+        return false;
+    }
+
+    @Override
+    public String chooseColor(HashMap<String, Boolean> color) {
+        return null;
+    }
+
+    @Override
+    public int getAction(Player p) {
+        return 0;
+    }
+
+    @Override
+    public String[] ressourceToBeDiscarded(Player player, int quantity) {
+        return new String[0];
+    }
+
+    @Override
+    public int[] getRoadPlacement() {
+        return new int[0];
+    }
+
+    @Override
+    public int[] getColonyPlacement() {
+        return new int[0];
+    }
+
+    @Override
+    public int[] getCityPlacement() {
+        return new int[0];
+    }
+
+    @Override
+    public int[] getThiefPlacement() {
+        return new int[0];
+    }
+
+    @Override
+    public String chooseCard() {
+        return null;
+    }
+
+    @Override
+    public String[] chooseResource(int number) {
+        return new String[0];
+    }
+
+    @Override
+    public void victory(Player p) {
+
+    }
+
+    @Override
+    public void displayBoard(Game game) {
+
+    }
+
+    @Override
+    public void displayPlayer(Player p) {
+
+    }
+
+    @Override
+    public Player choosePlayerFromColony(ArrayList<Colony> ownedColonies) {
+        return null;
+    }
+
+    @Override
+    public int portSelection(Player player) {
+        return 0;
+    }
+
+    @Override
+    public void displayDiceNumber(int diceNumber) {
+
+    }
+
+    @Override
+    public void showBuildCost() {
+
+    }
+
+    @Override
+    public void setPlayers() {
+
+    }
+
+    @Override
+    public void initialization(Game game) {
+
     }
 }
