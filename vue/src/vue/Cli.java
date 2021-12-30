@@ -25,10 +25,6 @@ public class Cli implements Vues{
         controller.chooseNbPlayers();
     }
 
-    @Override
-    public boolean chooseHuman() {
-        return false;
-    }
 
     @Override
     public void showBuildCost(){
@@ -68,63 +64,13 @@ public class Cli implements Vues{
 
 
     @Override
-    public int[] getRoadPlacement() {
-        System.out.println("To build a road :");
-        scanner=new Scanner(System.in);
-        try{
-            System.out.println("Please enter the line of the tile.");
-            int line=scanner.nextInt();
-            if(line>3 || line<0){
-                throw new InputMismatchException();
-            }
-            System.out.println("Please enter the column of the tile.");
-            int column=scanner.nextInt();
-            if(column>3 || column<0){
-                throw new InputMismatchException();
-            }
-            System.out.println("Please enter the placement-coordinates of the road. It is a number between 0-3. 0 is the top road.");
-            int roadPosition=scanner.nextInt();
-            if(roadPosition<0 || roadPosition>3){
-                throw new InputMismatchException();
-            }
-            int[] co={line,column,roadPosition};
-            return co;
-        }catch (InputMismatchException e) {
-            System.out.println("the line of the tile should be an Integer between 0-3");
-            System.out.println("the column of the tile should be an Integer between 0-3");
-            System.out.println("placement-coordinates of the road should be an Integer between 0-3");
-            return this.getRoadPlacement();
-        }
+    public void getRoadPlacement() {
+        System.out.println("To build a road please enter their coordinates");
     }
 
     @Override
-    public int[] getCityPlacement() {
-        System.out.println("To build a city :");
-        scanner=new Scanner(System.in);
-        try{
-            System.out.println("Please enter the line of the tile.");
-            int line=scanner.nextInt();
-            if(line>3 || line<0){
-                throw new InputMismatchException();
-            }
-            System.out.println("Please enter the column of the tile.");
-            int column=scanner.nextInt();
-            if(column>3 || column<0){
-                throw new InputMismatchException();
-            }
-            System.out.println("Please enter the placement-coordinates of the future city. It is a number between 0-3. 0 is the top-left corner.");
-            int cityPosition=scanner.nextInt();
-            int[] co={line,column,cityPosition};
-            if(cityPosition<0 || cityPosition>3){
-                throw new InputMismatchException();
-            }
-            return co;
-        }catch (InputMismatchException e) {
-            System.out.println("the line of the tile should be an Integer between 0-3");
-            System.out.println("the column of the tile should be an Integer between 0-3");
-            System.out.println("placement-coordinates of the future city should be an Integer between 0-3");
-            return this.getColonyPlacement();
-        }
+    public void getCityPlacement() {
+        System.out.println("To build a city/colony please enter their coordinates");
     }
 
     public void chooseResource(){
@@ -334,7 +280,7 @@ public class Cli implements Vues{
     }
 
     @Override
-    public int[] getThiefPlacement(){
+    public void getThiefPlacement(){
         scanner=new Scanner(System.in);
         try{
             System.out.println("Please enter the line of the tile.");

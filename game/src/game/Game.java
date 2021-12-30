@@ -30,8 +30,7 @@ public class Game{
     }
 
     // fonction construisant une route pour un joueur
-    public boolean buildRoad(Player player){
-        int[] placement=vueGenerale.getRoadPlacement();
+    public boolean buildRoad(Player player,int[] placement){
         int line=placement[0];
         int column=placement[1];
         int roadNumber=placement[2];
@@ -112,8 +111,7 @@ public class Game{
     }
 
     // fonction construisant une ville pour un joueur aux coordonnées en argument
-    public boolean buildCity(Player player){
-        int[] placement=vueGenerale.getCityPlacement();
+    public boolean buildCity(Player player, int[] placement){
         int line=placement[0];
         int column=placement[1];
         int colonyNumber=placement[2];

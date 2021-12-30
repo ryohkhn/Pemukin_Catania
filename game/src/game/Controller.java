@@ -27,12 +27,6 @@ public class Controller{
         }
     }
 
-
-    public boolean chooseHuman() {
-        if(scanner.nextLine().equals("1")) return true;
-        return false;
-    }
-
     public void getAction(Player p) {
         switch(scanner.nextInt()){
             case 1 -> {
@@ -40,15 +34,15 @@ public class Controller{
                 cli.getAction(p);
             }
             case 2 -> {
-                game.buildColony(p,cli.getColonyPlacement());
+                game.buildColony(p,this.getCityPlacement());
                 cli.getAction(p);
             }
             case 3 -> {
-                game.buildCity(p);
+                game.buildCity(p,this.getCityPlacement());
                 cli.getAction(p);
             }
             case 4 -> {
-                game.buildRoad(p);
+                game.buildRoad(p,this.getRoadPlacement());
                 cli.getAction(p);
             }
             case 5 -> {
@@ -76,6 +70,61 @@ public class Controller{
                 System.out.println("Please enter an Integer between 1-9");
                 cli.getAction(p);
             }
+        }
+    }
+    private int[] getCityPlacement(){
+        cli.getCityPlacement();
+        try{
+            System.out.println("Please enter the line of the tile.");
+            int line=scanner.nextInt();
+            if(line>3 || line<0){
+                throw new InputMismatchException();
+            }
+            System.out.println("Please enter the column of the tile.");
+            int column=scanner.nextInt();
+            if(column>3 || column<0){
+                throw new InputMismatchException();
+            }
+            System.out.println("Please enter the placement-coordinates of the future city. It is a number between 0-3. 0 is the top-left corner.");
+            int cityPosition=scanner.nextInt();
+            if(cityPosition<0 || cityPosition>3){
+                throw new InputMismatchException();
+            }
+            int[] co={line,column,cityPosition};
+            return co;
+        }catch (InputMismatchException e) {
+            System.out.println("the line of the tile should be an Integer between 0-3");
+            System.out.println("the column of the tile should be an Integer between 0-3");
+            System.out.println("placement-coordinates of the future city should be an Integer between 0-3");
+            return this.getCityPlacement();
+        }
+    }
+
+    private int[] getRoadPlacement() {
+        cli.getColonyPlacement();
+        try{
+            System.out.println("Please enter the line of the tile.");
+            int line=scanner.nextInt();
+            if(line>3 || line<0){
+                throw new InputMismatchException();
+            }
+            System.out.println("Please enter the column of the tile.");
+            int column=scanner.nextInt();
+            if(column>3 || column<0){
+                throw new InputMismatchException();
+            }
+            System.out.println("Please enter the placement-coordinates of the road. It is a number between 0-3. 0 is the top road.");
+            int roadPosition=scanner.nextInt();
+            if(roadPosition<0 || roadPosition>3){
+                throw new InputMismatchException();
+            }
+            int[] co={line,column,roadPosition};
+            return co;
+        }catch (InputMismatchException e) {
+            System.out.println("the line of the tile should be an Integer between 0-3");
+            System.out.println("the column of the tile should be an Integer between 0-3");
+            System.out.println("placement-coordinates of the road should be an Integer between 0-3");
+            return this.getRoadPlacement();
         }
     }
 
