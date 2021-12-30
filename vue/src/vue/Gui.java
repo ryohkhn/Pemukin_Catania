@@ -12,30 +12,16 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Gui extends JFrame implements Vues{
+public class Gui extends JFrame{
     private GuiBoard guiBoard;
     private GuiSideBar guiSideBar;
     private Game game;
-    private int nbplayer;
 
     public Gui(Launcher launcher){
-        guiBoard=new GuiBoard();
-        guiSideBar=new GuiSideBar();
         setUpGui(launcher);
-        /*
-        getContentPane().setLayout(new GridLayout());
-        guiSideBar.setBackground(Color.red);
-        getContentPane().add(guiBoard);
-        getContentPane().add(guiSideBar);
-        guiSideBar.setVisible(true);
-        guiBoard.setVisible(true);
-         */
     }
 
-    public int getNbplayer(){
-        return nbplayer;
-    }
-
+    // fonction qui initialise la gui et lance la configuration du jeu
     public void setUpGui(Launcher launcher){
         setTitle("Pemukin Catania");
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -44,7 +30,7 @@ public class Gui extends JFrame implements Vues{
 
         JPanel gameNumberPanel=new JPanel();
         gameNumberPanel.add(new JLabel("Choose how many players you want in the game :"));
-        String[] values={"3","4"};
+        String[] values={"1","3","4"};
         JComboBox comboBox=new JComboBox(values);
         JButton next=new JButton("Continue");
         gameNumberPanel.add(comboBox);
@@ -61,19 +47,17 @@ public class Gui extends JFrame implements Vues{
             }
         });
         setVisible(true);
-
     }
 
+    // fonction pour sélectionner si un joueur est un humain ou un robot
     public void playerSelection(int nbplayer){
         JPanel playerSelectionPanel=new JPanel();
         playerSelectionPanel.add(new JLabel("Select which player is Human or IA :"));
         String[] values={"Human","IA"};
         ArrayList<JComboBox> comboBoxList=new ArrayList<>();
-        for(int i=1; i<=nbplayer; i++){
+        for(int i=0; i<nbplayer; i++){
             comboBoxList.add(new JComboBox(values));
-        }
-        for(int i=0; i<comboBoxList.size(); i++){
-            playerSelectionPanel.add(new JLabel("Player "+i+" :"));
+            playerSelectionPanel.add(new JLabel("Player "+(i+1)+" :"));
             playerSelectionPanel.add(comboBoxList.get(i));
         }
         JButton next=new JButton("Continue");
@@ -88,142 +72,71 @@ public class Gui extends JFrame implements Vues{
                 }
                 game.setPlayers(returnedValue);
                 playerSelectionPanel.setVisible(false);
-                colorSelection(nbplayer);
+                HashMap<String,Boolean> colorMap=new HashMap<>();
+                colorMap.put("orange",false);
+                colorMap.put("blue",false);
+                colorMap.put("yellow",false);
+                colorMap.put("green",false);
+                colorSelection(nbplayer,nbplayer,new String[nbplayer],colorMap);
             }
         });
     }
 
-    public void colorSelection(int nbplayer){
+    public void colorSelection(int nbPlayer,int count,String[] returnedValue,HashMap<String,Boolean> colorMap){
         final int[] compt=new int[1];
-        compt[0]=nbplayer;
+        compt[0]=count;
         JPanel colorSelectionPanel=new JPanel();
-        final String[] returnedValue=new String[nbplayer];
-        while(compt[0]>0){
-            ButtonGroup buttonGroup=new ButtonGroup();
-            colorSelectionPanel.add(new JLabel("Select a color for every player :"));
-            HashMap<String,Boolean> colorMap=new HashMap<>();
-            ArrayList<JRadioButton> jRadioButtonList=new ArrayList<>();
-            for(String s:colorMap.keySet()){
-                if(!colorMap.get(s)){
-                    jRadioButtonList.add(new JRadioButton(s));
-                }
-            }
-            for(JRadioButton button:jRadioButtonList){
+        if(compt[0]==0){
+            game.setColors(returnedValue);
+            initiateGame();
+            return;
+        }
+        JButton next=new JButton("Continue");
+        ButtonGroup buttonGroup=new ButtonGroup();
+        colorSelectionPanel.add(new JLabel("Select a color for player :"));
+        ArrayList<JRadioButton> jRadioButtonList=new ArrayList<>();
+        for(String s:colorMap.keySet()){
+            if(!colorMap.get(s)){
+                JRadioButton button=new JRadioButton(s);
+                jRadioButtonList.add(button);
                 buttonGroup.add(button);
                 colorSelectionPanel.add(button);
             }
-            getContentPane().add(colorSelectionPanel);
         }
-        JButton next=new JButton("Continue");
+        jRadioButtonList.get(0).setSelected(true);
         colorSelectionPanel.add(next);
+        getContentPane().add(colorSelectionPanel);
         next.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e){
-                compt[0]--;
-                if(compt[0]==0){
-                    game.setColors(returnedValue);
-                    colorSelectionPanel.setVisible(false);
+                for(JRadioButton button:jRadioButtonList){
+                    if(button.isSelected()){
+                        returnedValue[Math.abs(count-nbPlayer)]=button.getActionCommand();
+                        colorMap.merge(button.getActionCommand(),true, (initialValue, replacedValue)->initialValue=replacedValue);
+                    }
                 }
+                compt[0]-=1;
+                colorSelection(nbPlayer,compt[0],returnedValue,colorMap);
+                colorSelectionPanel.setVisible(false);
             }
         });
     }
 
-    @Override
-    public void chooseNbPlayers() {
-    }
+    public void initiateGame(){
+        getContentPane().removeAll();
+        getContentPane().revalidate();
+        getContentPane().repaint();
 
-    @Override
-    public boolean chooseHuman() {
-        return false;
-    }
+        getContentPane().setLayout(new GridLayout());
+        guiBoard=new GuiBoard(game.getBoard());
+        guiSideBar=new GuiSideBar(game);
+        guiSideBar.setBackground(Color.red);
+        getContentPane().add(guiBoard);
+        getContentPane().add(guiSideBar);
 
-    @Override
-    public String chooseColor(HashMap<String, Boolean> color) {
-        return null;
-    }
+        guiBoard.repaint();
 
-    @Override
-    public int getAction(Player p) {
-        return 0;
-    }
-
-    @Override
-    public String[] ressourceToBeDiscarded(Player player, int quantity) {
-        return new String[0];
-    }
-
-    @Override
-    public int[] getRoadPlacement() {
-        return new int[0];
-    }
-
-    @Override
-    public int[] getColonyPlacement() {
-        return new int[0];
-    }
-
-    @Override
-    public int[] getCityPlacement() {
-        return new int[0];
-    }
-
-    @Override
-    public int[] getThiefPlacement() {
-        return new int[0];
-    }
-
-    @Override
-    public String chooseCard() {
-        return null;
-    }
-
-    @Override
-    public String[] chooseResource(int number) {
-        return new String[0];
-    }
-
-    @Override
-    public void victory(Player p) {
-
-    }
-
-    @Override
-    public void displayBoard(Game game) {
-
-    }
-
-    @Override
-    public void displayPlayer(Player p) {
-
-    }
-
-    @Override
-    public Player choosePlayerFromColony(ArrayList<Colony> ownedColonies) {
-        return null;
-    }
-
-    @Override
-    public int portSelection(Player player) {
-        return 0;
-    }
-
-    @Override
-    public void displayDiceNumber(int diceNumber) {
-
-    }
-
-    @Override
-    public void showBuildCost() {
-
-    }
-
-    @Override
-    public void setPlayers() {
-
-    }
-
-    @Override
-    public void initialization(Game game) {
-
+        guiSideBar.setVisible(true);
+        guiBoard.setVisible(true);
     }
 }

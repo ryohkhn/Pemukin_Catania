@@ -42,7 +42,7 @@ public class Board{
         }
     }
 
-    public Tile[][] getTiles() { // todo supprimer quand plus utile, sert juste a tester les fonctions
+    public Tile[][] getTiles() {
         return tiles;
     }
 

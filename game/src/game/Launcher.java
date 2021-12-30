@@ -1,8 +1,9 @@
 package game;
 
-import vue.*;
+import vue.Cli;
+import vue.Gui;
+import vue.Vues;
 
-import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -14,7 +15,7 @@ public class Launcher {
         System.out.println("If you want to play on GUI, type 1.\nElse you'll play on console.");
         Scanner sc2=new Scanner(System.in);
         String input=sc2.nextLine();
-        if(input.equals("1")) launcher.launch(new Gui(launcher));
+        if(input.equals("1")) launcher.launch((Vues)new Gui(launcher));
         else launcher.launch(new Cli(launcher));
     }
 
