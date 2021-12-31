@@ -23,7 +23,6 @@ public class Launcher {
 
     public void launch(Vues vue){
         vue.chooseNbPlayers();
-        game.setVueGenerale(vue);
         vue.setPlayers();
         vue.initialization(game);
         boolean hasWon=false;
@@ -35,7 +34,7 @@ public class Launcher {
                 Random rand=new Random();
                 int diceNumber=rand.nextInt(6) + 1 + rand.nextInt(6) + 1;
                 vue.displayDiceNumber(diceNumber);
-                if(diceNumber==7) game.sevenAtDice(p);
+                if(diceNumber==7) this.seven(p,vue);
                 game.diceProduction(diceNumber);
                 vue.getAction(p);
                 if(p.hasWin()){
@@ -44,6 +43,17 @@ public class Launcher {
                 }
             }
         }
+    }
+
+    private void seven(Player p,Vues vue) {
+        for(Player player: game.getPlayers()) {
+            int quantity=player.resourceCount()/2;
+            if(quantity>7) {
+                vue.sevenAtDice(player,quantity);
+            }
+        }
+        vue.setThief();
+        vue.steal(p,game.getBoard().getThiefTile());
     }
 
     public Game createGame(int nbPlayers){

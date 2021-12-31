@@ -3,7 +3,7 @@ package game;
 import java.util.Random;
 
 public enum Card{
-    Knigth,VictoryPoint,ProgressRoadBuilding,ProgressYearOfPlenty,ProgressMonopoly,LargestArmy;
+    Knight,VictoryPoint,ProgressRoadBuilding,ProgressYearOfPlenty,ProgressMonopoly,LargestArmy;
 
 
     private static final Random random=new Random();
@@ -18,7 +18,7 @@ public enum Card{
         switch(this){
             case ProgressMonopoly -> res+="Monopole";
             case VictoryPoint -> res+="Point de Victoire";
-            case Knigth -> res+="Roi";
+            case Knight -> res+="Roi";
             case ProgressYearOfPlenty -> res+= "Invention";
             case ProgressRoadBuilding -> res+= "Construction de route";
         }

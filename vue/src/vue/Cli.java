@@ -1,5 +1,6 @@
 package vue;
 
+import board.Board;
 import board.Colony;
 import board.Port;
 import board.Tile;
@@ -26,16 +27,8 @@ public class Cli implements Vues{
     }
 
 
-    @Override
-    public void showBuildCost(){
-        System.out.println("Road : 1x Clay, 1x Wood. 0 Victory Point");
-        System.out.println("Colony: 1x Clay, 1x Wood, 1x Wheat, 1x Wool. 1 Victory Point");
-        System.out.println("City : 2x Wheat, 3x Ore. 2 Victory Points");
-        System.out.println("Card : 1x Wool, 1x Wheat, 1x Ore. 0 Victory Point");
-    }
 
-
-
+/*
 
     @Override
     public String[] ressourceToBeDiscarded(Player player,int quantity) {
@@ -62,6 +55,8 @@ public class Cli implements Vues{
         return choosedResources;
     }
 
+ */
+
 
     @Override
     public void getRoadPlacement() {
@@ -78,20 +73,27 @@ public class Cli implements Vues{
     }
 
     @Override
-    public String chooseCard() {
-        scanner=new Scanner(System.in);
+    public void chooseCard() {
         System.out.println("choose a card among : Knigth,VictoryPoint,ProgressRoadBuilding,ProgressYearOfPlenty,ProgressMonopoly;");
-        String cardInput=scanner.next();
-        if(!cardInput.equals("Knigth") && !cardInput.equals("VictoryPoint") && !cardInput.equals("ProgressRoadBuilding") && !cardInput.equals("ProgressYearOfPlenty") && !cardInput.equals("ProgressMonopoly")){
-            return chooseCard();
-        }
-        else return cardInput;
     }
 
-    @Override
-    public void victory(Player p) {
-        System.out.println(p.toString() + "has won the game!");
-        System.exit(0);
+    public Player choosePlayerFromColony(ArrayList<Colony> colonies){
+        scanner=new Scanner(System.in);
+        int compt=1;
+        for(Colony colony:colonies){
+            System.out.println(compt+" - "+colony.getPlayer().toString());
+            compt++;
+        }
+        try{
+            int choice=scanner.nextInt();
+            if(choice<1 || choice>compt){
+                throw new InputMismatchException();
+            }
+            return colonies.get(choice-1).getPlayer();
+        }catch(InputMismatchException e){
+            System.out.println("The number should be between 1 and "+compt);
+            return this.choosePlayerFromColony(colonies);
+        }
     }
 
     @Override
@@ -244,62 +246,42 @@ public class Cli implements Vues{
 
     }
 
-    public Player choosePlayerFromColony(ArrayList<Colony> colonies){
-        scanner=new Scanner(System.in);
-        int compt=1;
-        for(Colony colony:colonies){
-            System.out.println(compt+" - "+colony.getPlayer().toString());
-            compt++;
-    }
-        try{
-            int choice=scanner.nextInt();
-            if(choice<1 || choice>compt){
-                throw new InputMismatchException();
-            }
-            return colonies.get(choice-1).getPlayer();
-        }catch(InputMismatchException e){
-            System.out.println("The number should be between 1 and "+compt);
-            return this.choosePlayerFromColony(colonies);
-        }
-    }
-
-    @Override
-    public void portSelection(Player player){
-        int compt=1;
-        System.out.println("0 - Pas de port : echange en 4:1");
-        for(Port port:player.getPorts()){
-            System.out.println(compt+" - "+(port.getRate()==2?"Port de ressource spécialisée "+port.getRessource()+", taux de 2:1":"Port sans ressource spécialisée, taux de 3:1"));
-            compt++;
-        }
-        System.out.println("Choisissez un port parmi cette liste pour faire une échange.");
-    }
-
     @Override
     public void displayDiceNumber(int diceNumber) {
         System.out.println("Dices = " + diceNumber);
     }
 
     @Override
-    public void getThiefPlacement(){
-        scanner=new Scanner(System.in);
-        try{
-            System.out.println("Please enter the line of the tile.");
-            int line=scanner.nextInt();
-            if(line>3 || line<0){
-                throw new InputMismatchException();
-            }
-            System.out.println("Please enter the column of the tile.");
-            int column=scanner.nextInt();
-            if(column>3 || column<0){
-                throw new InputMismatchException();
-            }
-            int[] co={line,column};
-            return co;
-        }catch (InputMismatchException e) {
-            System.out.println("the line of the tile should be an Integer between 0-3");
-            System.out.println("the column of the tile should be an Integer between 0-3");
-            return this.getThiefPlacement();
-        }
+    public void getAction(Player p) {
+        System.out.println("\nPlease select an action : \n 1 - exchange ressources with bank"+
+                " \n 2 - build a new colony\n"+" 3 - upgrade a colony into a city\n"+
+                " 4 - build a road\n"+" 5 - buy development cards\n"+
+                " 6 - play a development card\n"+" 7 - display player information\n"+" 8 - show building costs\n"+" 9 - end the round\n");
+        controller.getAction(p);
+    }
+
+    @Override
+    public void getPortResource(){
+        System.out.println("Please choose the resource you want to trade among \"Clay, Ore, Wheat, Wood, Wool.\" ");
+    }
+/*
+    @Override
+    public int[] getColonyPlacement() {
+        return new int[0];
+    }
+
+
+ */
+    public void getFirstColonyPlacement(Player p,Game game, boolean secondRound) {
+        this.controller.getFirstColonyPlacement(p,game,secondRound);
+    }
+
+    public void getFirstRoadPlacement(Player p, Colony colony, Game game){
+        this.displayBoard(game);
+        this.displayPlayer(p);
+        System.out.println("Please select coordinates for your road. She is next to the colony you just achieved.");
+        this.controller.getFirstRoadPlacement(p,colony);
+
     }
 
     @Override
@@ -322,45 +304,97 @@ public class Cli implements Vues{
         }
         game.coloniesProduction();
     }
-
-
-    public void getFirstColonyPlacement(Player p,Game game, boolean secondRound) {
-        this.controller.getFirstColonyPlacement(p,game,secondRound);
+/*
+    @Override
+    public void getThiefPlacement(){
+        scanner=new Scanner(System.in);
+        try{
+            System.out.println("Please enter the line of the tile.");
+            int line=scanner.nextInt();
+            if(line>3 || line<0){
+                throw new InputMismatchException();
+            }
+            System.out.println("Please enter the column of the tile.");
+            int column=scanner.nextInt();
+            if(column>3 || column<0){
+                throw new InputMismatchException();
+            }
+            int[] co={line,column};
+            return co;
+        }catch (InputMismatchException e) {
+            System.out.println("the line of the tile should be an Integer between 0-3");
+            System.out.println("the column of the tile should be an Integer between 0-3");
+            return this.getThiefPlacement();
+        }
     }
-    public void getFirstRoadPlacement(Player p, Colony colony, Game game){
-        this.displayBoard(game);
-        this.displayPlayer(p);
-        System.out.println("Please select coordinates for your road. She is next to the colony you just achieved.");
-        this.controller.getFirstRoadPlacement(p,colony);
+    */
 
+    @Override
+    public void portSelection(Player player){
+        int compt=1;
+        System.out.println("0 - Pas de port : echange en 4:1");
+        for(Port port:player.getPorts()){
+            System.out.println(compt+" - "+(port.getRate()==2?"Port de ressource spécialisée "+port.getRessource()+", taux de 2:1":"Port sans ressource spécialisée, taux de 3:1"));
+            compt++;
+        }
+        System.out.println("Choisissez un port parmi cette liste pour faire une échange.");
     }
+
     @Override
     public void setPlayers() {
         controller.setPlayers();
     }
 
+
     @Override
-    public String chooseColor(HashMap<String, Boolean> color) {
-        System.out.println("choose a color between :"+color.toString());
-        scanner=new Scanner(System.in);
-        return scanner.next();
+    public void showBuildCost(){
+        System.out.println("Road : 1x Clay, 1x Wood. 0 Victory Point");
+        System.out.println("Colony: 1x Clay, 1x Wood, 1x Wheat, 1x Wool. 1 Victory Point");
+        System.out.println("City : 2x Wheat, 3x Ore. 2 Victory Points");
+        System.out.println("Card : 1x Wool, 1x Wheat, 1x Ore. 0 Victory Point");
     }
 
     @Override
-    public void getAction(Player p) {
-        System.out.println("\nPlease select an action : \n 1 - exchange ressources with bank"+
-                " \n 2 - build a new colony\n"+" 3 - upgrade a colony into a city\n"+
-                " 4 - build a road\n"+" 5 - buy development cards\n"+
-                " 6 - play a development card\n"+" 7 - display player information\n"+" 8 - show building costs\n"+" 9 - end the round\n");
-        controller.getAction(p);
+    public void victory(Player p) {
+        System.out.println(p.toString() + "has won the game!");
+        System.exit(0);
     }
     @Override
-    public void getPortResource(){
-        System.out.println("Please choose the resource you want to trade among \"Clay, Ore, Wheat, Wood, Wool.\" ");
+    public void sevenAtDice(Player p, int quantity){
+        while(quantity>0){
+            System.out.println(quantity + " to destroy");
+            System.out.println("Choose a resource you want to destroy among \"Clay, Ore, Wheat, Wood, Wool.\" ");
+            controller.destroy(p);
+            quantity--;
+        }
     }
+    @Override
+    public void setThief(){
+        System.out.println("Please choose a tile to set the thief place.");
+        controller.setThief();
+    }
+    @Override
+    public void steal(Player p, Tile thiefTile){
+        System.out.println("You can then steal a resource from a player if one of his colonies are on the tile.");
+        ArrayList<Colony> ownedColonies=new ArrayList<>();
+        for(Colony colony:thiefTile.getColonies()){
+            if(colony.getPlayer()!=null && colony.getPlayer()!=p && !ownedColonies.contains(colony)){
+                ownedColonies.add(colony);
+            }
+        }
+        Player playerOfColony;
+        if(ownedColonies.size()!=0){
+            if(ownedColonies.size()>1){
+                System.out.println("Choose a player to steal the resource from.");
+                System.out.println(ownedColonies);
+                System.out.println("choose a number between 1 and " + ownedColonies.size());
+                playerOfColony=controller.choosePlayerFromColonies(ownedColonies,p);
+            }
+            else{
+                playerOfColony=ownedColonies.get(0).getPlayer();
+            }
+            controller.steal(p,playerOfColony);
 
-    @Override
-    public int[] getColonyPlacement() {
-        return new int[0];
+        }
     }
 }

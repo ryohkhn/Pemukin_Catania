@@ -9,7 +9,7 @@ import java.util.Map;
 
 public abstract class Player{
     protected String color;
-    protected HashMap<String,Integer> ressources=Board.generateHashMapRessource();
+    protected HashMap<String,Integer> resources=Board.generateHashMapRessource();
     protected HashMap<String,Integer> propertiesCounter=new HashMap<>();
     protected HashMap<Card,Integer> cards=new HashMap<>();
     protected LinkedList<Port> ports=new LinkedList<>();
@@ -60,7 +60,7 @@ public abstract class Player{
 
     public int resourceCount() {
         int compt=0;
-        for(int value : ressources.values()) {
+        for(int value : resources.values()) {
             compt+=value;
         }
         return compt;
@@ -101,7 +101,7 @@ public abstract class Player{
 
     public String getRessourcesToString() {
         String res="";
-        for(Map.Entry<String ,Integer> entry: this.ressources.entrySet()) {
+        for(Map.Entry<String ,Integer> entry: this.resources.entrySet()) {
             res+=entry.getKey() + ":"+ entry.getValue()+ " ; ";
         }
         return res;
@@ -131,22 +131,22 @@ public abstract class Player{
                 case "Wool" -> woolCount++;
             }
         }
-        for(String resource:this.ressources.keySet()){
+        for(String resource:this.resources.keySet()){
             switch(resource){
                 case "Clay" -> {
-                    if(this.ressources.get(resource)<clayCount) return false;
+                    if(this.resources.get(resource)<clayCount) return false;
                 }
                 case "Ore" -> {
-                    if(this.ressources.get(resource)<oreCount) return false;
+                    if(this.resources.get(resource)<oreCount) return false;
                 }
                 case "Wheat" -> {
-                    if(this.ressources.get(resource)<wheatCount) return false;
+                    if(this.resources.get(resource)<wheatCount) return false;
                 }
                 case "Wood" -> {
-                    if(this.ressources.get(resource)<woodCount) return false;
+                    if(this.resources.get(resource)<woodCount) return false;
                 }
                 case "Wool" -> {
-                    if(this.ressources.get(resource)<woolCount) return false;
+                    if(this.resources.get(resource)<woolCount) return false;
                 }
             }
         }

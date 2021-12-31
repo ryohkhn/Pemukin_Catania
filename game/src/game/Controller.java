@@ -3,10 +3,7 @@ package game;
 import board.*;
 import vue.Cli;
 
-import java.util.HashMap;
-import java.util.InputMismatchException;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class Controller{
     private Launcher launcher;
@@ -50,7 +47,24 @@ public class Controller{
                 cli.getAction(p);
             }
             case 6 -> {
-                game.useCard(p);
+                if(p.alreadyPlayedCardThisTurn){
+                    System.out.println("Vous avez deja joué une carte a ce tour.");
+                }else {
+                    String card=this.chooseCard();
+                    Card choosedCard=Card.valueOf(card);
+                    if(card.equals("ProgressYearOfPlenty")) {
+                        game.useCardProgressYearOfPlenty(p,this.chooseResource(2),choosedCard);
+                    } else if(card.equals("ProgressMonopoly")) {
+                        game.useCardProgressMonopoly(p, this.chooseResource(1), choosedCard);
+                    } else if(card.equals("ProgressRoadBuilding")) {
+                        game.useCardProgressRoadBuilding(p, this.getCityPlacement(), choosedCard);
+                    }else if(card.equals("Knight")){
+                        game.useCardKnight(p,this.getThiefPlacement());
+                        cli.steal(p,this.game.getBoard().getThiefTile());
+                    } else {
+                        game.useCard(p,choosedCard);
+                    }
+                }
                 cli.getAction(p);
 
             }
@@ -72,6 +86,16 @@ public class Controller{
             }
         }
     }
+
+    private String chooseCard() {
+        cli.chooseCard();
+        String cardInput=scanner.next();
+        if(!cardInput.equals("Knigth") && !cardInput.equals("VictoryPoint") && !cardInput.equals("ProgressRoadBuilding") && !cardInput.equals("ProgressYearOfPlenty") && !cardInput.equals("ProgressMonopoly")){
+            return chooseCard();
+        }
+        else return cardInput;
+    }
+
     private int[] getCityPlacement(){
         cli.getCityPlacement();
         try{
@@ -101,7 +125,7 @@ public class Controller{
     }
 
     private int[] getRoadPlacement() {
-        cli.getColonyPlacement();
+        cli.getRoadPlacement();
         try{
             System.out.println("Please enter the line of the tile.");
             int line=scanner.nextInt();
@@ -128,7 +152,7 @@ public class Controller{
         }
     }
 
-    private String[] chooseResource(int number) {
+    public String[] chooseResource(int number) {
         int compt=0;
         String[] res=new String[number];
         while(compt<number){
@@ -263,5 +287,76 @@ public class Controller{
         game.setPlayers(playersType);
         game.setColors(playersColor);
         game.botsGetColor(color);
+    }
+
+    public void destroy(Player p) {
+        String resourceInput=scanner.next();
+        if(!resourceInput.equals("Clay") && !resourceInput.equals("Ore") && !resourceInput.equals("Wheat") && !resourceInput.equals("Wood") && !resourceInput.equals("Wool")){
+            System.out.println("Choose a resource you want to destroy among \"Clay, Ore, Wheat, Wood, Wool.\" ");
+            destroy(p);
+        }
+        String[] res= new String[1];
+        res[0]=resourceInput;
+        if(p.hasResources(res)) game.destroy(p,resourceInput);
+        else destroy(p);
+    }
+    public void setThief(){
+        try{
+            System.out.println("Please enter the line of the tile.");
+            int line=scanner.nextInt();
+            if(line>3 || line<0){
+                throw new InputMismatchException();
+            }
+            System.out.println("Please enter the column of the tile.");
+            int column=scanner.nextInt();
+            if(column>3 || column<0){
+                throw new InputMismatchException();
+            }
+            int[] co={line,column};
+            game.setThief(co);
+        }catch (InputMismatchException e) {
+            System.out.println("the line of the tile should be an Integer between 0-3");
+            System.out.println("the column of the tile should be an Integer between 0-3");
+            this.setThief();
+        }
+    }
+
+    public int[] getThiefPlacement() {
+        try{
+            System.out.println("Please enter the line of the tile.");
+            int line=scanner.nextInt();
+            if(line>3 || line<0){
+                throw new InputMismatchException();
+            }
+            System.out.println("Please enter the column of the tile.");
+            int column=scanner.nextInt();
+            if(column>3 || column<0){
+                throw new InputMismatchException();
+            }
+            int[] co={line,column};
+            return co;
+        }catch (InputMismatchException e) {
+            System.out.println("the line of the tile should be an Integer between 0-3");
+            System.out.println("the column of the tile should be an Integer between 0-3");
+            return this.getThiefPlacement();
+        }
+    }
+
+    public void steal(Player p, Player playerOfColony) {
+        game.steal(p,playerOfColony);
+    }
+
+    public Player choosePlayerFromColonies(ArrayList<Colony> ownedColonies, Player p) {
+        try{
+            int i= scanner.nextInt();
+            if(i>ownedColonies.size()-1 || i<0){
+                throw new InputMismatchException();
+            }
+            return ownedColonies.get(i).getPlayer();
+        }catch (InputMismatchException e) {
+            int x= ownedColonies.size()-1;
+            System.out.println("choose a number between 1 and " + x);
+            return choosePlayerFromColonies(ownedColonies,p);
+        }
     }
 }
