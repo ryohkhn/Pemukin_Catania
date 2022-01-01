@@ -12,7 +12,6 @@ import java.util.*;
 public class Cli implements Vues{
     Launcher launcher;
     Controller controller;
-    Scanner scanner;
 
     public Cli(Launcher launcher){
         this.launcher=launcher;
@@ -26,15 +25,6 @@ public class Cli implements Vues{
     }
 
     @Override
-    public void getRoadPlacement() {
-        System.out.println("To build a road please enter their coordinates");
-    }
-
-    @Override
-    public void getCityPlacement() {
-        System.out.println("To build a city/colony please enter their coordinates");
-    }
-
     public void chooseResource(){
         System.out.println("Please choose a ressource among : Clay, Ore, Wheat, Wood, Wool.");
     }
@@ -43,27 +33,15 @@ public class Cli implements Vues{
     public void chooseCard() {
         System.out.println("choose a card among : Knight,VictoryPoint,ProgressRoadBuilding,ProgressYearOfPlenty,ProgressMonopoly;");
     }
-/*
-    public Player choosePlayerFromColony(ArrayList<Colony> colonies){
-        scanner=new Scanner(System.in);
-        int compt=1;
-        for(Colony colony:colonies){
-            System.out.println(compt+" - "+colony.getPlayer().toString());
-            compt++;
-        }
-        try{
-            int choice=scanner.nextInt();
-            if(choice<1 || choice>compt){
-                throw new InputMismatchException();
-            }
-            return colonies.get(choice-1).getPlayer();
-        }catch(InputMismatchException e){
-            System.out.println("The number should be between 1 and "+compt);
-            return this.choosePlayerFromColony(colonies);
-        }
-    }
 
- */
+    @Override
+    public void displayPlayer(Player p) {
+        System.out.println("Player     : " + p.getColor() + ", Victory Points : " + p.getVictoryPoint() );
+        System.out.println("Ressources : " + p.getRessourcesToString());
+        System.out.println("Cards      : " + p.getCardsToString());
+        System.out.println();
+
+    }
 
     @Override
     public void displayBoard(Game game) {
@@ -208,16 +186,6 @@ public class Cli implements Vues{
         System.out.println("\n");
 
     }
-
-    @Override
-    public void displayPlayer(Player p) {
-        System.out.println("Player     : " + p.getColor() + ", Victory Points : " + p.getVictoryPoint() );
-        System.out.println("Ressources : " + p.getRessourcesToString());
-        System.out.println("Cards      : " + p.getCardsToString());
-        System.out.println();
-
-    }
-
     @Override
     public void displayDiceNumber(int diceNumber) {
         System.out.println("Dices = " + diceNumber);
@@ -233,8 +201,8 @@ public class Cli implements Vues{
     }
 
     @Override
-    public void getPortResource(){
-        System.out.println("Please choose the resource (the resource you will give) you want to trade among \"Clay, Ore, Wheat, Wood, Wool.\" ");
+    public void getCityPlacement() {
+        System.out.println("To build a city/colony please enter their coordinates");
     }
 
     public void getFirstColonyPlacement(Player p,Game game, boolean secondRound) {
@@ -247,6 +215,16 @@ public class Cli implements Vues{
         System.out.println("Please select coordinates for your road. She is next to the colony you just achieved.");
         this.controller.getFirstRoadPlacement(p,colony);
 
+    }
+
+    @Override
+    public void getPortResource(){
+        System.out.println("Please choose the resource (the resource you will give) you want to trade among \"Clay, Ore, Wheat, Wood, Wool.\" ");
+    }
+
+    @Override
+    public void getRoadPlacement() {
+        System.out.println("To build a road please enter their coordinates");
     }
 
     @Override
@@ -281,25 +259,39 @@ public class Cli implements Vues{
         System.out.println("Choisissez un port parmi cette liste pour faire une échange.");
     }
 
+/*
+    public Player choosePlayerFromColony(ArrayList<Colony> colonies){
+        scanner=new Scanner(System.in);
+        int compt=1;
+        for(Colony colony:colonies){
+            System.out.println(compt+" - "+colony.getPlayer().toString());
+            compt++;
+        }
+        try{
+            int choice=scanner.nextInt();
+            if(choice<1 || choice>compt){
+                throw new InputMismatchException();
+            }
+            return colonies.get(choice-1).getPlayer();
+        }catch(InputMismatchException e){
+            System.out.println("The number should be between 1 and "+compt);
+            return this.choosePlayerFromColony(colonies);
+        }
+    }
+
+ */
+
     @Override
     public void setPlayers() {
         controller.setPlayers();
     }
 
-
     @Override
-    public void showBuildCost(){
-        System.out.println("Road : 1x Clay, 1x Wood. 0 Victory Point");
-        System.out.println("Colony: 1x Clay, 1x Wood, 1x Wheat, 1x Wool. 1 Victory Point");
-        System.out.println("City : 2x Wheat, 3x Ore. 2 Victory Points");
-        System.out.println("Card : 1x Wool, 1x Wheat, 1x Ore. 0 Victory Point");
+    public void setThief(){
+        System.out.println("Please choose a tile to set the thief place.");
+        controller.setThief();
     }
 
-    @Override
-    public void victory(Player p) {
-        System.out.println(p.toString() + "has won the game!");
-        System.exit(0);
-    }
     @Override
     public void sevenAtDice(Player p, int quantity){
         while(quantity>0){
@@ -309,10 +301,13 @@ public class Cli implements Vues{
             quantity--;
         }
     }
+
     @Override
-    public void setThief(){
-        System.out.println("Please choose a tile to set the thief place.");
-        controller.setThief();
+    public void showBuildCost(){
+        System.out.println("Road : 1x Clay, 1x Wood. 0 Victory Point");
+        System.out.println("Colony: 1x Clay, 1x Wood, 1x Wheat, 1x Wool. 1 Victory Point");
+        System.out.println("City : 2x Wheat, 3x Ore. 2 Victory Points");
+        System.out.println("Card : 1x Wool, 1x Wheat, 1x Ore. 0 Victory Point");
     }
 
     @Override
@@ -340,5 +335,11 @@ public class Cli implements Vues{
             controller.steal(p,playerOfColony);
 
         }
+    }
+
+    @Override
+    public void victory(Player p) {
+        System.out.println(p.toString() + "has won the game!");
+        System.exit(0);
     }
 }

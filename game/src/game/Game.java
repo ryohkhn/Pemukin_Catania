@@ -526,7 +526,6 @@ public class Game {
         }
     }
 
-
     public void steal(Player p, Player playerOfColony) {
         String resource;
         if(playerOfColony.resourceCount()>0) {

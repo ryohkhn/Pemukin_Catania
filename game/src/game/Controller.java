@@ -205,7 +205,6 @@ public class Controller{
         }
     }
 
-
     public void getFirstColonyPlacement(Player p,Game game, Boolean secondRound) {
         System.out.println("To build a colony :");
         scanner=new Scanner(System.in);
@@ -316,6 +315,7 @@ public class Controller{
             destroy(p);
         }
     }
+
     public void setThief(){
         scanner=new Scanner(System.in);
         try{
