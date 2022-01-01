@@ -17,6 +17,7 @@ public class Controller{
     }
 
     public void chooseNbPlayers() { //launcher of cli version
+        scanner=new Scanner(System.in);
         if(scanner.nextLine().equals("3")) {
             this.game=launcher.createGame(3);
         } else {
@@ -25,7 +26,12 @@ public class Controller{
     }
 
     public void getAction(Player p) {
+        scanner=new Scanner(System.in);
         switch(scanner.nextInt()){
+            case 0 -> {
+                cli.displayBoard(this.game);
+                cli.getAction(p);
+            }
             case 1 -> {
                 game.trade(p, this.portSelection(p), this.getPortResource(), this.chooseResource(1));
                 cli.getAction(p);
@@ -57,9 +63,9 @@ public class Controller{
                     } else if(card.equals("ProgressMonopoly")) {
                         game.useCardProgressMonopoly(p, this.chooseResource(1), choosedCard);
                     } else if(card.equals("ProgressRoadBuilding")) {
-                        game.useCardProgressRoadBuilding(p, this.getCityPlacement(), choosedCard);
+                        game.useCardProgressRoadBuilding(p, this.getRoadPlacement(), choosedCard);
                     }else if(card.equals("Knight")){
-                        game.useCardKnight(p,this.getThiefPlacement());
+                        game.useCardKnight(p,choosedCard,this.getThiefPlacement());
                         cli.steal(p,this.game.getBoard().getThiefTile());
                     } else {
                         game.useCard(p,choosedCard);
@@ -77,26 +83,28 @@ public class Controller{
                 cli.showBuildCost();
                 cli.getAction(p);
             }
-            case 9 -> {
+            case 9 -> { // end the turn
                 p.alreadyPlayedCardThisTurn=false;
             }
             default -> {
-                System.out.println("Please enter an Integer between 1-9");
+                System.out.println("Please enter an Integer between 0-9");
                 cli.getAction(p);
             }
         }
     }
 
     private String chooseCard() {
+        scanner=new Scanner(System.in);
         cli.chooseCard();
         String cardInput=scanner.next();
-        if(!cardInput.equals("Knigth") && !cardInput.equals("VictoryPoint") && !cardInput.equals("ProgressRoadBuilding") && !cardInput.equals("ProgressYearOfPlenty") && !cardInput.equals("ProgressMonopoly")){
+        if(!cardInput.equals("Knight") && !cardInput.equals("VictoryPoint") && !cardInput.equals("ProgressRoadBuilding") && !cardInput.equals("ProgressYearOfPlenty") && !cardInput.equals("ProgressMonopoly")){
             return chooseCard();
         }
         else return cardInput;
     }
 
     private int[] getCityPlacement(){
+        scanner=new Scanner(System.in);
         cli.getCityPlacement();
         try{
             System.out.println("Please enter the line of the tile.");
@@ -125,6 +133,7 @@ public class Controller{
     }
 
     private int[] getRoadPlacement() {
+        scanner=new Scanner(System.in);
         cli.getRoadPlacement();
         try{
             System.out.println("Please enter the line of the tile.");
@@ -153,6 +162,7 @@ public class Controller{
     }
 
     public String[] chooseResource(int number) {
+        scanner=new Scanner(System.in);
         int compt=0;
         String[] res=new String[number];
         while(compt<number){
@@ -168,6 +178,7 @@ public class Controller{
     }
 
     private String getPortResource() {
+        scanner=new Scanner(System.in);
         cli.getPortResource();
         String resourceInput=scanner.next();
         if(!resourceInput.equals("Clay") && !resourceInput.equals("Ore") && !resourceInput.equals("Wheat") && !resourceInput.equals("Wood") && !resourceInput.equals("Wool")){
@@ -177,6 +188,7 @@ public class Controller{
     }
 
     private Port portSelection(Player p) {
+        scanner=new Scanner(System.in);
         cli.portSelection(p);
         int compt=p.getPorts().size();
         try{
@@ -196,6 +208,7 @@ public class Controller{
 
     public void getFirstColonyPlacement(Player p,Game game, Boolean secondRound) {
         System.out.println("To build a colony :");
+        scanner=new Scanner(System.in);
         try{
             System.out.println("Please enter the line of the tile.");
             int line=scanner.nextInt();
@@ -214,7 +227,7 @@ public class Controller{
             }
             int[] co={line,column,colonyPosition};
             Colony colony=this.game.buildColonyInitialization(p,co);
-            if(colony==null) getFirstColonyPlacement(p,game,secondRound);
+            if(colony==null) throw new InputMismatchException();
             if(secondRound) game.secondRoundBuildedColonies.put(colony,p);
             cli.getFirstRoadPlacement(p,colony,game);
         }catch (InputMismatchException e) {
@@ -227,6 +240,7 @@ public class Controller{
 
     public void getFirstRoadPlacement(Player p, Colony colony){
         System.out.println("To build a road :");
+        scanner=new Scanner(System.in);
         try{
             System.out.println("Please enter the line of the tile.");
             int line=scanner.nextInt();
@@ -244,10 +258,7 @@ public class Controller{
                 throw new InputMismatchException();
             }
             int[] co={line,column,roadPosition};
-            if(!this.game.buildRoadInitialization(p,colony,co)){
-                getFirstRoadPlacement(p,colony);
-            }
-
+            if(!this.game.buildRoadInitialization(p,colony,co)) throw new InputMismatchException();
         }catch (InputMismatchException e) {
             System.out.println("the line of the tile should be an Integer between 0-3");
             System.out.println("the column of the tile should be an Integer between 0-3");
@@ -258,6 +269,7 @@ public class Controller{
     }
 
     public void setPlayers(){
+        scanner=new Scanner(System.in);
         HashMap<String, Boolean> color=new HashMap<>();
         color.put("blue", false);
         color.put("yellow", false);
@@ -290,17 +302,22 @@ public class Controller{
     }
 
     public void destroy(Player p) {
+        scanner=new Scanner(System.in);
         String resourceInput=scanner.next();
         if(!resourceInput.equals("Clay") && !resourceInput.equals("Ore") && !resourceInput.equals("Wheat") && !resourceInput.equals("Wood") && !resourceInput.equals("Wool")){
-            System.out.println("Choose a resource you want to destroy among \"Clay, Ore, Wheat, Wood, Wool.\" ");
+            System.out.println(p.color +"---> Choose a resource you want to destroy among \"Clay, Ore, Wheat, Wood, Wool.\" ");
             destroy(p);
         }
         String[] res= new String[1];
         res[0]=resourceInput;
         if(p.hasResources(res)) game.destroy(p,resourceInput);
-        else destroy(p);
+        else {
+            System.out.println("You don't have this resource anymore.");
+            destroy(p);
+        }
     }
     public void setThief(){
+        scanner=new Scanner(System.in);
         try{
             System.out.println("Please enter the line of the tile.");
             int line=scanner.nextInt();
@@ -322,6 +339,7 @@ public class Controller{
     }
 
     public int[] getThiefPlacement() {
+        scanner=new Scanner(System.in);
         try{
             System.out.println("Please enter the line of the tile.");
             int line=scanner.nextInt();
@@ -347,6 +365,7 @@ public class Controller{
     }
 
     public Player choosePlayerFromColonies(ArrayList<Colony> ownedColonies, Player p) {
+        scanner=new Scanner(System.in);
         try{
             int i= scanner.nextInt();
             if(i>ownedColonies.size()-1 || i<0){

@@ -34,7 +34,6 @@ public class Launcher {
         while(!hasWon){
             if(game!=null){
                 for(Player p : game.getPlayers()){
-                    game.checkLongestArmy();
                     vue.displayPlayer(p);
                     vue.displayBoard(game);
                     Random rand=new Random();
@@ -43,6 +42,7 @@ public class Launcher {
                     if(diceNumber==7) this.seven(p, vue);
                     game.diceProduction(diceNumber);
                     vue.getAction(p);
+                    game.checkLongestArmy();
                     if(p.hasWin()){
                         vue.victory(p);
                         hasWon=true;

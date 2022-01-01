@@ -258,7 +258,11 @@ public class Game {
         }
     }
 
-    public void useCardKnight(Player turnPlayer, int[] placement) {
+    public void useCardKnight(Player turnPlayer, Card choosedCard,int[] placement) {
+        if(turnPlayer.cards.get(choosedCard)<=0) {
+            System.out.println("You do not have this card.");
+            return;
+        }
         turnPlayer.knightPlayed+=1;
         this.setThief(placement);
     }
@@ -314,17 +318,17 @@ public class Game {
     // fonction qui permet de faire une échange avec un le port si le joueur en possède un
     public void trade(Player player, Port choosedPort, String portResource, String[] playerResource) {
         if(choosedPort==null) {
-            if(player.resources.get(playerResource)>=4) {
-                player.resources.merge(playerResource[0], 4, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-                player.resources.merge(portResource, 1, Integer::sum);
+            if(player.resources.get(portResource)>=4) {
+                player.resources.merge(portResource, 4, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+                player.resources.merge(playerResource[0], 1, Integer::sum);
             } else {
                 System.out.println("Vous n'avez pas les ressources suffisantes pour faire l'échange");
             }
         } else if(choosedPort.getRate()==2) {
-            if(player.resources.get(playerResource)>=2) {
+            if(player.resources.get(playerResource[0])>=2) {
                 if(choosedPort.getRessource().equals(portResource)) {
-                    player.resources.merge(choosedPort.getRessource(), 2, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-                    player.resources.merge(portResource, 1, Integer::sum);
+                    player.resources.merge(portResource, 2, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+                    player.resources.merge(playerResource[0], 1, Integer::sum);
                 } else {
                     System.out.println("Ce port n'échange pas cette ressource");
                 }
@@ -332,9 +336,9 @@ public class Game {
                 System.out.println("Vous n'avez pas les ressources suffisantes pour faire l'échange");
             }
         } else { //cas ou le port echange en 3:1
-            if(player.resources.get(playerResource)>=3) {
-                player.resources.merge(playerResource[0], 3, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-                player.resources.merge(portResource, 1, Integer::sum);
+            if(player.resources.get(portResource)>=3) {
+                player.resources.merge(portResource, 3, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+                player.resources.merge(playerResource[0], 1, Integer::sum);
             } else {
                 System.out.println("Vous n'avez pas les ressources suffisantes pour faire l'échange");
             }
@@ -379,7 +383,7 @@ public class Game {
             player.addPropertie("Road");
             return true;
         } else {
-            System.out.println("Vous ne pouvez pas constuire de route ici.");
+            System.out.println("Vous ne pouvez pas constuire de route ici. Votre ville n'est pas adjacente.");
         }
         return false;
     }

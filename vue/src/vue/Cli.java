@@ -41,9 +41,9 @@ public class Cli implements Vues{
 
     @Override
     public void chooseCard() {
-        System.out.println("choose a card among : Knigth,VictoryPoint,ProgressRoadBuilding,ProgressYearOfPlenty,ProgressMonopoly;");
+        System.out.println("choose a card among : Knight,VictoryPoint,ProgressRoadBuilding,ProgressYearOfPlenty,ProgressMonopoly;");
     }
-
+/*
     public Player choosePlayerFromColony(ArrayList<Colony> colonies){
         scanner=new Scanner(System.in);
         int compt=1;
@@ -62,6 +62,8 @@ public class Cli implements Vues{
             return this.choosePlayerFromColony(colonies);
         }
     }
+
+ */
 
     @Override
     public void displayBoard(Game game) {
@@ -144,7 +146,7 @@ public class Cli implements Vues{
                         if(x==0) {
                             if(t.getColonies().get(0).isOwned()) System.out.print(t.getColonies().get(0).getPlayer().firstLetter());
                             else System.out.print(t.getColonies().get(0).isCity()?"C ":"c ");
-                            }
+                        }
                         if(t.getRoads().get(0).isOwned()) System.out.print(t.getRoads().get(0).getPlayer().firstLetter());
                         else System.out.print("- ");
                         if(t.getColonies().get(1).isOwned()) System.out.print(t.getColonies().get(1).getPlayer().firstLetter());
@@ -156,15 +158,18 @@ public class Cli implements Vues{
                             if(t.getId()==11) id+="B ";
                             if(t.getId()==12) id+="Z ";
                         }else{
-                            id+=String.valueOf(t.getId() + " ");
+                            id+=String.valueOf(t.getId())+ " ";
                         }
                         if(x==0) {
-                            System.out.print("- ");
+                            if(t.getRoads().get(3).isOwned()) System.out.print(t.getRoads().get(3).getPlayer().firstLetter());
+                            else System.out.print("- ");
                             System.out.print(id);
-                            System.out.print("- ");
+                            if(t.getRoads().get(1).isOwned()) System.out.print(t.getRoads().get(1).getPlayer().firstLetter());
+                            else System.out.print("- ");
                         }else{
                             System.out.print(id);
-                            System.out.print("- ");
+                            if(t.getRoads().get(1).isOwned()) System.out.print(t.getRoads().get(1).getPlayer().firstLetter());
+                            else System.out.print("- ");
                         }
                     }
                 }
@@ -220,7 +225,7 @@ public class Cli implements Vues{
 
     @Override
     public void getAction(Player p) {
-        System.out.println("\nPlease select an action : \n 1 - exchange ressources with bank"+
+        System.out.println("\nPlease select an action : \n 0 - show board \n 1 - exchange ressources with bank"+
                 " \n 2 - build a new colony\n"+" 3 - upgrade a colony into a city\n"+
                 " 4 - build a road\n"+" 5 - buy development cards\n"+
                 " 6 - play a development card\n"+" 7 - display player information\n"+" 8 - show building costs\n"+" 9 - end the round\n");
@@ -229,7 +234,7 @@ public class Cli implements Vues{
 
     @Override
     public void getPortResource(){
-        System.out.println("Please choose the resource you want to trade among \"Clay, Ore, Wheat, Wood, Wool.\" ");
+        System.out.println("Please choose the resource (the resource you will give) you want to trade among \"Clay, Ore, Wheat, Wood, Wool.\" ");
     }
 
     public void getFirstColonyPlacement(Player p,Game game, boolean secondRound) {
@@ -323,7 +328,9 @@ public class Cli implements Vues{
         if(ownedColonies.size()!=0){
             if(ownedColonies.size()>1){
                 System.out.println("Choose a player to steal the resource from.");
-                System.out.println(ownedColonies);
+                for(int i=0;i<ownedColonies.size();i++){
+                    System.out.println(i+1 + " " + ownedColonies.get(i).getPlayer());
+                }
                 System.out.println("choose a number between 1 and " + ownedColonies.size());
                 playerOfColony=controller.choosePlayerFromColonies(ownedColonies,p);
             }
