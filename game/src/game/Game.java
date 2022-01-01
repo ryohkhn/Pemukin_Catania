@@ -1,7 +1,6 @@
 package game;
 
 import board.*;
-import vue.Vues;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -463,21 +462,23 @@ public class Game {
         Player playerOwningCard=null;
         Player nextPlayer=null;
         for(Player player : players) {
-            if(player.cards.get(Card.LargestArmy)>0) {
+            if(player!=null && player.cards.get(Card.LargestArmy)>0) {
                 cardOwned=true;
                 knightPlayedCount=player.knightPlayed;
                 playerOwningCard=player;
             }
         }
         for(Player player : players) {
-            if(cardOwned) {
-                if(player.knightPlayed>knightPlayedCount) {
-                    nextPlayer=player;
-                    knightPlayedCount=nextPlayer.knightPlayed;
-                }
-            } else {
-                if(player.knightPlayed>=3) {
-                    nextPlayer=player;
+            if(player!=null){
+                if(cardOwned) {
+                    if(player.knightPlayed>knightPlayedCount) {
+                        nextPlayer=player;
+                        knightPlayedCount=nextPlayer.knightPlayed;
+                    }
+                } else {
+                    if(player.knightPlayed>=3) {
+                        nextPlayer=player;
+                    }
                 }
             }
         }
@@ -533,6 +534,15 @@ public class Game {
             p.resources.merge(resource, 1, Integer::sum);
             System.out.println(p+" stole 1 "+resource+" from "+playerOfColony);
         }
+    }
+
+    public Colony getColonyFromPlayer(Player player){
+        for(Colony colony:secondRoundBuildedColonies.keySet()){
+            if(secondRoundBuildedColonies.get(colony)==player){
+                return colony;
+            }
+        }
+        return null;
     }
 }
 

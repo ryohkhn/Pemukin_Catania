@@ -1,6 +1,5 @@
 package vue;
 
-import board.Board;
 import board.Colony;
 import board.Port;
 import board.Tile;
@@ -25,38 +24,6 @@ public class Cli implements Vues{
         System.out.println("If you want to be 3 players type 3. \nElse you'll be 4.");
         controller.chooseNbPlayers();
     }
-
-
-
-/*
-
-    @Override
-    public String[] ressourceToBeDiscarded(Player player,int quantity) {
-        scanner=new Scanner(System.in);
-        System.out.println("Choose "+quantity+" resources you need to discard among : Clay, Ore, Wheat, Wood, Wool");
-        System.out.println("Resources of "+player+" :");
-        System.out.println(player.getRessourcesToString());
-        String[] choosedResources=new String[quantity];
-        int compt=0;
-        while(compt<quantity){
-            try{
-                System.out.println("Enter the resource number "+(compt+1)+" you want to discard.");
-                String ressource=scanner.next();
-                if(!ressource.equals("Clay") && !ressource.equals("Ore") && !ressource.equals("Wheat") && !ressource.equals("Wood") && !ressource.equals("Wool")){
-                    return ressourceToBeDiscarded(player, quantity);
-                }
-                choosedResources[compt]=ressource;
-            } catch(InputMismatchException e){
-                System.out.println("You need to input the resources you want to discard among : Clay, Ore, Wheat, Wood, Wool");
-                return ressourceToBeDiscarded(player, quantity);
-            }
-            compt++;
-        }
-        return choosedResources;
-    }
-
- */
-
 
     @Override
     public void getRoadPlacement() {
@@ -264,14 +231,7 @@ public class Cli implements Vues{
     public void getPortResource(){
         System.out.println("Please choose the resource you want to trade among \"Clay, Ore, Wheat, Wood, Wool.\" ");
     }
-/*
-    @Override
-    public int[] getColonyPlacement() {
-        return new int[0];
-    }
 
-
- */
     public void getFirstColonyPlacement(Player p,Game game, boolean secondRound) {
         this.controller.getFirstColonyPlacement(p,game,secondRound);
     }
@@ -304,30 +264,6 @@ public class Cli implements Vues{
         }
         game.coloniesProduction();
     }
-/*
-    @Override
-    public void getThiefPlacement(){
-        scanner=new Scanner(System.in);
-        try{
-            System.out.println("Please enter the line of the tile.");
-            int line=scanner.nextInt();
-            if(line>3 || line<0){
-                throw new InputMismatchException();
-            }
-            System.out.println("Please enter the column of the tile.");
-            int column=scanner.nextInt();
-            if(column>3 || column<0){
-                throw new InputMismatchException();
-            }
-            int[] co={line,column};
-            return co;
-        }catch (InputMismatchException e) {
-            System.out.println("the line of the tile should be an Integer between 0-3");
-            System.out.println("the column of the tile should be an Integer between 0-3");
-            return this.getThiefPlacement();
-        }
-    }
-    */
 
     @Override
     public void portSelection(Player player){
@@ -373,6 +309,7 @@ public class Cli implements Vues{
         System.out.println("Please choose a tile to set the thief place.");
         controller.setThief();
     }
+
     @Override
     public void steal(Player p, Tile thiefTile){
         System.out.println("You can then steal a resource from a player if one of his colonies are on the tile.");

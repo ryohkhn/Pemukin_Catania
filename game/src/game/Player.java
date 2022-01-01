@@ -3,12 +3,13 @@ package game;
 import board.Board;
 import board.Port;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
 public abstract class Player{
-    protected String color;
+    protected Color color;
     protected HashMap<String,Integer> resources=Board.generateHashMapRessource();
     protected HashMap<String,Integer> propertiesCounter=new HashMap<>();
     protected HashMap<Card,Integer> cards=new HashMap<>();
@@ -26,7 +27,7 @@ public abstract class Player{
         for(Card card : Card.values()){
             cards.put(card,0);
         }
-        this.color=color;
+        setColor(color);
     }
 
     // fonction qui incrémente les points de victoire d'un joueur en fonction de l'entier en argument
@@ -79,12 +80,19 @@ public abstract class Player{
         this.cards.merge(card,1,Integer::sum);
     }
 
-    public String getColor() {
+    public Color getColor() {
         return color;
     }
 
     public void setColor(String color){
-        this.color=color;
+        if(color!=null){
+            switch(color){
+                case "orange" -> this.color=new Color(0xE85C05);
+                case "green" -> this.color=new Color(0x55A100);
+                case "blue" -> this.color=new Color(0x0C59A2);
+                case "yellow" ->this.color=new Color(0xEEEE00);
+            }
+        }
     }
 
     public int getVictoryPoint() {
@@ -108,7 +116,7 @@ public abstract class Player{
     }
 
     public String firstLetter() {
-        return String.valueOf(color.charAt(0)) + " ";
+        return color.toString().charAt(0) + " ";
     }
 
     @Override
