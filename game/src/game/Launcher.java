@@ -97,5 +97,6 @@ public class Launcher {
 
 	public void setFirstPlayer() {
 		currentPlayer = game.getPlayers()[0];
+        indexCurrentPlayer=0;
 	}
 }

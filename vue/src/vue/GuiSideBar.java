@@ -58,6 +58,7 @@ public class GuiSideBar extends JPanel{
     public void initiateRoadsAndColonies(int nbPlayer, Player currentPlayer){
         if(nbPlayer==0){
             mainPanel.add(new JLabel("Initialization done !"));
+            mainPanel.removeAll();
             // lancement fonction partie
             return;
         }
@@ -67,6 +68,10 @@ public class GuiSideBar extends JPanel{
         compt[0]=nbPlayer;
         JButton button=new JButton("Place");
         button.addActionListener(actionEvent -> {
+            mainPanel.remove(button);
+            mainPanel.revalidate();
+            mainPanel.repaint();
+            mainPanel.add(new JLabel("Placing..."));
             if(countInitialization%2==1){
                 guiBoard.setAllTileAsListener(false,false,false,false);
             }
@@ -84,6 +89,7 @@ public class GuiSideBar extends JPanel{
         mainPanel.repaint();
         playerPanel.revalidate();
         playerPanel.repaint();
+        guiBoard.repaint();
         this.countInitialization-=1;
         int nbPlayers=game.getPlayers().length*2;
         if(countInitialization!=nbPlayers){
@@ -94,8 +100,7 @@ public class GuiSideBar extends JPanel{
                 launcher.prevPlayer();
             }
         }
-        launcher.nextPlayer();
-        initiateRoadsAndColonies(countInitialization, launcher.getCurrentPlayer());
+        initiateRoadsAndColonies(countInitialization,launcher.getCurrentPlayer());
     }
 
     public void displayDiceNumber(int diceNumber){

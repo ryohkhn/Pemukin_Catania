@@ -131,10 +131,13 @@ public class Gui extends JFrame implements Vues{
         guiBoard.setVisible(true);
         guiSideBar.setVisible(true);
 
+        launcher.setFirstPlayer();
         guiSideBar.initiateRoadsAndColonies(game.getPlayers().length,launcher.getCurrentPlayer());
     }
 
+    public void launchGame(){
 
+    }
 
     @Override
     public void getAction(Player player){

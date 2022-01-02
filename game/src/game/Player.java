@@ -121,7 +121,13 @@ public abstract class Player{
 
     @Override
     public String toString(){
-        return "Player "+this.color;
+        return "Player "+switch(color.getRGB()){
+            case -1549307 -> "orange";
+            case -11165440 -> "green";
+            case -15967838 -> "blue";
+            case -1118720 -> "yellow";
+            default -> throw new IllegalStateException();
+        };
     }
 
     public LinkedList<Port> getPorts(){

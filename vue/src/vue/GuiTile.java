@@ -32,10 +32,13 @@ public class GuiTile extends JPanel implements MouseInputListener{
     private boolean water;
     private boolean empty;
 
-    public GuiTile(int line,int column,boolean water, boolean empty){
+    public GuiTile(Game game,int line,int column,boolean water, boolean empty){
         this.line=line;
         this.column=column;
-        this.tile=game.getBoard().getTiles()[line][column];
+        this.game=game;
+        if(game!=null){
+            this.tile=game.getBoard().getTiles()[line][column];
+        }
         setLayout(new GridLayout(3, 1));
         if(water){
             if(tile!=null){
@@ -63,15 +66,14 @@ public class GuiTile extends JPanel implements MouseInputListener{
                 case "" -> Color.white;
                 default -> Color.black;
             });
+            JLabel resourceName;
             if(tile.getRessource().equals("")){
-                JLabel resourceName=new JLabel("Desert");
-                resourceName.setHorizontalAlignment(JLabel.CENTER);
-                add(resourceName);
+                resourceName=new JLabel("Desert");
             } else{
-                JLabel resourceName=new JLabel(tile.getRessource());
-                resourceName.setHorizontalAlignment(JLabel.CENTER);
-                add(resourceName);
+                resourceName=new JLabel(tile.getRessource());
             }
+            resourceName.setHorizontalAlignment(JLabel.CENTER);
+            add(resourceName);
             JLabel tileIdLabel=new JLabel(String.valueOf(tile.getId()));
             tileIdLabel.setHorizontalAlignment(JLabel.CENTER);
             add(tileIdLabel);
@@ -90,8 +92,7 @@ public class GuiTile extends JPanel implements MouseInputListener{
         addMouseListener(this);
     }
 
-    public void setAttributes(Game game,GuiSideBar guiSideBar,GuiBoard guiboard,Gui gui,Launcher launcher){
-        this.game=game;
+    public void setAttributes(GuiSideBar guiSideBar,GuiBoard guiboard,Gui gui,Launcher launcher){
         this.guiSideBar=guiSideBar;
         this.guiBoard=guiboard;
         this.gui=gui;
@@ -106,46 +107,82 @@ public class GuiTile extends JPanel implements MouseInputListener{
     public void mouseClicked(MouseEvent e){
         if(!water || !empty){
             int buildLocation=-1;
-            if(e.getX()<(this.getWidth()/3) && e.getY()<(this.getWidth()/3)){
-                buildLocation=0;
-            }
-            else if(e.getX()>((this.getWidth()*2)/3) && e.getY()<(this.getWidth()/3)){
-                buildLocation=1;
-            }
-            else if(e.getX()>((this.getWidth()*2)/3) && e.getY()>((this.getWidth()*2)/3)){
-                buildLocation=2;
-            }
-            else if(e.getX()<(this.getWidth()/3) && e.getY()>((this.getWidth()*2)/3)){
-                buildLocation=3;
-            }
-            switch(typeOfMove){
-                case "ColonyInitialization" -> {
-                    Colony buildedColony=game.buildColonyInitialization(launcher.getCurrentPlayer(), new int[]{line, column,buildLocation});
-                    if(buildedColony!=null){
-                        game.secondRoundBuildedColonies.put(buildedColony, launcher.getCurrentPlayer());
-                        guiBoard.removeAllTileAsListener();
+            try{
+                switch(typeOfMove){
+                    case "ColonyInitialization","Colony","City" -> {
+                        if(e.getX()<(this.getWidth()/3) && e.getY()<(this.getWidth()/3)){
+                            buildLocation=0;
+                        }
+                        else if(e.getX()>((this.getWidth()*2)/3) && e.getY()<(this.getWidth()/3)){
+                            buildLocation=1;
+                        }
+                        else if(e.getX()>((this.getWidth()*2)/3) && e.getY()>((this.getWidth()*2)/3)){
+                            buildLocation=2;
+                        }
+                        else if(e.getX()<(this.getWidth()/3) && e.getY()>((this.getWidth()*2)/3)){
+                            buildLocation=3;
+                        }
+                    }
+                    case "RoadInitialization","Road"->{
+                        if(e.getY()<(this.getHeight()/4) && e.getX()>(this.getWidth()/4) && e.getX()<((this.getWidth()*3)/4)){
+                            buildLocation=0;
+                            System.out.println("route haut");
+                        }
+                        else if(e.getX()>((this.getWidth()*3)/4) && e.getY()>(this.getHeight()/4) && e.getY()<((this.getHeight()*3)/4)){
+                            buildLocation=1;
+                            System.out.println("route droit");
+                        }
+                        else if(e.getY()>((this.getHeight()*3)/4) && e.getX()>(this.getWidth()/4) && e.getX()<((this.getWidth()*3)/4)){
+                            buildLocation=2;
+                            System.out.println("route bas");
+                        }
+                        else if(e.getX()<(this.getWidth()/4) && e.getY()>(this.getHeight()/4) && e.getY()<((this.getHeight()*3)/4)){
+                            buildLocation=3;
+                            System.out.println("route gauche");
+                        }
                     }
                 }
-                case "RoadInitialization" -> {
-                    Colony buildedOnSecondRound=game.getColonyFromPlayer(launcher.getCurrentPlayer());
-                    if(game.buildRoadInitialization(launcher.getCurrentPlayer(),buildedOnSecondRound, new int[]{line, column,buildLocation})){
-                        guiSideBar.roundInitializationDone();
-                        guiBoard.removeAllTileAsListener();
-                    }
-                }
-                case "City" ->{
-                    if(game.buildCity(launcher.getCurrentPlayer(),new int[]{line,column,buildLocation})){
-                        // faire qq chose
-                        guiBoard.removeAllTileAsListener();
-                    }
-                }
-                case "Road" ->{
-                    if(game.buildRoad(launcher.getCurrentPlayer(),new int[]{line,column,buildLocation})){
-                        // faire qq chose
-                        guiBoard.removeAllTileAsListener();
+                if(buildLocation!=-1){
+                    switch(typeOfMove){
+                        case "ColonyInitialization" -> {
+                            Colony buildedColony=game.buildColonyInitialization(launcher.getCurrentPlayer(), new int[]{line, column,buildLocation});
+                            if(buildedColony!=null){
+                                game.secondRoundBuildedColonies.put(buildedColony, launcher.getCurrentPlayer());
+                                System.out.println("construction colonie faite");
+                                guiBoard.removeAllTileAsListener();
+                                guiSideBar.roundInitializationDone();
+                            }
+                        }
+                        case "RoadInitialization" -> {
+                            Colony buildedOnSecondRound=game.getColonyFromPlayer(launcher.getCurrentPlayer());
+                            if(game.buildRoadInitialization(launcher.getCurrentPlayer(),buildedOnSecondRound, new int[]{line, column,buildLocation})){
+                                System.out.println("construction route faite");
+                                guiBoard.removeAllTileAsListener();
+                                guiSideBar.roundInitializationDone();
+                            }
+                        }
+                        case "Colony" ->{
+                            if(game.buildColony(launcher.getCurrentPlayer(),new int[]{line,column,buildLocation})){
+                                // faire qq chose
+                                guiBoard.removeAllTileAsListener();
+                            }
+                        }
+                        case "City" ->{
+                            if(game.buildCity(launcher.getCurrentPlayer(),new int[]{line,column,buildLocation})){
+                                // faire qq chose
+                                guiBoard.removeAllTileAsListener();
+                            }
+                        }
+                        case "Road" ->{
+                            if(game.buildRoad(launcher.getCurrentPlayer(),new int[]{line,column,buildLocation})){
+                                // faire qq chose
+                                guiBoard.removeAllTileAsListener();
+                            }
+                        }
                     }
                 }
             }
+            catch(NullPointerException ignored){};
         }
     }
 
