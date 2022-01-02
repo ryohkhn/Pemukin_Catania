@@ -85,7 +85,7 @@ public class GuiBoard extends JPanel{
                 else if(listenerForCity) tile.setTypeOfMove("City");
                 else if(listenerForRoad) tile.setTypeOfMove("Road");
                 else tile.setTypeOfMove("RoadInitialization");
-                addMouseListener(tile);
+                tile.activateMouseListener();
             }
         }
     }
@@ -95,7 +95,7 @@ public class GuiBoard extends JPanel{
         for(Component component:this.getComponents()){
             if(component instanceof GuiTile){
                 GuiTile tile=(GuiTile)component;
-                removeMouseListener(tile);
+                tile.disableMouseListener();
             }
         }
     }

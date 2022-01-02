@@ -31,11 +31,13 @@ public class GuiTile extends JPanel implements MouseInputListener{
     private int column;
     private boolean water;
     private boolean empty;
+    private boolean isActiveMouseListener;
 
     public GuiTile(Game game,int line,int column,boolean water, boolean empty){
         this.line=line;
         this.column=column;
         this.game=game;
+        this.isActiveMouseListener=false;
         if(game!=null){
             this.tile=game.getBoard().getTiles()[line][column];
         }
@@ -103,9 +105,17 @@ public class GuiTile extends JPanel implements MouseInputListener{
         this.typeOfMove=typeOfMove;
     }
 
+    public void activateMouseListener(){
+        this.isActiveMouseListener=true;
+    }
+
+    public void disableMouseListener(){
+        this.isActiveMouseListener=false;
+    }
+
     @Override
     public void mouseClicked(MouseEvent e){
-        if(!water || !empty){
+        if((!water || !empty) && isActiveMouseListener){
             int buildLocation=-1;
             try{
                 switch(typeOfMove){
@@ -156,6 +166,7 @@ public class GuiTile extends JPanel implements MouseInputListener{
                         case "RoadInitialization" -> {
                             Colony buildedOnSecondRound=game.getColonyFromPlayer(launcher.getCurrentPlayer());
                             if(game.buildRoadInitialization(launcher.getCurrentPlayer(),buildedOnSecondRound, new int[]{line, column,buildLocation})){
+                                // TODO: 03/01/2022 on peut construire une route sur la première colonie ERREUR 
                                 System.out.println("construction route faite");
                                 guiBoard.removeAllTileAsListener();
                                 guiSideBar.roundInitializationDone();

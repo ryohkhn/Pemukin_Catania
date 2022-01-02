@@ -63,7 +63,9 @@ public class GuiSideBar extends JPanel{
             return;
         }
         playerPanel.add(new JLabel(currentPlayer.toString()));
-        playerPanel.add(new JLabel("Place your "+(countInitialization>game.getPlayers().length?"first":"second")+(countInitialization%2==1?" road.":"colony.")));
+        System.out.println(countInitialization);
+        System.out.println(game.getPlayers().length*2);
+        playerPanel.add(new JLabel("place your "+(countInitialization>(game.getPlayers().length*2)?"first":"second")+(countInitialization%2==1?" road.":" colony.")));
         final int[] compt=new int[1];
         compt[0]=nbPlayer;
         JButton button=new JButton("Place");
@@ -92,7 +94,7 @@ public class GuiSideBar extends JPanel{
         guiBoard.repaint();
         this.countInitialization-=1;
         int nbPlayers=game.getPlayers().length*2;
-        if(countInitialization!=nbPlayers){
+        if(countInitialization!=nbPlayers && countInitialization%2==0){
             if(countInitialization>nbPlayers){
                 launcher.nextPlayer();
             }
