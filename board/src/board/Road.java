@@ -248,7 +248,7 @@ public class Road {
         return false;
     }
 
-    public boolean isBuildableInitialization(Player player,Colony linkedColony){
+    public boolean isBuildableInitialization(Colony linkedColony){
         for(Colony colony:adjacentColonies){
             if(colony==linkedColony) return true;
         }

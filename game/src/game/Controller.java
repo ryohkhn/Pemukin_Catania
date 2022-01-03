@@ -83,11 +83,15 @@ public class Controller{
                 cli.showBuildCost();
                 cli.getAction(p);
             }
-            case 9 -> { // end the turn
+            case 9 -> {
+                cli.displayOtherPlayers(p,game);
+                cli.getAction(p);
+            }
+            case 10 -> { // end the turn
                 p.alreadyPlayedCardThisTurn=false;
             }
             default -> {
-                System.out.println("Please enter an Integer between 0-9");
+                System.out.println("Please enter an Integer between 0-10");
                 cli.getAction(p);
             }
         }
@@ -280,16 +284,16 @@ public class Controller{
         for(Player p : game.getPlayers()){
             System.out.println("Type 1 to initialize a human player.\n Else this player will be a bot.");
             playersType[i]=scanner.nextLine();
-            if(playersType[i].equals("1")){
-                boolean verif=false;
-                while(!verif) {
-                    System.out.println("please choose a color between :" + color.toString());
-                    String s=scanner.nextLine();
-                    for(Map.Entry<String, Boolean> entry : color.entrySet()) {
-                        if(color.replace(s,false,true)) {
-                            playersColor[i]=entry.getKey();
-                            verif=true;
-                        }
+            boolean verif=false;
+            while(!verif) {
+                System.out.println("please choose a color between :" + color.toString());
+                String s=scanner.nextLine();
+                for(Map.Entry<String, Boolean> entry : color.entrySet()) {
+                    if(color.replace(s, false, true)) {
+                        playersColor[i]=entry.getKey();
+                        verif=true;
+                    }
+                    if(entry.getKey().equals(s)) {
                     }
                 }
             }
@@ -297,7 +301,6 @@ public class Controller{
         }
         game.setPlayers(playersType);
         game.setColors(playersColor);
-        game.botsGetColor(color);
     }
 
     public void destroy(Player p) {

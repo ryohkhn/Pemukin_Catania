@@ -30,6 +30,19 @@ public abstract class Player{
         setColor(color);
     }
 
+    public int getKnightPlayed() {
+        return knightPlayed;
+    }
+    public int getNbCards(){
+        int res=0;
+        for(Map.Entry<Card,Integer> entry : this.cards.entrySet()){
+            if(!entry.getKey().name().equals("LargestArmy")){
+                res+=entry.getValue();
+            }
+        }
+        return res;
+    }
+
     // fonction qui incrémente les points de victoire d'un joueur en fonction de l'entier en argument
     public void addVictoryPoint(int point){
         this.victoryPoint+=point;
@@ -116,12 +129,12 @@ public abstract class Player{
     }
 
     public String firstLetter() {
-        return color.toString().charAt(0) + " ";
+        return this.toString().charAt(0) + " ";
     }
 
     @Override
     public String toString(){
-        return "Player "+switch(color.getRGB()){
+        return switch(color.getRGB()){
             case -1549307 -> "orange";
             case -11165440 -> "green";
             case -15967838 -> "blue";

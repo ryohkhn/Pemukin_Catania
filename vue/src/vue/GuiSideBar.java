@@ -269,6 +269,7 @@ public class GuiSideBar extends JPanel implements Vues{
         infoPanel.add(buildCostDevelopmentCard);
     }
 
+    @Override
     public void displayDiceNumber(int diceNumber){
         displayPlayer(launcher.getCurrentPlayer());
         JButton diceRoll=new JButton("Roll the dices !");

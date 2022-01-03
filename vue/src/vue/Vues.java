@@ -14,6 +14,7 @@ public interface Vues{
     void victory(Player p);
     void displayBoard(Game game);
     void displayPlayer(Player p);
+    void displayOtherPlayers(Player p,Game game);
     void displayDiceNumber(int diceNumber);
     void showBuildCost();
     void chooseNbPlayers();

@@ -383,7 +383,7 @@ public class Game {
             System.out.println("Cette route appartient deja a quelqu'un."); // TODO: 24/12/2021 mettre tous les messages dans une fonction error de la vue, avec en argument un int qui represente le message a afficher (par exemple 1 = cette route appartient deja a quelqu'un)
             return false;
         }
-        if(choosedRoad.isBuildableInitialization(player, colony)) {
+        if(choosedRoad.isBuildableInitialization(colony)) {
             choosedRoad.setPlayer(player);
             player.addPropertie("Road");
             return true;
@@ -513,7 +513,7 @@ public class Game {
             }
         }
     }
-
+/*
     public void botsGetColor(HashMap<String, Boolean> color) {
         for(int i=0; i<this.players.length; i++) {
             if(this.getPlayers()[i] instanceof Bot) {
@@ -524,9 +524,10 @@ public class Game {
             }
         }
     }
-
+*/
     public void setColors(String[] playersColor) {
         for(int i=0; i<this.players.length; i++) {
+            System.out.println(playersColor[i]);
             this.players[i].setColor(playersColor[i]);
         }
     }

@@ -36,11 +36,24 @@ public class Cli implements Vues{
 
     @Override
     public void displayPlayer(Player p) {
-        System.out.println("Player     : " + p.getColor() + ", Victory Points : " + p.getVictoryPoint() );
+        System.out.println("Player     : " + p.toString() + ", Victory Points : " + p.getVictoryPoint() );
         System.out.println("Ressources : " + p.getRessourcesToString());
         System.out.println("Cards      : " + p.getCardsToString());
         System.out.println();
 
+    }
+
+    @Override
+    public void displayOtherPlayers(Player p, Game game) {
+        System.out.println("Other players informations :");
+        for(Player player : game.getPlayers()){
+            if(!player.equals(p)){
+                System.out.println(player.toString() + " : " +
+                        player.getVictoryPoint() + " victory points - " +
+                        player.getKnightPlayed() + " knights played - " +
+                        player.getNbCards() + " cards.");
+            }
+        }
     }
 
     @Override
@@ -186,6 +199,7 @@ public class Cli implements Vues{
         System.out.println("\n");
 
     }
+
     @Override
     public void displayDiceNumber(int diceNumber) {
         System.out.println("Dices = " + diceNumber);
@@ -196,7 +210,8 @@ public class Cli implements Vues{
         System.out.println("\nPlease select an action : \n 0 - show board \n 1 - exchange ressources with bank"+
                 " \n 2 - build a new colony\n"+" 3 - upgrade a colony into a city\n"+
                 " 4 - build a road\n"+" 5 - buy development cards\n"+
-                " 6 - play a development card\n"+" 7 - display player information\n"+" 8 - show building costs\n"+" 9 - end the round\n");
+                " 6 - play a development card\n"+" 7 - display player information\n"+" 8 - show building costs\n"+
+                " 9 - show others players informations\n"+" 10 - end the round\n");
         controller.getAction(p);
     }
 
@@ -237,9 +252,10 @@ public class Cli implements Vues{
             this.displayPlayer(p);
             System.out.println("Please select coordinates for your first colony.");
             this.getFirstColonyPlacement(p,  game, false);
+
         }
         while(!stack.isEmpty()){
-            Player p=p=stack.pop();
+            Player p=stack.pop();
             this.displayBoard(game);
             this.displayPlayer(p);
             System.out.println("Please select coordinates for your second colony.");
@@ -335,6 +351,11 @@ public class Cli implements Vues{
             controller.steal(p,playerOfColony);
 
         }
+    }
+
+    @Override
+    public void displayDiceProduction(HashMap<Player, String> diceResultsProduction) {
+        diceResultsProduction.forEach((p,s)-> System.out.println(p + " " + s));
     }
 
     @Override
