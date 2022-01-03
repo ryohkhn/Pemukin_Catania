@@ -4,6 +4,8 @@ import board.Tile;
 import game.Game;
 import game.Player;
 
+import java.util.HashMap;
+
 public interface Vues{
 
     void getRoadPlacement();
@@ -24,4 +26,5 @@ public interface Vues{
     void sevenAtDice(Player p,int quantity);
     void setThief();
     void steal(Player p, Tile thiefTile);
+    void displayDiceProduction(HashMap<Player,String> diceResultsProduction);
 }

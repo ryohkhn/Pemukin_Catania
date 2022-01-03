@@ -4,7 +4,6 @@ import vue.Cli;
 import vue.Gui;
 import vue.Vues;
 
-import java.util.Random;
 import java.util.Scanner;
 
 public class Launcher {
@@ -36,8 +35,7 @@ public class Launcher {
                 for(Player p : game.getPlayers()){
                     vue.displayPlayer(p);
                     vue.displayBoard(game);
-                    Random rand=new Random();
-                    int diceNumber=rand.nextInt(6)+1+rand.nextInt(6)+1;
+                    int diceNumber=game.generateDiceNumber();
                     vue.displayDiceNumber(diceNumber);
                     if(diceNumber==7) this.seven(p, vue);
                     game.diceProduction(diceNumber);

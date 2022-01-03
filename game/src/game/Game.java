@@ -1,14 +1,17 @@
 package game;
 
 import board.*;
+import vue.Vues;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 public class Game {
     private Player[] players;
     private Board board;
     public HashMap<Colony, Player> secondRoundBuildedColonies=new HashMap<>();
+    private Vues vue;
 
     public Game(int nb) {
         board=new Board();
@@ -132,6 +135,7 @@ public class Game {
 
     // fonction donnant aux joueurs les ressources produites si leur colonie se trouve sur la case de l'id en argument
     public void diceProduction(int diceNumber) {
+        HashMap<Player,String> diceResultsProduction=new HashMap<>();
         for(Tile[] tiles : board.getTiles()) {
             for(Tile tile : tiles) {
                 if(tile.getId()==diceNumber) {
@@ -140,7 +144,7 @@ public class Game {
                         for(Colony colony : tile.getColonies()) {
                             int producedValue=colony.isCity()?2:1;
                             if(colony.isOwned()) {
-                                System.out.println(colony.getPlayer()+" : "+ressource+" + 1");
+                                diceResultsProduction.put(colony.getPlayer(),ressource+" + "+producedValue);
                                 colony.getPlayer().resources.merge(ressource, producedValue, Integer::sum);
                             }
                         }
@@ -148,6 +152,7 @@ public class Game {
                 }
             }
         }
+        vue.displayDiceProduction(diceResultsProduction);
     }
 
     public void destroy(Player p, String resource) {
@@ -546,6 +551,11 @@ public class Game {
             }
         }
         return null;
+    }
+
+    public int generateDiceNumber(){
+        Random rand=new Random();
+        return(rand.nextInt(6)+1+rand.nextInt(6)+1);
     }
 }
 
