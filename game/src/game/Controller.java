@@ -289,11 +289,11 @@ public class Controller{
                 System.out.println("please choose a color between :" + color.toString());
                 String s=scanner.nextLine();
                 for(Map.Entry<String, Boolean> entry : color.entrySet()) {
-                    if(color.replace(s, false, true)) {
-                        playersColor[i]=entry.getKey();
-                        verif=true;
-                    }
                     if(entry.getKey().equals(s)) {
+                        if(color.replace(s, false, true)) {
+                            playersColor[i]=entry.getKey();
+                            verif=true;
+                        }
                     }
                 }
             }

@@ -525,6 +525,7 @@ public class Game {
             }
         }
     }
+<<<<<<< Updated upstream
 */
     public void setColors(String[] playersColor) {
         for(int i=0; i<this.players.length; i++) {

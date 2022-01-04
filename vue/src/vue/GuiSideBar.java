@@ -290,6 +290,7 @@ public class GuiSideBar extends JPanel implements Vues{
         // TODO: 04/01/2022 faire fonction 
     }
 
+
     public void showBuildCost(){
         JLabel buildCostRoad=new JLabel("Road : 1x Clay, 1x Wood -> 0 Victory Point");
         JLabel buildCostColony=new JLabel("Colony : 1x Clay, 1x Wheat, 1x Wood, 1x Wool -> 1 Victory Point");

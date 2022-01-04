@@ -21,17 +21,17 @@ public class Launcher {
         String input=sc2.nextLine();
         if(input.equals("1")){
             //Gui gui=new Gui(launcher);
-        }
-        else{
+        }else{
             Cli cli=new Cli(launcher);
             launcher.vue=cli;
-            launcher.launch(new Cli(launcher));
+            launcher.launch();
         }
+
     }
 
 
 
-    public void launch(Vues vue){
+    public void launch(){
         vue.chooseNbPlayers();
         vue.setPlayers();
         vue.initialization(game);
