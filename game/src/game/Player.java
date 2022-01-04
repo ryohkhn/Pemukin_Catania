@@ -29,6 +29,7 @@ public abstract class Player{
         }
         setColor(color);
     }
+    public abstract boolean isBot();
 
     public int getKnightPlayed() {
         return knightPlayed;
@@ -183,5 +184,10 @@ public abstract class Player{
             }
         }
         return true;
+    }
+
+    public boolean hasCard(){
+        for(Map.Entry<Card, Integer> entry : this.cards.entrySet()) if(entry.getValue()>0) return true;
+        return false;
     }
 }

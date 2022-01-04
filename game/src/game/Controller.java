@@ -6,8 +6,8 @@ import vue.Cli;
 import java.util.*;
 
 public class Controller{
-    private Launcher launcher;
-    private Cli cli;
+    private final Launcher launcher;
+    private final Cli cli;
     private Game game;
     private Scanner scanner=new Scanner(System.in);
 
@@ -27,7 +27,7 @@ public class Controller{
 
     public void getAction(Player p) {
         scanner=new Scanner(System.in);
-        switch(scanner.nextInt()){
+        switch(scanner.nextInt()) {
             case 0 -> {
                 cli.displayBoard(this.game);
                 cli.getAction(p);
@@ -37,15 +37,15 @@ public class Controller{
                 cli.getAction(p);
             }
             case 2 -> {
-                game.buildColony(p,this.getCityPlacement());
+                game.buildColony(p, this.getCityPlacement());
                 cli.getAction(p);
             }
             case 3 -> {
-                game.buildCity(p,this.getCityPlacement());
+                game.buildCity(p, this.getCityPlacement());
                 cli.getAction(p);
             }
             case 4 -> {
-                game.buildRoad(p,this.getRoadPlacement());
+                game.buildRoad(p, this.getRoadPlacement());
                 cli.getAction(p);
             }
             case 5 -> {
@@ -53,22 +53,37 @@ public class Controller{
                 cli.getAction(p);
             }
             case 6 -> {
-                if(p.alreadyPlayedCardThisTurn){
+                if(p.alreadyPlayedCardThisTurn) {
                     System.out.println("Vous avez deja joué une carte a ce tour.");
-                }else {
+                } else {
                     String card=this.chooseCard();
-                    Card choosedCard=Card.valueOf(card);
-                    if(card.equals("ProgressYearOfPlenty")) {
-                        game.useCardProgressYearOfPlenty(p,this.chooseResource(2));
-                    } else if(card.equals("ProgressMonopoly")) {
-                        game.useCardProgressMonopoly(p, this.chooseResource(1));
-                    } else if(card.equals("ProgressRoadBuilding")) {
-                        game.useCardProgressRoadBuilding(p, this.getRoadPlacement());
-                    }else if(card.equals("Knight")){
-                        game.useCardKnight(p,choosedCard,this.getThiefPlacement());
-                        cli.steal(p,this.game.getBoard().getThiefTile());
-                    } else {
-                        game.useCardVP(p);
+                    Card chosenCard=Card.valueOf(card);
+                    if(game.hasChoosedCard(p, chosenCard)) {
+                        if(card.equals("ProgressYearOfPlenty")) {
+                            game.useCardProgressYearOfPlenty(p, this.chooseResource(2));
+                        } else if(card.equals("ProgressMonopoly")) {
+                            game.useCardProgressMonopoly(p, this.chooseResource(1));
+                        } else if(card.equals("ProgressRoadBuilding")) {
+                            int[] placement;
+                            boolean verify;
+                            do{
+                               placement=this.getRoadPlacement();
+                               verify=game.isRoadBuildable(placement,p);
+                            }while(!verify);
+                            game.useCardProgressRoadBuilding(p, placement);
+                            verify=false;
+                            do{
+                                placement=this.getRoadPlacement();
+                                verify=game.isRoadBuildable(placement,p);
+                            }while(!verify);
+                            game.useCardProgressRoadBuildingSecondRound(p, placement);
+
+                        } else if(card.equals("Knight")) {
+                            game.useCardKnight(p, this.getThiefPlacement());
+                            cli.steal(p, this.game.getBoard().getThiefTile());
+                        } else {
+                            game.useCardVP(p);
+                        }
                     }
                 }
                 cli.getAction(p);
@@ -84,7 +99,7 @@ public class Controller{
                 cli.getAction(p);
             }
             case 9 -> {
-                cli.displayOtherPlayers(p,game);
+                cli.displayOtherPlayers(p, game);
                 cli.getAction(p);
             }
             case 10 -> { // end the turn
@@ -210,6 +225,7 @@ public class Controller{
     }
 
     public void getFirstColonyPlacement(Player p,Game game, Boolean secondRound) {
+
         System.out.println("To build a colony :");
         scanner=new Scanner(System.in);
         try{
@@ -286,7 +302,7 @@ public class Controller{
             playersType[i]=scanner.nextLine();
             boolean verif=false;
             while(!verif) {
-                System.out.println("please choose a color between :" + color.toString());
+                System.out.println("please choose a color between :" + color);
                 String s=scanner.nextLine();
                 for(Map.Entry<String, Boolean> entry : color.entrySet()) {
                     if(entry.getKey().equals(s)) {

@@ -256,57 +256,52 @@ public class Game {
             System.out.println("Vous n'avez pas les ressources suffisantes pour acheter une carte de développement.");
         }
     }
+    public boolean hasChoosedCard(Player p, Card choosedCard){
+        if(p.cards.get(choosedCard)<=0) {
+            System.out.println("you do not have this card");
+            return false;
+        }
+        return true;
+    }
 
     // fonction permettant d'utiliser une carte point de victoire
     public void useCardVP(Player turnPlayer) {
-        if(turnPlayer.cards.get(Card.VictoryPoint)>0) {
-            turnPlayer.addVictoryPoint(1);
-            turnPlayer.removeCard(Card.VictoryPoint);
-            turnPlayer.alreadyPlayedCardThisTurn=true;
-        } else {
-            System.out.println("You do not have this card.");
-        }
+        turnPlayer.addVictoryPoint(1);
+        turnPlayer.removeCard(Card.VictoryPoint);
+        turnPlayer.alreadyPlayedCardThisTurn=true;
     }
 
-    public void useCardKnight(Player turnPlayer, Card choosedCard,int[] placement) {
-        if(turnPlayer.cards.get(choosedCard)<=0) {
-            System.out.println("You do not have this card.");
-            return;
-        }
+    public boolean isRoadBuildable(int[] placement,Player p){
+        return this.board.getTiles()[placement[0]][placement[1]].getRoads().get(placement[2]).isBuildable(p);
+    }
+
+    public void useCardKnight(Player turnPlayer,int[] placement) {
         turnPlayer.knightPlayed+=1;
         this.setThief(placement);
+        turnPlayer.removeCard(Card.Knight);
+        turnPlayer.alreadyPlayedCardThisTurn=true;
     }
 
     public void useCardProgressYearOfPlenty(Player turnPlayer, String[] resources) {
-        if(turnPlayer.cards.get(Card.ProgressYearOfPlenty)<=0) {
-            System.out.println("You do not have this card.");
-            return;
-        }
         turnPlayer.resources.merge(resources[0], 1, Integer::sum);
         turnPlayer.resources.merge(resources[1], 1, Integer::sum);
         turnPlayer.removeCard(Card.ProgressYearOfPlenty);
         turnPlayer.alreadyPlayedCardThisTurn=true;
-
     }
 
-    public void useCardProgressRoadBuilding(Player turnPlayer, int[] placement) {
-        if(turnPlayer.cards.get(Card.ProgressRoadBuilding)<=0) {
-            System.out.println("You do not have this card.");
-            return;
-        }
-        int buildedRoad=0;
+    public boolean useCardProgressRoadBuilding(Player turnPlayer, int[] placement) {
         turnPlayer.resources.merge("Clay", 2, Integer::sum);
         turnPlayer.resources.merge("Wood", 2, Integer::sum);
-        while(buildedRoad<2) {
-            boolean isBuild=false;
-            do {
-                isBuild=!buildRoad(turnPlayer, placement);
-            }
-            while(!isBuild);
-            buildedRoad++;
-        }
+        buildRoad(turnPlayer, placement);
         turnPlayer.removeCard(Card.ProgressRoadBuilding);
         turnPlayer.alreadyPlayedCardThisTurn=true;
+        return true;
+    }
+
+    public boolean useCardProgressRoadBuildingSecondRound(Player turnPlayer, int[] placement){
+        turnPlayer.resources.merge("Clay", 2, Integer::sum);
+        turnPlayer.resources.merge("Wood", 2, Integer::sum);
+        return buildRoad(turnPlayer, placement);
     }
 
     public void useCardProgressMonopoly(Player turnPlayer, String[] resource) {
@@ -325,7 +320,6 @@ public class Game {
         }
         turnPlayer.removeCard(Card.ProgressMonopoly);
         turnPlayer.alreadyPlayedCardThisTurn=true;
-
     }
 
     // fonction qui permet de faire une échange avec un le port si le joueur en possède un
@@ -532,7 +526,6 @@ public class Game {
             }
         }
     }
-<<<<<<< Updated upstream
 */
     public void setColors(String[] playersColor) {
         for(int i=0; i<this.players.length; i++) {

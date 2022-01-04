@@ -3,10 +3,8 @@ package vue;
 import board.Colony;
 import board.Port;
 import board.Tile;
-import game.Controller;
-import game.Game;
-import game.Launcher;
-import game.Player;
+import game.*;
+
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -208,16 +206,20 @@ public class Cli implements Vues{
 
     @Override
     public void displayDiceNumber(int diceNumber) {
-        System.out.println("Dices = " + diceNumber);
+        System.out.println("Dices :" + diceNumber);
     }
 
     @Override
     public void getAction(Player p) {
-        System.out.println("\nPlease select an action : \n 0 - show board \n 1 - exchange ressources with bank"+
-                " \n 2 - build a new colony\n"+" 3 - upgrade a colony into a city\n"+
-                " 4 - build a road\n"+" 5 - buy development cards\n"+
-                " 6 - play a development card\n"+" 7 - display player information\n"+" 8 - show building costs\n"+
-                " 9 - show others players informations\n"+" 10 - end the round\n");
+        if(!p.isBot()) {
+            this.displayPlayer(p);
+            this.displayBoard(launcher.getGame());
+            System.out.println("\nPlease select an action : \n 0 - show board \n 1 - exchange ressources with bank"+
+                    " \n 2 - build a new colony\n"+" 3 - upgrade a colony into a city\n"+
+                    " 4 - build a road\n"+" 5 - buy development cards\n"+
+                    " 6 - play a development card\n"+" 7 - display player information\n"+" 8 - show building costs\n"+
+                    " 9 - show others players informations\n"+" 10 - end the round\n");
+        }
         controller.getAction(p);
     }
 
@@ -251,21 +253,28 @@ public class Cli implements Vues{
     @Override
     public void initialization(Game game){
         Stack<Player> stack=new Stack<>();
-        System.out.println("Phase d'initialisation :\nTous les joueurs construisent deux colonies et deux routes, la deulineième colonie peut se trouver éloignée de la première à condition que la règle de distance soit respectée.");
+        System.out.println("Phase d'initialisation :\nTous les joueurs construisent deux colonies et deux routes, la deuxième colonie peut se trouver éloignée de la première à condition que la règle de distance soit respectée.");
         for(Player p : game.getPlayers()){
             stack.push(p);
-            this.displayBoard(game);
-            this.displayPlayer(p);
-            System.out.println("Please select coordinates for your first colony.");
-            this.getFirstColonyPlacement(p,  game, false);
-
+            if(!p.isBot()) {
+                this.displayBoard(game);
+                this.displayPlayer(p);
+                System.out.println("Please select coordinates for your first colony.");
+                this.getFirstColonyPlacement(p, game, false);
+            }else{
+                ((Bot)p).iniBuild(game);
+            }
         }
         while(!stack.isEmpty()){
             Player p=stack.pop();
-            this.displayBoard(game);
-            this.displayPlayer(p);
-            System.out.println("Please select coordinates for your second colony.");
-            this.getFirstColonyPlacement(p, game, true);
+            if(!p.isBot()) {
+                this.displayBoard(game);
+                this.displayPlayer(p);
+                System.out.println("Please select coordinates for your second colony.");
+                this.getFirstColonyPlacement(p, game, true);
+            }else{
+                ((Bot)p).iniBuild(game);
+            }
         }
         game.coloniesProduction();
     }
@@ -316,11 +325,15 @@ public class Cli implements Vues{
 
     @Override
     public void sevenAtDice(Player p, int quantity){
-        while(quantity>0){
-            System.out.println(quantity + " to destroy");
-            System.out.println("Choose a resource you want to destroy among \"Clay, Ore, Wheat, Wood, Wool.\" ");
-            controller.destroy(p);
-            quantity--;
+        if(p.isBot()){
+            ((Bot)p).seventAtDice(quantity,this.launcher.getGame());
+        }else {
+            while(quantity>0) {
+                System.out.println(quantity+" to destroy");
+                System.out.println("Choose a resource you want to destroy among \"Clay, Ore, Wheat, Wood, Wool.\" ");
+                controller.destroy(p);
+                quantity--;
+            }
         }
     }
 
@@ -344,12 +357,16 @@ public class Cli implements Vues{
         Player playerOfColony;
         if(ownedColonies.size()!=0){
             if(ownedColonies.size()>1){
-                System.out.println("Choose a player to steal the resource from.");
-                for(int i=0;i<ownedColonies.size();i++){
-                    System.out.println(i+1 + " " + ownedColonies.get(i).getPlayer());
+                if(!p.isBot()) {
+                    System.out.println("Choose a player to steal the resource from.");
+                    for(int i=0; i<ownedColonies.size(); i++) {
+                        System.out.println(i+1+" "+ownedColonies.get(i).getPlayer());
+                    }
+                    System.out.println("choose a number between 1 and "+ownedColonies.size());
+                    playerOfColony=controller.choosePlayerFromColonies(ownedColonies, p);
+                }else{
+                    playerOfColony=ownedColonies.get(((Bot)p).getRand(ownedColonies.size())).getPlayer();
                 }
-                System.out.println("choose a number between 1 and " + ownedColonies.size());
-                playerOfColony=controller.choosePlayerFromColonies(ownedColonies,p);
             }
             else{
                 playerOfColony=ownedColonies.get(0).getPlayer();

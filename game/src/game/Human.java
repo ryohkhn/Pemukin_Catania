@@ -5,6 +5,11 @@ public class Human extends Player{
         super(color);
     }
 
+    @Override
+    public boolean isBot() {
+        return false;
+    }
+
     public Human getPlayer(){
         return this.getPlayer();
     }

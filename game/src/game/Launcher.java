@@ -4,6 +4,7 @@ import vue.Cli;
 import vue.Gui;
 import vue.Vues;
 
+import java.util.Random;
 import java.util.Scanner;
 
 public class Launcher {
@@ -13,6 +14,7 @@ public class Launcher {
     private Vues vue;
 
     public static void main(String[] args){
+        Random rand=new Random();
         Launcher launcher=new Launcher();
         Gui gui=new Gui(launcher);
         launcher.vue=gui.getGuiSideBar();
@@ -39,13 +41,12 @@ public class Launcher {
         while(!hasWon){
             if(game!=null){
                 for(Player p : game.getPlayers()){
-                    vue.displayPlayer(p);
-                    vue.displayBoard(game);
                     int diceNumber=game.generateDiceNumber();
                     vue.displayDiceNumber(diceNumber);
                     if(diceNumber==7) this.seven(p, vue);
                     game.diceProduction(diceNumber);
-                    vue.getAction(p);
+                    if(!p.isBot()) vue.getAction(p);
+                    else ((Bot)p).getAction(game);
                     game.checkLongestArmy();
                     if(p.hasWin()){
                         vue.victory(p);
@@ -63,8 +64,16 @@ public class Launcher {
                 vue.sevenAtDice(player,quantity);
             }
         }
-        vue.setThief();
+        if(p.isBot()){
+            vue.setThief();
+        }else{
+            ((Bot)p).setThief(game);
+        }
         vue.steal(p,game.getBoard().getThiefTile());
+    }
+
+    public Game getGame() {
+        return game;
     }
 
     public Game createGame(int nbPlayers){
