@@ -76,7 +76,7 @@ public class GuiBoard extends JPanel{
         }
     }
 
-    public void setAllTileAsListener(boolean listenerForColonyInitialization,boolean listenerForColony,boolean listenerForCity,boolean listenerForRoad){
+    public void setAllTileAsListener(boolean listenerForColonyInitialization, boolean listenerForColony, boolean listenerForCity, boolean listenerForRoad, boolean listenerForThief){
         for(Component component:this.getComponents()){
             if(component instanceof GuiTile){
                 GuiTile tile=(GuiTile) component;
@@ -84,6 +84,7 @@ public class GuiBoard extends JPanel{
                 else if(listenerForColonyInitialization) tile.setTypeOfMove("ColonyInitialization");
                 else if(listenerForCity) tile.setTypeOfMove("City");
                 else if(listenerForRoad) tile.setTypeOfMove("Road");
+                else if(listenerForThief) tile.setTypeOfMove("Thief");
                 else tile.setTypeOfMove("RoadInitialization");
                 tile.activateMouseListener();
             }

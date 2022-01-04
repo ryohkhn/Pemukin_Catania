@@ -33,6 +33,7 @@ public abstract class Player{
     public int getKnightPlayed() {
         return knightPlayed;
     }
+
     public int getNbCards(){
         int res=0;
         for(Map.Entry<Card,Integer> entry : this.cards.entrySet()){
@@ -41,6 +42,10 @@ public abstract class Player{
             }
         }
         return res;
+    }
+
+    public HashMap<Card, Integer> getCards(){
+        return cards;
     }
 
     // fonction qui incrémente les points de victoire d'un joueur en fonction de l'entier en argument

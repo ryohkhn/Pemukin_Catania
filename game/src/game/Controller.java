@@ -59,16 +59,16 @@ public class Controller{
                     String card=this.chooseCard();
                     Card choosedCard=Card.valueOf(card);
                     if(card.equals("ProgressYearOfPlenty")) {
-                        game.useCardProgressYearOfPlenty(p,this.chooseResource(2),choosedCard);
+                        game.useCardProgressYearOfPlenty(p,this.chooseResource(2));
                     } else if(card.equals("ProgressMonopoly")) {
-                        game.useCardProgressMonopoly(p, this.chooseResource(1), choosedCard);
+                        game.useCardProgressMonopoly(p, this.chooseResource(1));
                     } else if(card.equals("ProgressRoadBuilding")) {
-                        game.useCardProgressRoadBuilding(p, this.getRoadPlacement(), choosedCard);
+                        game.useCardProgressRoadBuilding(p, this.getRoadPlacement());
                     }else if(card.equals("Knight")){
                         game.useCardKnight(p,choosedCard,this.getThiefPlacement());
                         cli.steal(p,this.game.getBoard().getThiefTile());
                     } else {
-                        game.useCard(p,choosedCard);
+                        game.useCardVP(p);
                     }
                 }
                 cli.getAction(p);

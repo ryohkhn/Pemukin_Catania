@@ -197,6 +197,11 @@ public class GuiTile extends JPanel implements MouseInputListener{
                         }
                     }
                 }
+                else if(typeOfMove.equals("Thief")){
+                    game.setThief(new int[]{this.line,this.column});
+                    guiBoard.removeAllTileAsListener();
+                    guiSideBar.steal(launcher.getCurrentPlayer(),tile);
+                }
             }
             catch(NullPointerException ignored){};
         }

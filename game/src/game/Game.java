@@ -3,9 +3,7 @@ package game;
 import board.*;
 import vue.Vues;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 public class Game {
     private Player[] players;
@@ -136,7 +134,7 @@ public class Game {
 
     // fonction donnant aux joueurs les ressources produites si leur colonie se trouve sur la case de l'id en argument
     public void diceProduction(int diceNumber) {
-        HashMap<Player,String> diceResultsProduction=new HashMap<>();
+        HashMap<Player, List<String>> diceResultsProduction=new HashMap<>();
         for(Tile[] tiles : board.getTiles()) {
             for(Tile tile : tiles) {
                 if(tile.getId()==diceNumber) {
@@ -145,7 +143,16 @@ public class Game {
                         for(Colony colony : tile.getColonies()) {
                             int producedValue=colony.isCity()?2:1;
                             if(colony.isOwned()) {
-                                diceResultsProduction.put(colony.getPlayer(),ressource+" + "+producedValue);
+                                List<String> resourcesAcquired=diceResultsProduction.get(colony.getPlayer());
+                                if(resourcesAcquired!=null){
+                                    resourcesAcquired.add(ressource+" + "+producedValue);
+                                    diceResultsProduction.replace(colony.getPlayer(),resourcesAcquired);
+                                }
+                                else{
+                                    ArrayList<String> resources=new ArrayList<>();
+                                    resources.add(ressource+" + "+producedValue);
+                                    diceResultsProduction.put(colony.getPlayer(),resources);
+                                }
                                 colony.getPlayer().resources.merge(ressource, producedValue, Integer::sum);
                             }
                         }
@@ -232,6 +239,7 @@ public class Game {
     }
     */
 
+    // TODO une carte achetée dans le round ne peut pas être jouée directement
     // fonction permettant d'acheter une carte de développement
     public void buyCard(Player player) {
         int oreStock=player.resources.get("Ore");
@@ -249,15 +257,11 @@ public class Game {
         }
     }
 
-    // fonction permettant d'utiliser une carte de développement
-    public void useCard(Player turnPlayer, Card choosedCard) {
-        if(turnPlayer.cards.get(choosedCard)>0) {
-            switch(choosedCard) {
-                case VictoryPoint -> {
-                    turnPlayer.addVictoryPoint(1);
-                }
-            }
-            turnPlayer.removeCard(choosedCard);
+    // fonction permettant d'utiliser une carte point de victoire
+    public void useCardVP(Player turnPlayer) {
+        if(turnPlayer.cards.get(Card.VictoryPoint)>0) {
+            turnPlayer.addVictoryPoint(1);
+            turnPlayer.removeCard(Card.VictoryPoint);
             turnPlayer.alreadyPlayedCardThisTurn=true;
         } else {
             System.out.println("You do not have this card.");
@@ -273,20 +277,20 @@ public class Game {
         this.setThief(placement);
     }
 
-    public void useCardProgressYearOfPlenty(Player turnPlayer, String[] resources, Card choosedCard) {
-        if(turnPlayer.cards.get(choosedCard)<=0) {
+    public void useCardProgressYearOfPlenty(Player turnPlayer, String[] resources) {
+        if(turnPlayer.cards.get(Card.ProgressYearOfPlenty)<=0) {
             System.out.println("You do not have this card.");
             return;
         }
         turnPlayer.resources.merge(resources[0], 1, Integer::sum);
         turnPlayer.resources.merge(resources[1], 1, Integer::sum);
-        turnPlayer.removeCard(choosedCard);
+        turnPlayer.removeCard(Card.ProgressYearOfPlenty);
         turnPlayer.alreadyPlayedCardThisTurn=true;
 
     }
 
-    public void useCardProgressRoadBuilding(Player turnPlayer, int[] placement, Card choosedCard) {
-        if(turnPlayer.cards.get(choosedCard)<=0) {
+    public void useCardProgressRoadBuilding(Player turnPlayer, int[] placement) {
+        if(turnPlayer.cards.get(Card.ProgressRoadBuilding)<=0) {
             System.out.println("You do not have this card.");
             return;
         }
@@ -301,22 +305,25 @@ public class Game {
             while(!isBuild);
             buildedRoad++;
         }
-        turnPlayer.removeCard(choosedCard);
+        turnPlayer.removeCard(Card.ProgressRoadBuilding);
         turnPlayer.alreadyPlayedCardThisTurn=true;
     }
 
-    public void useCardProgressMonopoly(Player turnPlayer, String[] resource, Card choosedCard) {
-        if(turnPlayer.cards.get(choosedCard)<=0) {
+    public void useCardProgressMonopoly(Player turnPlayer, String[] resource) {
+        if(turnPlayer.cards.get(Card.ProgressMonopoly)<=0) {
+            // error message
             System.out.println("You do not have this card.");
             return;
         }
         for(Player player : players) {
             if(player.resources.get(resource[0])>0) {
-                player.resources.merge(resource[0], 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-                turnPlayer.resources.merge(resource[0], 1, Integer::sum);
+                int playerResourceQuantity=player.resources.get(resource[0]);
+                player.resources.merge(resource[0],playerResourceQuantity, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+                vue.displayStolenResource(turnPlayer,resource[0],turnPlayer,playerResourceQuantity);
+                turnPlayer.resources.merge(resource[0], playerResourceQuantity, Integer::sum);
             }
         }
-        turnPlayer.removeCard(choosedCard);
+        turnPlayer.removeCard(Card.ProgressMonopoly);
         turnPlayer.alreadyPlayedCardThisTurn=true;
 
     }
@@ -543,7 +550,7 @@ public class Game {
             while(playerOfColony.resources.get(resource)==0);
             playerOfColony.resources.merge(resource, 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
             p.resources.merge(resource, 1, Integer::sum);
-            System.out.println(p+" stole 1 "+resource+" from "+playerOfColony);
+            vue.displayStolenResource(p,resource,playerOfColony,1);
         }
     }
 

@@ -5,12 +5,14 @@ import game.Game;
 import game.Player;
 
 import java.util.HashMap;
+import java.util.List;
 
 public interface Vues{
 
     void getRoadPlacement();
     void getCityPlacement();
     void chooseCard();
+    void displayStolenResource(Player player, String resource, Player stolenPlayer,int quantity);
     void victory(Player p);
     void displayBoard(Game game);
     void displayPlayer(Player p);
@@ -27,5 +29,5 @@ public interface Vues{
     void sevenAtDice(Player p,int quantity);
     void setThief();
     void steal(Player p, Tile thiefTile);
-    void displayDiceProduction(HashMap<Player,String> diceResultsProduction);
+    void displayDiceProduction(HashMap<Player, List<String>> diceResultsProduction);
 }

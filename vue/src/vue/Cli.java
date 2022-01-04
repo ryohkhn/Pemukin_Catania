@@ -3,10 +3,16 @@ package vue;
 import board.Colony;
 import board.Port;
 import board.Tile;
-import game.*;
+import game.Controller;
+import game.Game;
+import game.Launcher;
+import game.Player;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Stack;
 
 
 public class Cli implements Vues{
@@ -349,13 +355,21 @@ public class Cli implements Vues{
                 playerOfColony=ownedColonies.get(0).getPlayer();
             }
             controller.steal(p,playerOfColony);
-
         }
     }
 
     @Override
-    public void displayDiceProduction(HashMap<Player, String> diceResultsProduction) {
-        diceResultsProduction.forEach((p,s)-> System.out.println(p + " " + s));
+    public void displayDiceProduction(HashMap<Player, List<String>> diceResultsProduction) {
+        for(Player player:diceResultsProduction.keySet()){
+            for(String resource:diceResultsProduction.get(player)){
+                System.out.println(player+" "+resource);
+            }
+        }
+    }
+
+    @Override
+    public void displayStolenResource(Player player,String resource,Player playerOfColony,int quantity){
+        System.out.println(player+" stole "+quantity+" "+resource+" from "+playerOfColony);
     }
 
     @Override
