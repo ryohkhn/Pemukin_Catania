@@ -5,6 +5,7 @@ import board.Road;
 import board.Tile;
 import game.Game;
 import game.Launcher;
+import game.Player;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -119,7 +120,7 @@ public class GuiTile extends JPanel implements MouseInputListener{
             int buildLocation=-1;
             try{
                 switch(typeOfMove){
-                    case "ColonyInitialization","Colony","City" -> {
+                    case "ColonyInitialization","ColonyInitializationSecondRound","Colony","City" -> {
                         if(e.getX()<(this.getWidth()/3) && e.getY()<(this.getWidth()/3)){
                             buildLocation=0;
                         }
@@ -153,39 +154,43 @@ public class GuiTile extends JPanel implements MouseInputListener{
                     }
                 }
                 if(buildLocation!=-1){
+                    Player player=launcher.getCurrentPlayer();
                     switch(typeOfMove){
                         case "ColonyInitialization" -> {
-                            Colony buildedColony=game.buildColonyInitialization(launcher.getCurrentPlayer(), new int[]{line, column,buildLocation});
+                            Colony buildedColony=game.buildColonyInitialization(player, new int[]{line, column,buildLocation});
                             if(buildedColony!=null){
-                                game.secondRoundBuildedColonies.put(buildedColony, launcher.getCurrentPlayer());
+                                Colony buildedOnSecondRound=game.getColonyFromPlayer(player);
+                                if(buildedOnSecondRound!=null){
+                                    game.secondRoundBuildedColonies.remove(buildedOnSecondRound);
+                                }
+                                game.secondRoundBuildedColonies.put(buildedColony,player);
                                 System.out.println("construction colonie faite");
                                 guiBoard.removeAllTileAsListener();
                                 guiSideBar.roundInitializationDone();
                             }
                         }
                         case "RoadInitialization" -> {
-                            Colony buildedOnSecondRound=game.getColonyFromPlayer(launcher.getCurrentPlayer());
-                            if(game.buildRoadInitialization(launcher.getCurrentPlayer(),buildedOnSecondRound, new int[]{line, column,buildLocation})){
-                                // TODO: 03/01/2022 on peut construire une route sur la première colonie ERREUR 
+                            Colony buildedOnSecondRound=game.getColonyFromPlayer(player);
+                            if(game.buildRoadInitialization(player,buildedOnSecondRound, new int[]{line, column,buildLocation})){
                                 System.out.println("construction route faite");
                                 guiBoard.removeAllTileAsListener();
                                 guiSideBar.roundInitializationDone();
                             }
                         }
                         case "Colony" ->{
-                            if(game.buildColony(launcher.getCurrentPlayer(),new int[]{line,column,buildLocation})){
+                            if(game.buildColony(player,new int[]{line,column,buildLocation})){
                                 // faire qq chose
                                 guiBoard.removeAllTileAsListener();
                             }
                         }
                         case "City" ->{
-                            if(game.buildCity(launcher.getCurrentPlayer(),new int[]{line,column,buildLocation})){
+                            if(game.buildCity(player,new int[]{line,column,buildLocation})){
                                 // faire qq chose
                                 guiBoard.removeAllTileAsListener();
                             }
                         }
                         case "Road" ->{
-                            if(game.buildRoad(launcher.getCurrentPlayer(),new int[]{line,column,buildLocation})){
+                            if(game.buildRoad(player,new int[]{line,column,buildLocation})){
                                 // faire qq chose
                                 guiBoard.removeAllTileAsListener();
                             }

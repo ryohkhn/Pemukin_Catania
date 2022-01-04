@@ -115,7 +115,7 @@ public abstract class Player{
     public String getCardsToString() {
         String res="";
         for(Map.Entry<Card,Integer> entry: this.cards.entrySet()) {
-            res+=entry.getKey().name() + ":"+ String.valueOf(entry.getValue())+ " ; ";
+            res+=entry.getKey().name() + " : "+ String.valueOf(entry.getValue())+ " ; ";
         }
         return res;
     }
@@ -123,7 +123,7 @@ public abstract class Player{
     public String getRessourcesToString() {
         String res="";
         for(Map.Entry<String ,Integer> entry: this.resources.entrySet()) {
-            res+=entry.getKey() + ":"+ entry.getValue()+ " ; ";
+            res+=entry.getKey() + " : "+ entry.getValue()+ " ; ";
         }
         return res;
     }

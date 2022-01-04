@@ -13,9 +13,10 @@ public class Game {
     public HashMap<Colony, Player> secondRoundBuildedColonies=new HashMap<>();
     private Vues vue;
 
-    public Game(int nb) {
+    public Game(int nb,Vues vue) {
         board=new Board();
         players=new Player[nb];
+        this.vue=vue;
     }
 
 

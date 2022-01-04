@@ -10,17 +10,23 @@ public class Launcher {
     private Game game;
     private Player currentPlayer;
     private int indexCurrentPlayer;
+    private Vues vue;
 
     public static void main(String[] args){
         Launcher launcher=new Launcher();
         Gui gui=new Gui(launcher);
+        launcher.vue=gui.getGuiSideBar();
         System.out.println("If you want to play on GUI, type 1.\nElse you'll play on console.");
         Scanner sc2=new Scanner(System.in);
         String input=sc2.nextLine();
         if(input.equals("1")){
             //Gui gui=new Gui(launcher);
         }
-        else launcher.launch(new Cli(launcher));
+        else{
+            Cli cli=new Cli(launcher);
+            launcher.vue=cli;
+            launcher.launch(new Cli(launcher));
+        }
     }
 
 
@@ -62,7 +68,7 @@ public class Launcher {
     }
 
     public Game createGame(int nbPlayers){
-        Game game=new Game(nbPlayers);
+        Game game=new Game(nbPlayers,this.vue);
         this.game=game;
         return game;
     }

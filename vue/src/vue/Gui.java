@@ -62,4 +62,8 @@ public class Gui extends JFrame{
             startRound();
         }
     }
+
+    public GuiSideBar getGuiSideBar(){
+        return guiSideBar;
+    }
 }

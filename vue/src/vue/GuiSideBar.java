@@ -18,8 +18,6 @@ public class GuiSideBar extends JPanel implements Vues{
     private JPanel playerPanel;
     private JPanel mainPanel;
     private JPanel infoPanel;
-    private JPanel gameNumberPanel;
-    private JPanel playerSelectionPanel;
     private int countInitialization;
 
     public GuiSideBar(Game game,Gui gui,Launcher launcher){
@@ -34,10 +32,10 @@ public class GuiSideBar extends JPanel implements Vues{
 
     public void setUpGui(){
         setLayout(new GridLayout(3,1));
-        playerPanel=new JPanel();
-        mainPanel=new JPanel();
+        playerPanel=new JPanel(new GridLayout(5,1));
+        mainPanel=new JPanel(new GridLayout(5,1));
         infoPanel=new JPanel();
-        infoPanel.setLayout(new GridLayout(3,1));
+        infoPanel.setLayout(new BoxLayout(infoPanel,BoxLayout.Y_AXIS));
         this.add(playerPanel);
         this.add(mainPanel);
         this.add(infoPanel);
@@ -45,7 +43,7 @@ public class GuiSideBar extends JPanel implements Vues{
 
     @Override
     public void chooseNbPlayers(){
-        gameNumberPanel=new JPanel();
+        JPanel gameNumberPanel=new JPanel();
         gameNumberPanel.add(new JLabel("Choose how many players you want in the game :"));
         String[] values={"1","3","4"};
         JComboBox comboBox=new JComboBox(values);
@@ -65,7 +63,7 @@ public class GuiSideBar extends JPanel implements Vues{
 
     @Override
     public void setPlayers(){
-        playerSelectionPanel=new JPanel();
+        JPanel playerSelectionPanel=new JPanel();
         playerSelectionPanel.add(new JLabel("Select which player is Human or IA :"));
         int nbplayer=game.getPlayers().length;
         String[] values={"Human","IA"};
@@ -146,8 +144,8 @@ public class GuiSideBar extends JPanel implements Vues{
 
     public void initiateRoadsAndColonies(int nbPlayer, Player currentPlayer){
         if(nbPlayer==0){
-            mainPanel.add(new JLabel("Initialization done !"));
-            mainPanel.removeAll();
+            removeAndRefresh(true,true,false);
+            refreshPanel(this);
             gui.startRound();
             return;
         }
@@ -160,7 +158,8 @@ public class GuiSideBar extends JPanel implements Vues{
         button.addActionListener(actionEvent -> {
             mainPanel.remove(button);
             refreshPanel(mainPanel);
-            mainPanel.add(new JLabel("Placing..."));
+            JLabel placingLabel=new JLabel("Placing...");
+            mainPanel.add(placingLabel);
             if(countInitialization%2==1){
                 guiBoard.setAllTileAsListener(false,false,false,false);
             }
@@ -174,10 +173,7 @@ public class GuiSideBar extends JPanel implements Vues{
     // fonction appelée par le MouseInputListener de la class GuiTile lorsque la construction a bien été faite
     // elle permet de diminuer le compteur, passer au joueur suivant et appeler la fonction tant que le compteur n'est pas à 0
     public void roundInitializationDone(){
-        mainPanel.removeAll();
-        playerPanel.removeAll();
-        refreshPanel(mainPanel);
-        refreshPanel(playerPanel);
+        removeAndRefresh(true,true,false);
         refreshPanel(guiBoard);
         this.countInitialization-=1;
         int nbPlayers=game.getPlayers().length*2;
@@ -194,7 +190,27 @@ public class GuiSideBar extends JPanel implements Vues{
 
     @Override
     public void getAction(Player player){
+        JButton buildOrBuyButton=new JButton("Build/Buy");
+        JButton tradeButton=new JButton("Trade");
+        JButton useButton=new JButton("Use card");
+        JButton endRoundButton=new JButton("End round");
+        buildOrBuyButton.addActionListener(event->{
 
+        });
+        tradeButton.addActionListener(event->{
+
+        });
+        useButton.addActionListener(event->{
+
+        });
+        endRoundButton.addActionListener(event->{
+            gui.endRound();
+        });
+        mainPanel.add(buildOrBuyButton);
+        mainPanel.add(tradeButton);
+        mainPanel.add(useButton);
+        mainPanel.add(endRoundButton);
+        refreshPanel(mainPanel);
     }
 
     @Override
@@ -249,13 +265,29 @@ public class GuiSideBar extends JPanel implements Vues{
 
     @Override
     public void displayBoard(Game game){
-
+        guiBoard.repaint();
     }
 
+    @Override
     public void displayPlayer(Player currentPlayer){
-        JLabel playerInfo=new JLabel(currentPlayer.toString()+" place your "+(countInitialization>(game.getPlayers().length*2)?"first":"second")+(countInitialization%2==1?" road.":" colony."));
-        playerInfo.setHorizontalAlignment(SwingConstants.HORIZONTAL);
-        playerPanel.add(playerInfo);
+        JLabel playerTurn=new JLabel("Turn of "+currentPlayer.toString());
+        JLabel playerResources=new JLabel("Resources : "+currentPlayer.getRessourcesToString());
+        JLabel playerCards=new JLabel("Cards : "+currentPlayer.getCardsToString());
+        JLabel playerVP=new JLabel("Victory Point : "+currentPlayer.getVictoryPoint());
+        playerTurn.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+        playerResources.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+        playerCards.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+        playerVP.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+        playerPanel.add(playerTurn);
+        playerPanel.add(playerResources);
+        playerPanel.add(playerCards);
+        playerPanel.add(playerVP);
+        refreshPanel(playerPanel);
+    }
+
+    @Override
+    public void displayOtherPlayers(Player p, Game game){
+        // TODO: 04/01/2022 faire fonction 
     }
 
     public void showBuildCost(){
@@ -271,27 +303,56 @@ public class GuiSideBar extends JPanel implements Vues{
 
     @Override
     public void displayDiceNumber(int diceNumber){
+        removeAndRefresh(true,true,true);
         displayPlayer(launcher.getCurrentPlayer());
-        JButton diceRoll=new JButton("Roll the dices !");
-        diceRoll.addActionListener(event->{
-            mainPanel.add(new JLabel("Dice roll :" + diceNumber));
+        JButton diceRollButton=new JButton("Roll the dices !");
+        diceRollButton.addActionListener(event->{
+            JLabel diceRollLabel=new JLabel("Dice roll : " + diceNumber);
+            mainPanel.add(diceRollLabel);
+            mainPanel.remove(diceRollButton);
             game.diceProduction(diceNumber);
-            diceRoll.setVisible(false);
+            getAction(launcher.getCurrentPlayer());
+            // TODO: 03/01/2022 appel de la fonction avec le panel général des actions + affichage des autre joueurs
+            showBuildCost();
+            refreshPanel(mainPanel);
         });
+        mainPanel.add(diceRollButton);
     }
 
     @Override
     public void displayDiceProduction(HashMap<Player, String> diceResultsProduction){
-
+        String stringProduction="";
+        infoPanel.add(new JLabel(""));
+        for(Player player:diceResultsProduction.keySet()){
+            infoPanel.add(new JLabel(player+" : "+diceResultsProduction.get(player)));
+        }
+        infoPanel.add(new JLabel(stringProduction));
     }
 
     public void endGame(Player currentPlayer){
-        playerPanel.removeAll();
-        playerPanel.revalidate();
-        playerPanel.repaint();
+        removeAndRefresh(true,true,false);
         JLabel playerWonLabel=new JLabel(currentPlayer+" has won the game !");
         playerWonLabel.setHorizontalAlignment(JLabel.CENTER);
         mainPanel.add(playerWonLabel);
+        refreshPanel(mainPanel);
+    }
+
+    public void removeAndRefresh(boolean playerPanel,boolean mainPanel,boolean infoPanel){
+        if(playerPanel){
+            this.playerPanel.removeAll();
+            this.playerPanel.revalidate();
+            this.playerPanel.repaint();
+        }
+        if(mainPanel){
+            this.mainPanel.removeAll();
+            this.mainPanel.revalidate();
+            this.mainPanel.repaint();
+        }
+        if(infoPanel){
+            this.infoPanel.removeAll();
+            this.infoPanel.revalidate();
+            this.infoPanel.repaint();
+        }
     }
 
     public static void refreshPanel(JPanel jPanel){
