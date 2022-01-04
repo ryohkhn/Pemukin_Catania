@@ -58,7 +58,7 @@ public class Controller{
                 } else {
                     String card=this.chooseCard();
                     Card chosenCard=Card.valueOf(card);
-                    if(game.hasChoosedCard(p, chosenCard)) {
+                    if(game.hasChosenCard(p, chosenCard)) {
                         if(card.equals("ProgressYearOfPlenty")) {
                             game.useCardProgressYearOfPlenty(p, this.chooseResource(2));
                         } else if(card.equals("ProgressMonopoly")) {
@@ -211,12 +211,12 @@ public class Controller{
         cli.portSelection(p);
         int compt=p.getPorts().size();
         try{
-            int choosedPort=scanner.nextInt();
-            if(choosedPort>compt || choosedPort<0){
+            int chosenPort=scanner.nextInt();
+            if(chosenPort>compt || chosenPort<0){
                 throw new InputMismatchException();
             }
-            if(choosedPort==0) return null;
-            return p.getPorts().get(choosedPort-1);
+            if(chosenPort==0) return null;
+            return p.getPorts().get(chosenPort-1);
         }
         catch(InputMismatchException e){
             System.out.println("Vous devez rentrer un chiffre entre 0 et "+compt);

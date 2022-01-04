@@ -1,7 +1,9 @@
 package game;
 
+import board.Colony;
+import board.Tile;
+
 import java.util.Random;
-import board.*;
 
 public class Bot extends Player{
     private Random rand=new Random();
@@ -13,7 +15,7 @@ public class Bot extends Player{
         return true;
     }
 
-    // Méthode qui créer une colonie et une route d'un bot lors d'un round de l'initialisation.
+    // Méthode qui crée une colonie et une route d'un bot lors d'un round de l'initialisation.
     public void iniBuild(Game game){
         Colony c;
         int[] placement=new int[3];
@@ -81,17 +83,17 @@ public class Bot extends Player{
             }
             case 4 -> {
                 if(!this.alreadyPlayedCardThisTurn) {
-                    Card choosedCard;
+                    Card chosenCard;
                     if(!this.hasCard()) this.getAction(game);
-                    choosedCard=this.chooseCard();
-                    if(choosedCard.toString().equals("ProgressYearOfPlenty")) {
+                    chosenCard=this.chooseCard();
+                    if(chosenCard.toString().equals("ProgressYearOfPlenty")) {
                         game.useCardProgressYearOfPlenty(this, this.chooseResource(2));
-                    } else if(choosedCard.toString().equals("ProgressMonopoly")) {
+                    } else if(chosenCard.toString().equals("ProgressMonopoly")) {
                         game.useCardProgressMonopoly(this, this.chooseResource(1));
-                    } else if(choosedCard.toString().equals("ProgressRoadBuilding")) {
+                    } else if(chosenCard.toString().equals("ProgressRoadBuilding")) {
                         game.useCardProgressRoadBuilding(this, this.getRoadPlacement());
                         game.useCardProgressRoadBuildingSecondRound(this,this.getRoadPlacement());
-                    } else if(choosedCard.toString().equals("Knight")) {
+                    } else if(chosenCard.toString().equals("Knight")) {
                         game.useCardKnight(this, this.getTilePlacement());
                         Tile t=game.getBoard().getThiefTile();
                         Colony c;
@@ -113,20 +115,23 @@ public class Bot extends Player{
 
     private int[] getColonyPlacement() {
 
+        return null;
     }
 
     private int[] getCityPlacement() {
+        return null;
     }
 
     private int[] getRoadPlacement() {
+        return null;
     }
 
     private Card chooseCard() {
-        Card choosedCard;
+        Card chosenCard;
         do {
-            choosedCard=Card.randomCard();
-        }while(this.cards.get(choosedCard)>0);
-        return choosedCard;
+            chosenCard=Card.randomCard();
+        }while(this.cards.get(chosenCard)>0);
+        return chosenCard;
     }
 
     private String[] chooseResource(int i) {

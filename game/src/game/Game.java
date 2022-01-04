@@ -31,8 +31,8 @@ public class Game {
         int line=placement[0];
         int column=placement[1];
         int roadNumber=placement[2];
-        Road choosedRoad=board.getTiles()[line][column].getRoads().get(roadNumber);
-        if(choosedRoad.isOwned()) {
+        Road chosenRoad=board.getTiles()[line][column].getRoads().get(roadNumber);
+        if(chosenRoad.isOwned()) {
             System.out.println("La route est déjà occupée.");
             return false;
         }
@@ -40,8 +40,8 @@ public class Game {
         int woodStock=player.resources.get("Wood");
         if(clayStock>=1&&woodStock>=1) {
             if(player.canBuildPropertie("Road", 15)) {
-                if(choosedRoad.isBuildable(player)) {
-                    choosedRoad.setPlayer(player);
+                if(chosenRoad.isBuildable(player)) {
+                    chosenRoad.setPlayer(player);
                     player.resources.merge("Clay", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
                     player.resources.merge("Wood", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
                     player.addPropertie("Road");
@@ -65,8 +65,8 @@ public class Game {
         int line=placement[0];
         int column=placement[1];
         int colonyNumber=placement[2];
-        Colony choosedColony=board.getTiles()[line][column].getColonies().get(colonyNumber);
-        if(choosedColony.isOwned()) {
+        Colony chosenColony=board.getTiles()[line][column].getColonies().get(colonyNumber);
+        if(chosenColony.isOwned()) {
             System.out.println("Cette colonie appartient déjà à quelqu'un.");
             return false;
         }
@@ -76,11 +76,11 @@ public class Game {
         int woolStock=player.resources.get("Wool");
         if(clayStock>=1&&wheatStock>=1&&woodStock>=1&&woolStock>=1) {
             if(player.canBuildPropertie("Colony", 5)) {
-                if(choosedColony.isBuildable(player)) {
-                    if(choosedColony.isPort()) {
-                        player.addPort(choosedColony.getLinkedPort());
+                if(chosenColony.isBuildable(player)) {
+                    if(chosenColony.isPort()) {
+                        player.addPort(chosenColony.getLinkedPort());
                     }
-                    choosedColony.setPlayer(player);
+                    chosenColony.setPlayer(player);
                     player.resources.merge("Clay", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
                     player.resources.merge("Wood", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
                     player.resources.merge("Wheat", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
@@ -106,8 +106,8 @@ public class Game {
         int line=placement[0];
         int column=placement[1];
         int colonyNumber=placement[2];
-        Colony choosedColony=board.getTiles()[line][column].getColonies().get(colonyNumber);
-        if(!choosedColony.isOwned(player)) {
+        Colony chosenColony=board.getTiles()[line][column].getColonies().get(colonyNumber);
+        if(!chosenColony.isOwned(player)) {
             System.out.println("La colonie ne vous appartient pas, vous ne pouvez pas constuire de ville ici.");
             return false;
         }
@@ -115,7 +115,7 @@ public class Game {
         int wheatStock=player.resources.get("Wheat");
         if(wheatStock>=2&&oreStock>=3) {
             if(player.canBuildPropertie("City", 4)) {
-                choosedColony.setAsCity();
+                chosenColony.setAsCity();
                 player.resources.replace("Wheat", wheatStock-2);
                 player.resources.replace("Ore", oreStock-3);
                 player.addPropertie("City");
@@ -169,16 +169,16 @@ public class Game {
 
     // fonction dans le cas d'un 7 aux dés, on défausse les cartes des joueurs et on change l'emplacement du brigand
     /*
-    public void sevenAtDice(String[] choosedResources){
+    public void sevenAtDice(String[] chosenResources){
         for(Player player:this.players){
             int quantity=player.resourceCount()/2;
             if(quantity>7){
                 System.out.println(player+" you have to discard "+quantity+" cards of your hand.");
                 do{
-                    choosedResources=vueGenerale.ressourceToBeDiscarded(player,quantity);
+                    chosenResources=vueGenerale.ressourceToBeDiscarded(player,quantity);
                 }
-                while(!player.hasResources(choosedResources));
-                for(String resource:choosedResources){
+                while(!player.hasResources(chosenResources));
+                for(String resource:chosenResources){
                     player.resources.merge(resource,1,(initialValue, valueRemoved)->initialValue-valueRemoved);
                 }
             }
@@ -189,10 +189,10 @@ public class Game {
     public void setThief(int[] placement) {
         int line=placement[0];
         int column=placement[1];
-        Tile choosedTile=board.getTiles()[line][column];
+        Tile chosenTile=board.getTiles()[line][column];
         board.getThiefTile().setThief(false);
-        board.setThiefTile(choosedTile);
-        choosedTile.setThief(true);
+        board.setThiefTile(chosenTile);
+        chosenTile.setThief(true);
     }
 
     // fonction pour réattribuer l'emplacement du brigand et voler les ressources de colonies présentes sur la nouvelle case
@@ -203,13 +203,13 @@ public class Game {
         int[] placement=vueGenerale.getThiefPlacement();
         int line=placement[0];
         int column=placement[1];
-        Tile choosedTile=board.getTiles()[line][column];
+        Tile chosenTile=board.getTiles()[line][column];
         board.getThiefTile().setThief(false);
-        board.setThiefTile(choosedTile);
-        choosedTile.setThief(true);
+        board.setThiefTile(chosenTile);
+        chosenTile.setThief(true);
 
         ArrayList<Colony> ownedColonies=new ArrayList<>();
-        for(Colony colony:choosedTile.getColonies()){
+        for(Colony colony:chosenTile.getColonies()){
             if(colony.getPlayer()!=null && colony.getPlayer()!=player && !ownedColonies.contains(colony)){
                 ownedColonies.add(colony);
             }
@@ -256,8 +256,9 @@ public class Game {
             System.out.println("Vous n'avez pas les ressources suffisantes pour acheter une carte de développement.");
         }
     }
-    public boolean hasChoosedCard(Player p, Card choosedCard){
-        if(p.cards.get(choosedCard)<=0) {
+    
+    public boolean hasChosenCard(Player p, Card chosenCard){
+        if(p.cards.get(chosenCard)<=0) {
             System.out.println("you do not have this card");
             return false;
         }
@@ -323,17 +324,17 @@ public class Game {
     }
 
     // fonction qui permet de faire une échange avec un le port si le joueur en possède un
-    public void trade(Player player, Port choosedPort, String portResource, String[] playerResource) {
-        if(choosedPort==null) {
+    public void trade(Player player, Port chosenPort, String portResource, String[] playerResource) {
+        if(chosenPort==null) {
             if(player.resources.get(portResource)>=4) {
                 player.resources.merge(portResource, 4, (initialValue, valueRemoved) -> initialValue-valueRemoved);
                 player.resources.merge(playerResource[0], 1, Integer::sum);
             } else {
                 System.out.println("Vous n'avez pas les ressources suffisantes pour faire l'échange");
             }
-        } else if(choosedPort.getRate()==2) {
+        } else if(chosenPort.getRate()==2) {
             if(player.resources.get(playerResource[0])>=2) {
-                if(choosedPort.getRessource().equals(portResource)) {
+                if(chosenPort.getRessource().equals(portResource)) {
                     player.resources.merge(portResource, 2, (initialValue, valueRemoved) -> initialValue-valueRemoved);
                     player.resources.merge(playerResource[0], 1, Integer::sum);
                 } else {
@@ -356,19 +357,19 @@ public class Game {
         int line=placement[0];
         int column=placement[1];
         int colonyNumber=placement[2];
-        Colony choosedColony=board.getTiles()[line][column].getColonies().get(colonyNumber);
-        if(choosedColony.isOwned()) {
+        Colony chosenColony=board.getTiles()[line][column].getColonies().get(colonyNumber);
+        if(chosenColony.isOwned()) {
             System.out.println("Cette colonie appartient déjà à quelqu'un.");
             return null;
         }
-        if(choosedColony.isBuildableInitialization(player)) {
-            if(choosedColony.isPort()) {
-                player.addPort(choosedColony.getLinkedPort());
+        if(chosenColony.isBuildableInitialization(player)) {
+            if(chosenColony.isPort()) {
+                player.addPort(chosenColony.getLinkedPort());
             }
-            choosedColony.setPlayer(player);
+            chosenColony.setPlayer(player);
             player.addPropertie("Colony");
             player.addVictoryPoint(1);
-            return choosedColony;
+            return chosenColony;
         } else {
             System.out.println("Vous ne pouvez pas constuire de colonie ici, la règle de distance n'est pas respectée.");
         }
@@ -380,13 +381,13 @@ public class Game {
         int line=placement[0];
         int column=placement[1];
         int roadNumber=placement[2];
-        Road choosedRoad=board.getTiles()[line][column].getRoads().get(roadNumber);
-        if(choosedRoad.isOwned()) {
+        Road chosenRoad=board.getTiles()[line][column].getRoads().get(roadNumber);
+        if(chosenRoad.isOwned()) {
             System.out.println("Cette route appartient deja a quelqu'un."); // TODO: 24/12/2021 mettre tous les messages dans une fonction error de la vue, avec en argument un int qui represente le message a afficher (par exemple 1 = cette route appartient deja a quelqu'un)
             return false;
         }
-        if(choosedRoad.isBuildableInitialization(colony)) {
-            choosedRoad.setPlayer(player);
+        if(chosenRoad.isBuildableInitialization(colony)) {
+            chosenRoad.setPlayer(player);
             player.addPropertie("Road");
             return true;
         } else {

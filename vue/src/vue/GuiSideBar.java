@@ -69,6 +69,7 @@ public class GuiSideBar extends JPanel implements Vues{
             refreshPanel(this);
             setPlayers();
         });
+        refreshPanel(this);
     }
 
     // fonction de la Vue pour choisir si chaque joueur est une Humain ou un Robot
@@ -119,7 +120,7 @@ public class GuiSideBar extends JPanel implements Vues{
         }
         JButton next=new JButton("Continue");
         ButtonGroup buttonGroup=new ButtonGroup();
-        colorSelectionPanel.add(new JLabel("Select a color for player :"));
+        colorSelectionPanel.add(new JLabel("Select a color for Player "+(Math.abs(count-nbPlayer)+1)+" :"));
         ArrayList<JRadioButton> jRadioButtonList=new ArrayList<>();
         for(String s:colorMap.keySet()){
             if(!colorMap.get(s)){
