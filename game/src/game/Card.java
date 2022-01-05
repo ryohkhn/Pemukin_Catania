@@ -14,7 +14,7 @@ public enum Card{
     }
 
     public String toString(){
-        String res="Carte : ";
+        String res="";
         switch(this){
             case ProgressMonopoly -> res+="ProgressMonopoly";
             case VictoryPoint -> res+="VictoryPoint";
@@ -22,6 +22,7 @@ public enum Card{
             case ProgressYearOfPlenty -> res+= "ProgressYearOfPlenty";
             case ProgressRoadBuilding -> res+= "ProgressRoadBuilding";
         }
+        res+=" Card";
         return res;
     }
 }

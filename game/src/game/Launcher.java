@@ -1,13 +1,10 @@
 package game;
 
-import board.Colony;
 import vue.Cli;
 import vue.Gui;
 import vue.Vues;
 
-import java.util.Collections;
 import java.util.Scanner;
-import java.util.Set;
 
 public class Launcher {
     private Game game;

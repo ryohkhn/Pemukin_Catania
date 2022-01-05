@@ -53,6 +53,7 @@ public class Gui extends JFrame{
 
     public void endRound(){
         Player currentPlayer=launcher.getCurrentPlayer();
+        currentPlayer.alreadyPlayedCardThisTurn=false;
         game.checkLongestArmy();
         if(currentPlayer.hasWin()){
             guiSideBar.endGame(currentPlayer);

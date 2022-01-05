@@ -169,7 +169,7 @@ public class Game {
         for(Tile[] tiles : board.getTiles()) {
             for(Tile tile : tiles) {
                 if(tile.getId()==diceNumber) {
-                    if(!tile.hasThief()&&!tile.getRessource().equals("")) {
+                    if(!tile.hasThief()  && !tile.getRessource().equals("")) {
                         String ressource=tile.getRessource();
                         for(Colony colony : tile.getColonies()) {
                             int producedValue=colony.isCity()?2:1;
@@ -230,11 +230,15 @@ public class Game {
     }
 
     public boolean hasChosenCard(Player p, Card chosenCard){
-        if(p.cards.get(chosenCard)>p.cardsDrawnThisTurn.get(chosenCard)) {
+        if(p.cards.get(chosenCard)>0) return true;
+        return false;
+        /*if(p.cards.get(chosenCard)>p.cardsDrawnThisTurn.get(chosenCard)) {
             vue.message(p, "error", "card", 1);
             return false;
         }
         return true;
+
+         */
     }
 
     // fonction permettant d'utiliser une carte point de victoire
@@ -272,14 +276,12 @@ public class Game {
     }
 
     public void useCardProgressRoadBuildingSecondRound(Player turnPlayer, int[] placement){
-        turnPlayer.resources.merge("Clay", 2, Integer::sum);
-        turnPlayer.resources.merge("Wood", 2, Integer::sum);
         buildRoad(turnPlayer, placement);
     }
 
     public void useCardProgressMonopoly(Player turnPlayer, String[] resource) {
         for(Player player : players) {
-            if(player.resources.get(resource[0])>0) {
+            if(player.resources.get(resource[0])>0 && player!=turnPlayer) {
                 int playerResourceQuantity=player.resources.get(resource[0]);
                 player.resources.merge(resource[0],playerResourceQuantity, (initialValue, valueRemoved) -> initialValue-valueRemoved);
                 vue.displayStolenResource(turnPlayer,resource[0],turnPlayer,playerResourceQuantity);
@@ -527,6 +529,13 @@ public class Game {
     public int generateDiceNumber(){
         Random rand=new Random();
         return(rand.nextInt(6)+1+rand.nextInt(6)+1);
+    }
+
+    public void removeResourcesFromPlayer(Player player,int[] quantity){
+        LinkedList<String> resources=Board.generateListResource();
+        for(int i=0; i<resources.size(); i++){
+            player.resources.merge(resources.get(i),quantity[i],(initialValue,valueRemoved)->initialValue-valueRemoved);
+        }
     }
 }
 

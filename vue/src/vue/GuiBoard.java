@@ -95,4 +95,13 @@ public class GuiBoard extends JPanel{
             }
         }
     }
+
+    public void removeThiefImage(){
+        for(Component component:this.getComponents()){
+            if(component instanceof GuiTile){
+                GuiTile tile=(GuiTile)component;
+                tile.removeThiefImage();
+            }
+        }
+    }
 }

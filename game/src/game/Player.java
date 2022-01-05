@@ -197,4 +197,15 @@ public abstract class Player{
         }
         return false;
     }
+
+    // TODO à enlever utile pour les test
+    public void setMaxResources(){
+        for(String resource:resources.keySet()){
+            resources.merge(resource,2,Integer::sum);
+        }
+    }
+
+    public HashMap<String, Integer> getResources(){
+        return resources;
+    }
 }

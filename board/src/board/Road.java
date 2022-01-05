@@ -239,6 +239,9 @@ public class Road {
     }
 
     public boolean isBuildable(Player player){
+        if(isOwned()){
+            return false;
+        }
         for(Road road:adjacentRoads){
             if(road.player==player) return true;
         }

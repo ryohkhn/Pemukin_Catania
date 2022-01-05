@@ -3,15 +3,11 @@ package vue;
 import board.Board;
 import board.Colony;
 import board.Tile;
-import game.Card;
-import game.Game;
-import game.Launcher;
-import game.Player;
+import game.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 
 public class GuiSideBar extends JPanel implements Vues{
@@ -25,6 +21,8 @@ public class GuiSideBar extends JPanel implements Vues{
     private JPanel infoPanelOtherPlayers;
     private int countInitialization;
     private int countRoadBuildingCard;
+    private LinkedHashMap<Player,Integer> playersDiscardingQuantity;
+    private LinkedList<Player> playersDiscarding;
 
     public GuiSideBar(Game game,Gui gui,Launcher launcher){
         this.game=game;
@@ -41,7 +39,8 @@ public class GuiSideBar extends JPanel implements Vues{
     public void setUpGui(){
         setLayout(new GridLayout(3,1));
         playerPanel=new JPanel(new GridLayout(5,1));
-        mainPanel=new JPanel(new GridLayout(5,1,5,5));
+        mainPanel=new JPanel();
+        mainPanel.setLayout(new GridLayout(5,1,5,5));
         infoPanel=new JPanel();
         infoPanel.setLayout(new GridLayout(1,2));
         infoPanelOtherPlayers=new JPanel(new GridLayout(0,1));
@@ -208,6 +207,9 @@ public class GuiSideBar extends JPanel implements Vues{
     // On lance la fonction de Game pour générer les ressources de la fin d'initialisation et on affiche les informations nécessaires sur les JPanels
     public void startGame(){
         game.coloniesProduction();
+        for(Player player:game.getPlayers()){
+            player.setMaxResources();
+        }
         removeAndRefresh(true,true,false);
         refreshPanel(this);
         displayPlayer(launcher.getCurrentPlayer());
@@ -269,6 +271,7 @@ public class GuiSideBar extends JPanel implements Vues{
     // il lance ensuite la fonction pour afficher le panel d'actions et met à jour ceux des ressources des joueurs
     @Override
     public void displayDiceNumber(int diceNumber){
+        mainPanel.setLayout(new GridLayout(5,1,5,5));
         Player player=launcher.getCurrentPlayer();
         removeAndRefresh(true,true,false);
         displayPlayer(player);
@@ -278,10 +281,15 @@ public class GuiSideBar extends JPanel implements Vues{
             mainPanel.add(diceRollLabel);
             mainPanel.remove(diceRollButton);
             infoPanelOtherPlayers.removeAll();
-            game.diceProduction(diceNumber);
+            if(diceNumber==7){
+                startSevenAtDice();
+            }
+            else{
+                game.diceProduction(diceNumber);
+                getAction(player);
+            }
             displayOtherPlayers(player,game);
 
-            getAction(player);
             playerPanel.removeAll();
             displayPlayer(player);
             refreshPanel(mainPanel);
@@ -318,7 +326,7 @@ public class GuiSideBar extends JPanel implements Vues{
     }
 
     public void displayDrawnCard(Player player,Card randomCard){
-        JLabel drawnCardLabel=new JLabel("Player "+player+" you draw a "+randomCard);
+        JLabel drawnCardLabel=new JLabel("You draw a "+randomCard);
         drawnCardLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
         mainPanel.add(drawnCardLabel);
     }
@@ -355,11 +363,17 @@ public class GuiSideBar extends JPanel implements Vues{
     }
 
     public void buyOrBuild(){
-        // TODO Ajouter bouton pour annuler le placement
         removeAndRefresh(false,true,false);
         Player player=launcher.getCurrentPlayer();
         JButton returnToMenu=new JButton("Go back to the menu");
         returnToMenu.addActionListener(event->{
+            removeAndRefresh(true,true,false);
+            displayPlayer(player);
+            getAction(player);
+        });
+        JButton cancelButton=new JButton("Cancel");
+        cancelButton.addActionListener(event->{
+            guiBoard.removeAllTileAsListener();
             removeAndRefresh(false,true,false);
             getAction(player);
         });
@@ -375,6 +389,7 @@ public class GuiSideBar extends JPanel implements Vues{
             removeAndRefresh(false,true,false);
             if(game.hasResourcesForColony(player)){
                 mainPanel.add(placingLabel);
+                mainPanel.add(cancelButton);
                 guiBoard.setAllTileAsListener("Colony");
             }
             else{
@@ -386,6 +401,7 @@ public class GuiSideBar extends JPanel implements Vues{
             removeAndRefresh(false,true,false);
             if(game.hasResourcesForCity(player)){
                 mainPanel.add(placingLabel);
+                mainPanel.add(cancelButton);
                 getCityPlacement();
             }
             else{
@@ -397,6 +413,7 @@ public class GuiSideBar extends JPanel implements Vues{
             removeAndRefresh(false,true,false);
             if(game.hasResourcesForRoad(player)){
                 mainPanel.add(placingLabel);
+                mainPanel.add(cancelButton);
                 getRoadPlacement();
             }
             else{
@@ -432,9 +449,76 @@ public class GuiSideBar extends JPanel implements Vues{
 
     }
 
-    @Override
-    public void sevenAtDice(Player p, int quantity){
+    public void startSevenAtDice(){
+        mainPanel.setLayout(new GridLayout(12,2,5,5));
+        playersDiscardingQuantity=new LinkedHashMap<>();
+        playersDiscarding=new LinkedList<>();
+        int quantityResource;
+        for(Player player:game.getPlayers()){
+            quantityResource=player.resourceCount();
+            if(quantityResource>7){
+                playersDiscardingQuantity.put(player,quantityResource);
+                playersDiscarding.add(player);
+            }
+        }
+        if(playersDiscarding.size()==0){
+            removeAndRefresh(false,true,false);
+            setThief();
+        }
+        else{
+            Player player=playersDiscarding.get(0);
+            sevenAtDice(player,playersDiscardingQuantity.get(player)/2);
+        }
+    }
 
+    @Override
+    public void sevenAtDice(Player player, int quantity){
+        removeAndRefresh(false,true,false);
+        JButton next=new JButton("Continue");
+        JLabel resouceChoiceLabel=new JLabel("Player "+player+" select "+quantity+" resources you need to discard :");
+        JLabel emptySpace=new JLabel(" ");
+        resouceChoiceLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+        mainPanel.add(resouceChoiceLabel);
+        mainPanel.add(emptySpace);
+        LinkedList<String> resourcesName=Board.generateListResource();
+        ArrayList<JComboBox<Integer>> comboBoxList=new ArrayList<>();
+        for(int i=0; i<resourcesName.size(); i++){
+            int playerResourceQuantity=player.getResources().get(resourcesName.get(i));
+            Integer[] values=new Integer[playerResourceQuantity+1];
+            for(int j=0; j<=playerResourceQuantity; j++){
+                values[j]=j;
+            }
+            comboBoxList.add(new JComboBox<>(values));
+            JLabel resourceNameLabel=new JLabel(resourcesName.get(i));
+            resourceNameLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+            mainPanel.add(comboBoxList.get(i));
+            mainPanel.add(resourceNameLabel);
+        }
+        final int[] resourceChoice=new int[5];
+        final int[] total={0};
+        next.addActionListener(actionEvent -> {
+            for(int i=0; i<comboBoxList.size(); i++){
+                resourceChoice[i]=(Integer)comboBoxList.get(i).getSelectedItem();
+                total[0]+=resourceChoice[i];
+            }
+            if(total[0]==quantity){
+                playersDiscarding.remove(player);
+                playersDiscardingQuantity.remove(player);
+                if(playersDiscarding.size()==0){
+                    removeAndRefresh(false,true,false);
+                    setThief();
+                }
+                else{
+                    game.removeResourcesFromPlayer(player,resourceChoice);
+                    Player nextPlayer=playersDiscarding.get(0);
+                    sevenAtDice(nextPlayer,playersDiscardingQuantity.get(nextPlayer));
+                }
+            }
+            else{
+                JOptionPane.showMessageDialog(this,"You have to discard "+quantity+" resources.");
+            }
+        });
+        mainPanel.add(next);
     }
 
     @Override
@@ -462,9 +546,19 @@ public class GuiSideBar extends JPanel implements Vues{
         Player player=launcher.getCurrentPlayer();
         JButton returnToMenu=new JButton("Go back to the menu");
         returnToMenu.addActionListener(event->{
+            removeAndRefresh(true,true,false);
+            displayPlayer(player);
+            getAction(player);
+        });
+        /*
+        JButton cancelButton=new JButton("Cancel");
+        cancelButton.addActionListener(event->{
+            guiBoard.removeAllTileAsListener();
             removeAndRefresh(false,true,false);
             getAction(player);
         });
+
+         */
         if(player.getNbCards()==0){
             // error message
             JLabel noCardsLabel=new JLabel("You don't have any card to use.");
@@ -498,7 +592,7 @@ public class GuiSideBar extends JPanel implements Vues{
                 }
             });
             useYOP.addActionListener(event->{
-                removeAndRefresh(false,true,true);
+                removeAndRefresh(false,true,false);
                 if(game.hasChosenCard(player,Card.ProgressYearOfPlenty)){
                     chooseResourceYopCard(new int[]{2},new String[2]);
                 }
@@ -555,6 +649,7 @@ public class GuiSideBar extends JPanel implements Vues{
     @Override
     public void steal(Player p, Tile thiefTile){
         removeAndRefresh(false,true,false);
+        displayBoard(game);
         ArrayList<Colony> ownedColonies=new ArrayList<>();
         for(Colony colony:thiefTile.getColonies()){
             if(colony.getPlayer()!=null && colony.getPlayer()!=p && !ownedColonies.contains(colony)){
@@ -599,17 +694,25 @@ public class GuiSideBar extends JPanel implements Vues{
                 showBackToMenuButton(p);
             }
         }
+        else{
+            JLabel noColonyToStealLabel=new JLabel("No colony to steal resources from");
+            noColonyToStealLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+            mainPanel.add(noColonyToStealLabel);
+            showBackToMenuButton(p);
+        }
     }
 
     @Override
     public void chooseResource(){
         final Player[] resourceChoice=new Player[1];
         Player player=launcher.getCurrentPlayer();
-        JLabel choosePlayer=new JLabel("Please choose a resource");
+        JLabel choosePlayer=new JLabel("Please choose a resource you will steal from players");
+        choosePlayer.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+        mainPanel.add(choosePlayer);
         JButton next=new JButton("Continue");
         ButtonGroup buttonGroup=new ButtonGroup();
         ArrayList<JRadioButton> jRadioButtonList=new ArrayList<>();
-        ArrayList<String> resources=Board.generateListResource();
+        LinkedList<String> resources=Board.generateListResource();
 
         for(String resource: resources){
             JRadioButton radioButton=new JRadioButton(resource);
@@ -633,7 +736,6 @@ public class GuiSideBar extends JPanel implements Vues{
     // fonction appelée lors de l'utilisation de la carte "Year Of Plenty" permettant au joueur de choisir deux ressources qu'il obtiendra par la suite
     public void chooseResourceYopCard(int[] count,String[] resource){
         removeAndRefresh(false,true,false);
-        JPanel colorSelectionPanel=new JPanel();
         Player player=launcher.getCurrentPlayer();
         if(count[0]==0){
             game.useCardProgressYearOfPlenty(player,resource);
@@ -642,9 +744,11 @@ public class GuiSideBar extends JPanel implements Vues{
         }
         JButton next=new JButton("Continue");
         ButtonGroup buttonGroup=new ButtonGroup();
-        mainPanel.add(new JLabel("Select the "+(count[0]==0?"first":"second")+" resource you want to get :"));
+        JLabel resouceChoiceLabel=new JLabel("Select the "+(count[0]==2?"first":"second")+" resource you want to get :");
+        resouceChoiceLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+        mainPanel.add(resouceChoiceLabel);
         ArrayList<JRadioButton> jRadioButtonList=new ArrayList<>();
-        ArrayList<String> resources=Board.generateListResource();
+        LinkedList<String> resources=Board.generateListResource();
         for(String s:resources){
             JRadioButton button=new JRadioButton(s);
             jRadioButtonList.add(button);
@@ -666,6 +770,7 @@ public class GuiSideBar extends JPanel implements Vues{
 
     public void buildRoadCardDone(){
         removeAndRefresh(false,true,false);
+        displayBoard(game);
         this.countRoadBuildingCard--;
         if(this.countRoadBuildingCard==0){
             JLabel allRoadBuilded=new JLabel("Your two roads are now builded");
@@ -677,7 +782,7 @@ public class GuiSideBar extends JPanel implements Vues{
         JLabel roadBuilded=new JLabel("Build your second road");
         roadBuilded.setHorizontalAlignment(SwingConstants.HORIZONTAL);
         mainPanel.add(roadBuilded);
-        guiBoard.setAllTileAsListener("RoadCard");
+        guiBoard.setAllTileAsListener("RoadCardSecondBuild");
     }
 
     public void buildDone(String typeOfBuild){
@@ -694,7 +799,8 @@ public class GuiSideBar extends JPanel implements Vues{
     public void showBackToMenuButton(Player player){
         JButton returnToMenu=new JButton("Go back to the menu");
         returnToMenu.addActionListener(event -> {
-            removeAndRefresh(false, true, false);
+            removeAndRefresh(true, true, false);
+            displayPlayer(player);
             getAction(player);
         });
         mainPanel.add(returnToMenu);

@@ -28,6 +28,7 @@ public class GuiTile extends JPanel implements MouseInputListener{
     private GuiBoard guiBoard;
     private Tile tile;
     private String typeOfMove;
+    private JLabel picLabel;
     private int line;
     private int column;
     private boolean water;
@@ -83,8 +84,7 @@ public class GuiTile extends JPanel implements MouseInputListener{
             if(tile.hasThief()){
                 try{
                     BufferedImage thiefImage=ImageIO.read(new File("resources/thief_dot.png"));
-                    JLabel picLabel=new JLabel(new ImageIcon(thiefImage));
-                    picLabel.setSize(1, 1);
+                    picLabel=new JLabel(new ImageIcon(thiefImage));
                     add(picLabel);
                 } catch(IOException e){
                     e.printStackTrace();
@@ -118,93 +118,115 @@ public class GuiTile extends JPanel implements MouseInputListener{
     public void mouseClicked(MouseEvent e){
         if((!water || !empty) && isActiveMouseListener){
             int buildLocation=-1;
-            try{
-                switch(typeOfMove){
-                    case "ColonyInitialization","ColonyInitializationSecondRound","Colony","City" -> {
-                        if(e.getX()<(this.getWidth()/3) && e.getY()<(this.getWidth()/3)){
-                            buildLocation=0;
-                        }
-                        else if(e.getX()>((this.getWidth()*2)/3) && e.getY()<(this.getWidth()/3)){
-                            buildLocation=1;
-                        }
-                        else if(e.getX()>((this.getWidth()*2)/3) && e.getY()>((this.getWidth()*2)/3)){
-                            buildLocation=2;
-                        }
-                        else if(e.getX()<(this.getWidth()/3) && e.getY()>((this.getWidth()*2)/3)){
-                            buildLocation=3;
-                        }
+            switch(typeOfMove){
+                case "ColonyInitialization","ColonyInitializationSecondRound","Colony","City" -> {
+                    if(e.getX()<(this.getWidth()/3) && e.getY()<(this.getWidth()/3)){
+                        buildLocation=0;
                     }
-                    case "RoadInitialization","Road","RoadCard"->{
-                        if(e.getY()<(this.getHeight()/4) && e.getX()>(this.getWidth()/4) && e.getX()<((this.getWidth()*3)/4)){
-                            buildLocation=0;
-                        }
-                        else if(e.getX()>((this.getWidth()*3)/4) && e.getY()>(this.getHeight()/4) && e.getY()<((this.getHeight()*3)/4)){
-                            buildLocation=1;
-                        }
-                        else if(e.getY()>((this.getHeight()*3)/4) && e.getX()>(this.getWidth()/4) && e.getX()<((this.getWidth()*3)/4)){
-                            buildLocation=2;
-                        }
-                        else if(e.getX()<(this.getWidth()/4) && e.getY()>(this.getHeight()/4) && e.getY()<((this.getHeight()*3)/4)){
-                            buildLocation=3;
-                        }
+                    else if(e.getX()>((this.getWidth()*2)/3) && e.getY()<(this.getWidth()/3)){
+                        buildLocation=1;
+                    }
+                    else if(e.getX()>((this.getWidth()*2)/3) && e.getY()>((this.getWidth()*2)/3)){
+                        buildLocation=2;
+                    }
+                    else if(e.getX()<(this.getWidth()/3) && e.getY()>((this.getWidth()*2)/3)){
+                        buildLocation=3;
                     }
                 }
-                if(buildLocation!=-1){
-                    Player player=launcher.getCurrentPlayer();
-                    switch(typeOfMove){
-                        case "ColonyInitialization" -> {
-                            Colony buildedColony=game.buildColonyInitialization(player, new int[]{line, column,buildLocation});
-                            if(buildedColony!=null){
-                                Colony buildedOnSecondRound=game.getColonyFromPlayer(player);
-                                if(buildedOnSecondRound!=null){
-                                    game.secondRoundBuildedColonies.remove(buildedOnSecondRound);
-                                }
-                                game.secondRoundBuildedColonies.put(buildedColony,player);
-                                guiBoard.removeAllTileAsListener();
-                                guiSideBar.roundInitializationDone();
-                            }
-                        }
-                        case "RoadInitialization" -> {
-                            Colony buildedOnSecondRound=game.getColonyFromPlayer(player);
-                            if(game.buildRoadInitialization(player,buildedOnSecondRound, new int[]{line, column,buildLocation})){
-                                guiBoard.removeAllTileAsListener();
-                                guiSideBar.roundInitializationDone();
-                            }
-                        }
-                        case "Colony" ->{
-                            if(game.buildColony(player,new int[]{line,column,buildLocation})){
-                                guiBoard.removeAllTileAsListener();
-                                guiSideBar.buildDone("colony");
-                            }
-                        }
-                        case "City" ->{
-                            if(game.buildCity(player,new int[]{line,column,buildLocation})){
-                                guiBoard.removeAllTileAsListener();
-                                guiSideBar.buildDone("city");
-                            }
-                        }
-                        case "Road" ->{
-                            if(game.buildRoad(player,new int[]{line,column,buildLocation})){
-                                guiBoard.removeAllTileAsListener();
-                                guiSideBar.buildDone("road");
-                            }
-                        }
-                        case "RoadCard" ->{
-                            if(game.isRoadBuildable(new int[]{line,column,buildLocation},player)){
-                                game.useCardProgressRoadBuilding(player,new int[]{line,column,buildLocation});
-                                guiSideBar.buildRoadCardDone();
-                                guiBoard.removeAllTileAsListener();
-                            }
-                        }
+                case "RoadInitialization","Road","RoadCard","RoadCardSecondBuild" ->{
+                    if(e.getY()<(this.getHeight()/4) && e.getX()>(this.getWidth()/4) && e.getX()<((this.getWidth()*3)/4)){
+                        buildLocation=0;
                     }
-                }
-                else if(typeOfMove.equals("Thief")){
-                    game.setThief(new int[]{this.line,this.column});
-                    guiBoard.removeAllTileAsListener();
-                    guiSideBar.steal(launcher.getCurrentPlayer(),tile);
+                    else if(e.getX()>((this.getWidth()*3)/4) && e.getY()>(this.getHeight()/4) && e.getY()<((this.getHeight()*3)/4)){
+                        buildLocation=1;
+                    }
+                    else if(e.getY()>((this.getHeight()*3)/4) && e.getX()>(this.getWidth()/4) && e.getX()<((this.getWidth()*3)/4)){
+                        buildLocation=2;
+                    }
+                    else if(e.getX()<(this.getWidth()/4) && e.getY()>(this.getHeight()/4) && e.getY()<((this.getHeight()*3)/4)){
+                        buildLocation=3;
+                    }
                 }
             }
-            catch(NullPointerException ignored){};
+            if(buildLocation!=-1){
+                Player player=launcher.getCurrentPlayer();
+                switch(typeOfMove){
+                    case "ColonyInitialization" -> {
+                        Colony buildedColony=game.buildColonyInitialization(player, new int[]{line, column,buildLocation});
+                        if(buildedColony!=null){
+                            Colony buildedOnSecondRound=game.getColonyFromPlayer(player);
+                            if(buildedOnSecondRound!=null){
+                                game.secondRoundBuildedColonies.remove(buildedOnSecondRound);
+                            }
+                            game.secondRoundBuildedColonies.put(buildedColony,player);
+                            guiBoard.removeAllTileAsListener();
+                            guiSideBar.roundInitializationDone();
+                        }
+                    }
+                    case "RoadInitialization" -> {
+                        Colony buildedOnSecondRound=game.getColonyFromPlayer(player);
+                        if(game.buildRoadInitialization(player,buildedOnSecondRound, new int[]{line, column,buildLocation})){
+                            guiBoard.removeAllTileAsListener();
+                            guiSideBar.roundInitializationDone();
+                        }
+                    }
+                    case "Colony" ->{
+                        if(game.buildColony(player,new int[]{line,column,buildLocation})){
+                            guiBoard.removeAllTileAsListener();
+                            guiSideBar.buildDone("colony");
+                        }
+                    }
+                    case "City" ->{
+                        if(game.buildCity(player,new int[]{line,column,buildLocation})){
+                            guiBoard.removeAllTileAsListener();
+                            guiSideBar.buildDone("city");
+                        }
+                    }
+                    case "Road" ->{
+                        if(game.buildRoad(player,new int[]{line,column,buildLocation})){
+                            guiBoard.removeAllTileAsListener();
+                            guiSideBar.buildDone("road");
+                        }
+                    }
+                    case "RoadCard" ->{
+                        if(game.isRoadBuildable(new int[]{line,column,buildLocation},player)){
+                            game.useCardProgressRoadBuilding(player,new int[]{line,column,buildLocation});
+                            guiBoard.removeAllTileAsListener();
+                            guiSideBar.buildRoadCardDone();
+                        }
+                    }
+                    case "RoadCardSecondBuild" ->{
+                        if(game.isRoadBuildable(new int[]{line,column,buildLocation},player)){
+                            game.useCardProgressRoadBuildingSecondRound(player,new int[]{line,column,buildLocation});
+                            guiSideBar.buildRoadCardDone();
+                            guiBoard.removeAllTileAsListener();
+                        }
+                    }
+                }
+            }
+            else if(typeOfMove.equals("Thief")){
+                game.setThief(new int[]{this.line,this.column});
+                guiSideBar.steal(launcher.getCurrentPlayer(),tile);
+                guiBoard.removeThiefImage();
+                this.setThiefImage();
+                guiBoard.removeAllTileAsListener();
+            }
+        }
+    }
+
+    public void removeThiefImage(){
+        if(picLabel!=null){
+            remove(picLabel);
+        }
+    }
+
+    public void setThiefImage(){
+        try{
+            BufferedImage thiefImage=ImageIO.read(new File("resources/thief_dot.png"));
+            picLabel=new JLabel(new ImageIcon(thiefImage));
+            add(picLabel);
+        } catch(IOException e){
+            e.printStackTrace();
         }
     }
 
