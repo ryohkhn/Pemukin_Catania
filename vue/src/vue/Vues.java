@@ -1,6 +1,7 @@
 package vue;
 
 import board.Tile;
+import game.Card;
 import game.Game;
 import game.Player;
 
@@ -31,4 +32,63 @@ public interface Vues{
     void steal(Player p, Tile thiefTile);
     void displayDiceProduction(HashMap<Player, List<String>> diceResultsProduction);
     void displayYopGivenResources(String resource, String resource1);
+    void message(Player p, String type, String object, int error);
+    void cardDrawn(Player p, Card randomCard);
+
+    //message template for the gui
+    /*
+    @Override
+    public void message(Player p, String type, String object, int error) {
+        if(!(p instanceof Bot)){
+            if(type.equals("error")){
+                if(object.equals("road")){
+                }else if(object.equals("city")){
+                    switch(error){
+                        case 0 ->
+                        case 1 ->
+                        case 2 ->
+                    }
+                }else if(object.equals("card")){
+                    switch(error){
+                        case 0 ->
+                        case 1 ->
+                        case 2 ->
+                    }
+                }else if(object.equals("colony")){
+                    switch(error){
+                        case 0 ->
+                        case 1 ->
+                        case 2 ->
+                    }
+                }
+            }if(type.equals("good")){
+                if(object.equals("road")){
+                    switch(error){
+                        case 0 ->
+                        case 1 ->
+                        case 2 ->
+                    }
+                }else if(object.equals("city")){
+                    switch(error){
+                        case 0 ->
+                        case 1 ->
+                        case 2 ->
+                    }
+                }else if(object.equals("card")){
+                    switch(error){
+                        case 0 ->
+                        case 1 ->
+                        case 2 ->
+                    }
+                }else if(object.equals("colony")){
+                    switch(error){
+                        case 0 ->
+                        case 1 ->
+                        case 2 ->
+                    }
+                }
+            }
+        }
+    }
+     */
 }

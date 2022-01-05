@@ -54,36 +54,39 @@ public class Controller{
             }
             case 6 -> {
                 if(p.alreadyPlayedCardThisTurn) {
-                    System.out.println("Vous avez deja joué une carte a ce tour.");
+                    cli.message(p,"error", "card", 3);
                 } else {
                     String card=this.chooseCard();
                     Card chosenCard=Card.valueOf(card);
-                    if(game.hasChosenCard(p, chosenCard)) {
-                        if(card.equals("ProgressYearOfPlenty")) {
-                            game.useCardProgressYearOfPlenty(p, this.chooseResource(2));
-                        } else if(card.equals("ProgressMonopoly")) {
-                            game.useCardProgressMonopoly(p, this.chooseResource(1));
-                        } else if(card.equals("ProgressRoadBuilding")) {
-                            int[] placement;
-                            boolean verify;
-                            do{
-                               placement=this.getRoadPlacement();
-                               verify=game.isRoadBuildable(placement,p);
-                            }while(!verify);
-                            game.useCardProgressRoadBuilding(p, placement);
-                            verify=false;
-                            do{
-                                placement=this.getRoadPlacement();
-                                verify=game.isRoadBuildable(placement,p);
-                            }while(!verify);
-                            game.useCardProgressRoadBuildingSecondRound(p, placement);
-
-                        } else if(card.equals("Knight")) {
-                            game.useCardKnight(p, this.getThiefPlacement());
-                            cli.steal(p, this.game.getBoard().getThiefTile());
-                        } else {
-                            game.useCardVP(p);
+                    if(p.hasCard()) {
+                        if(game.hasChosenCard(p, chosenCard)) {
+                            if(card.equals("ProgressYearOfPlenty")) {
+                                game.useCardProgressYearOfPlenty(p, this.chooseResource(2));
+                            } else if(card.equals("ProgressMonopoly")) {
+                                game.useCardProgressMonopoly(p, this.chooseResource(1));
+                            } else if(card.equals("ProgressRoadBuilding")) {
+                                int[] placement;
+                                boolean verify;
+                                do {
+                                    placement=this.getRoadPlacement();
+                                    verify=game.isRoadBuildable(placement, p);
+                                } while(!verify);
+                                game.useCardProgressRoadBuilding(p, placement);
+                                verify=false;
+                                do {
+                                    placement=this.getRoadPlacement();
+                                    verify=game.isRoadBuildable(placement, p);
+                                } while(!verify);
+                                game.useCardProgressRoadBuildingSecondRound(p, placement);
+                            } else if(card.equals("Knight")) {
+                                game.useCardKnight(p, this.getThiefPlacement());
+                                cli.steal(p, this.game.getBoard().getThiefTile());
+                            } else {
+                                game.useCardVP(p);
+                            }
                         }
+                    }else{
+                        cli.message(p,"error", "card", 1);
                     }
                 }
                 cli.getAction(p);
@@ -103,6 +106,7 @@ public class Controller{
                 cli.getAction(p);
             }
             case 10 -> { // end the turn
+                p.cardsDrawnThisTurn.clear();
                 p.alreadyPlayedCardThisTurn=false;
             }
             default -> {

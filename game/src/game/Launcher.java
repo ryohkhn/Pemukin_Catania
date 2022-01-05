@@ -1,11 +1,13 @@
 package game;
 
+import board.Colony;
 import vue.Cli;
 import vue.Gui;
 import vue.Vues;
 
-import java.util.Random;
+import java.util.Collections;
 import java.util.Scanner;
+import java.util.Set;
 
 public class Launcher {
     private Game game;
@@ -14,7 +16,7 @@ public class Launcher {
     private Vues vue;
 
     public static void main(String[] args){
-        Random rand=new Random();
+
         Launcher launcher=new Launcher();
         Gui gui=new Gui(launcher);
         launcher.vue=gui.getGuiSideBar();
@@ -30,8 +32,6 @@ public class Launcher {
         }
 
     }
-
-
 
     public void launch(){
         vue.chooseNbPlayers();
@@ -61,15 +61,21 @@ public class Launcher {
         for(Player player: game.getPlayers()) {
             int quantity=player.resourceCount()/2;
             if(quantity>7) {
-                vue.sevenAtDice(player,quantity);
+                if(!p.isBot()) {
+                    vue.sevenAtDice(player, quantity);
+                }else{
+                    ((Bot)p).seventAtDice(quantity,game);
+                }
             }
         }
-        if(p.isBot()){
+        if(!p.isBot()){
             vue.setThief();
+            vue.steal(p,game.getBoard().getThiefTile());
         }else{
             ((Bot)p).setThief(game);
+            ((Bot)p).steal(game.getBoard().getThiefTile(),game);
         }
-        vue.steal(p,game.getBoard().getThiefTile());
+
     }
 
     public Game getGame() {

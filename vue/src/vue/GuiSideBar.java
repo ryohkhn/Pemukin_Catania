@@ -312,6 +312,16 @@ public class GuiSideBar extends JPanel implements Vues{
         mainPanel.add(secondResourceLabel);
     }
 
+    @Override
+    public void message(Player p, String type, String object, int error) {
+
+    }
+
+    @Override
+    public void cardDrawn(Player p, Card randomCard) {
+
+    }
+
     // fonction de la Vue qui affiche les buttons d'action pour le tour
     @Override
     public void getAction(Player player){

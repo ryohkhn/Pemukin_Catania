@@ -30,24 +30,30 @@ public class Game {
         int line=placement[0];
         int column=placement[1];
         int roadNumber=placement[2];
-        Road chosenRoad=board.getTiles()[line][column].getRoads().get(roadNumber);
-        if(chosenRoad.isOwned()) {
-            System.out.println("La route est déjà occupée.");
+        Road choosedRoad=board.getTiles()[line][column].getRoads().get(roadNumber);
+        if(choosedRoad.isOwned()) {
+            vue.message(player,"error","road", 0 );
             return false;
         }
-        if(player.canBuildPropertie("Road", 15)) {
-            if(chosenRoad.isBuildable(player)) {
-                chosenRoad.setPlayer(player);
-                player.resources.merge("Clay", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-                player.resources.merge("Wood", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-                player.addPropertie("Road");
-                System.out.println("Route construite.");
-                return true;
+        int clayStock=player.resources.get("Clay");
+        int woodStock=player.resources.get("Wood");
+        if(clayStock>=1&&woodStock>=1) {
+            if(player.canBuildPropertie("Road", 15)) {
+                if(choosedRoad.isBuildable(player)) {
+                    choosedRoad.setPlayer(player);
+                    player.resources.merge("Clay", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+                    player.resources.merge("Wood", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+                    player.addPropertie("Road");
+                    vue.message(player,"good","road", 0 );
+                    return true;
+                } else {
+                    vue.message(player,"error","road", 1 );
+                }
             } else {
-                System.out.println("Vous ne pouvez pas constuire de route ici.");
+                vue.message(player,"error","road", 2 );
             }
         } else {
-            System.out.println("Vous ne pouvez pas constuire de route, vous avez atteint la quantité maximum possible.");
+            vue.message(player,"error","road", 3 );
         }
         return false;
     }
@@ -69,30 +75,39 @@ public class Game {
         int line=placement[0];
         int column=placement[1];
         int colonyNumber=placement[2];
-        Colony chosenColony=board.getTiles()[line][column].getColonies().get(colonyNumber);
-        if(chosenColony.isOwned()) {
-            System.out.println("Cette colonie appartient déjà à quelqu'un.");
+        Colony choosedColony=board.getTiles()[line][column].getColonies().get(colonyNumber);
+        if(choosedColony.isOwned()) {
+            vue.message(player,"error","colony", 0 );
             return false;
         }
-        if(player.canBuildPropertie("Colony", 5)) {
-            if(chosenColony.isBuildable(player)) {
-                if(chosenColony.isPort()) {
-                    player.addPort(chosenColony.getLinkedPort());
+        int clayStock=player.resources.get("Clay");
+        int wheatStock=player.resources.get("Wheat");
+        int woodStock=player.resources.get("Wood");
+        int woolStock=player.resources.get("Wool");
+        if(clayStock>=1&&wheatStock>=1&&woodStock>=1&&woolStock>=1) {
+            if(player.canBuildPropertie("Colony", 5)) {
+                if(choosedColony.isBuildable(player)) {
+                    if(choosedColony.isPort()) {
+                        player.addPort(choosedColony.getLinkedPort());
+                    }
+                    choosedColony.setPlayer(player);
+                    player.resources.merge("Clay", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+                    player.resources.merge("Wood", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+                    player.resources.merge("Wheat", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+                    player.resources.merge("Wool", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+                    player.addPropertie("Colony");
+                    player.addVictoryPoint(1);
+                    if(player instanceof Bot) ((Bot) player).colonies.put(choosedColony,placement);
+                    vue.message(player,"good","colony", 0 );
+                    return true;
+                } else {
+                    vue.message(player,"error","colony", 1 );
                 }
-                chosenColony.setPlayer(player);
-                player.resources.merge("Clay", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-                player.resources.merge("Wood", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-                player.resources.merge("Wheat", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-                player.resources.merge("Wool", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-                player.addPropertie("Colony");
-                player.addVictoryPoint(1);
-                System.out.println("Colonie construite.");
-                return true;
             } else {
-                System.out.println("Vous ne pouvez pas constuire de colonie ici.");
+                vue.message(player,"error","colony", 2 );
             }
         } else {
-            System.out.println("Vous ne pouvez pas constuire de colonie, vous avez atteint la quantité maximum possible.");
+            vue.message(player,"error","colony", 3 );
         }
         return false;
     }
@@ -117,7 +132,7 @@ public class Game {
         int colonyNumber=placement[2];
         Colony chosenColony=board.getTiles()[line][column].getColonies().get(colonyNumber);
         if(!chosenColony.isOwned(player)) {
-            System.out.println("La colonie ne vous appartient pas, vous ne pouvez pas constuire de ville ici.");
+            vue.message(player, "error", "city", 0);
             return false;
         }
         if(player.canBuildPropertie("City", 4)) {
@@ -126,15 +141,17 @@ public class Game {
             player.resources.merge("Ore",3,((initialValue, valueRemoved) -> initialValue-valueRemoved));
             player.addPropertie("City");
             player.removeColonyInCounter();
-            player.addVictoryPoint(2);
-            System.out.println("Ville construite.");
+            //ajoute 1 point (prend toujours en compte le point de la colonie qu'était la ville).
+            player.addVictoryPoint(1);
+            vue.message(player, "good", "city", 0);
             return true;
         } else {
-            System.out.println("Vous ne pouvez pas constuire de ville, vous avez atteint la quantité maximum possible.");
+            vue.message(player, "error", "city", 1);
         }
         return false;
     }
 
+    // TODO: 05/01/2022 verifier hasResourcesForCity() avant d'appeler la contruction dans cli/controller ET dans bot
     // fonction qui vérife si le joueur a les ressources nécessaires pour construire une ville
     public boolean hasResourcesForCity(Player player){
         int oreStock=player.resources.get("Ore");
@@ -142,7 +159,7 @@ public class Game {
         if(wheatStock>=2&&oreStock>=3) {
             return true;
         }
-        System.out.println("Vous n'avez pas la quantité suffisante de ressources pour constuire une ville.");
+        vue.message(player, "error", "city", 2);
         return false;
     }
 
@@ -190,8 +207,8 @@ public class Game {
         chosenTile.setThief(true);
     }
 
-
-    // TODO une carte achetée dans le round ne peut pas être jouée directement
+    // TODO une carte achetée dans le round ne peut pas être jouée directement, modif faite dans cli, ne pas oublier la gui
+    // TODO: 05/01/2022 a tester dans cli
     // fonction permettant d'acheter une carte de développement
     public void buyCard(Player player) {
         int oreStock=player.resources.get("Ore");
@@ -202,16 +219,17 @@ public class Game {
             player.resources.merge("Wool", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
             player.resources.merge("Wheat", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
             Card randomCard=Card.randomCard();
-            System.out.println("You draw a "+randomCard);
+            vue.cardDrawn(player,randomCard);
             player.cards.merge(Card.randomCard(), 1, Integer::sum);
+            player.cardsDrawnThisTurn.merge(Card.randomCard(),1,Integer::sum);
         } else {
-            System.out.println("Vous n'avez pas les ressources suffisantes pour acheter une carte de développement.");
+            vue.message(player, "error", "card", 0);
         }
     }
-    
+
     public boolean hasChosenCard(Player p, Card chosenCard){
-        if(p.cards.get(chosenCard)<=0) {
-            System.out.println("you do not have this card");
+        if(p.cards.get(chosenCard)>p.cardsDrawnThisTurn.get(chosenCard)) {
+            vue.message(p, "error", "card", 1);
             return false;
         }
         return true;
@@ -258,11 +276,6 @@ public class Game {
     }
 
     public void useCardProgressMonopoly(Player turnPlayer, String[] resource) {
-        if(turnPlayer.cards.get(Card.ProgressMonopoly)<=0) {
-            // error message
-            System.out.println("You do not have this card.");
-            return;
-        }
         for(Player player : players) {
             if(player.resources.get(resource[0])>0) {
                 int playerResourceQuantity=player.resources.get(resource[0]);
@@ -282,7 +295,7 @@ public class Game {
                 player.resources.merge(portResource, 4, (initialValue, valueRemoved) -> initialValue-valueRemoved);
                 player.resources.merge(playerResource[0], 1, Integer::sum);
             } else {
-                System.out.println("Vous n'avez pas les ressources suffisantes pour faire l'échange");
+                vue.message(player, "error", "trade", 0);
             }
         } else if(chosenPort.getRate()==2) {
             if(player.resources.get(playerResource[0])>=2) {
@@ -290,17 +303,17 @@ public class Game {
                     player.resources.merge(portResource, 2, (initialValue, valueRemoved) -> initialValue-valueRemoved);
                     player.resources.merge(playerResource[0], 1, Integer::sum);
                 } else {
-                    System.out.println("Ce port n'échange pas cette ressource");
+                    vue.message(player, "error", "trade", 1);
                 }
             } else {
-                System.out.println("Vous n'avez pas les ressources suffisantes pour faire l'échange");
+                vue.message(player, "error", "trade", 0);
             }
         } else { //cas ou le port echange en 3:1
             if(player.resources.get(portResource)>=3) {
                 player.resources.merge(portResource, 3, (initialValue, valueRemoved) -> initialValue-valueRemoved);
                 player.resources.merge(playerResource[0], 1, Integer::sum);
             } else {
-                System.out.println("Vous n'avez pas les ressources suffisantes pour faire l'échange");
+                vue.message(player, "error", "trade", 0);
             }
         }
     }
@@ -311,7 +324,7 @@ public class Game {
         int colonyNumber=placement[2];
         Colony chosenColony=board.getTiles()[line][column].getColonies().get(colonyNumber);
         if(chosenColony.isOwned()) {
-            System.out.println("Cette colonie appartient déjà à quelqu'un.");
+            vue.message(player, "error", "colony", 0);
             return null;
         }
         if(chosenColony.isBuildableInitialization(player)) {
@@ -321,9 +334,10 @@ public class Game {
             chosenColony.setPlayer(player);
             player.addPropertie("Colony");
             player.addVictoryPoint(1);
+            if(player instanceof Bot) ((Bot) player).colonies.put(chosenColony,placement);
             return chosenColony;
         } else {
-            System.out.println("Vous ne pouvez pas constuire de colonie ici, la règle de distance n'est pas respectée.");
+            vue.message(player, "error", "colony", 4);
         }
         return null;
     }
@@ -335,7 +349,7 @@ public class Game {
         int roadNumber=placement[2];
         Road chosenRoad=board.getTiles()[line][column].getRoads().get(roadNumber);
         if(chosenRoad.isOwned()) {
-            System.out.println("Cette route appartient deja a quelqu'un.");
+            vue.message(player, "error", "road", 0);
             return false;
         }
         if(chosenRoad.isBuildableInitialization(colony)) {
@@ -343,7 +357,7 @@ public class Game {
             player.addPropertie("Road");
             return true;
         } else {
-            System.out.println("Vous ne pouvez pas constuire de route ici. Votre ville n'est pas adjacente.");
+            vue.message(player, "error", "road", 0);
         }
         return false;
     }
@@ -448,12 +462,12 @@ public class Game {
         }
         if(playerOwningCard!=nextPlayer) {
             if(playerOwningCard!=null) {
-                System.out.println(playerOwningCard+"has lost the longest army card. He lost his two victory points.");
+                vue.message(playerOwningCard, "error", "card", 2);
                 playerOwningCard.removeCard(Card.LargestArmy);
                 playerOwningCard.victoryPoint-=2;
             }
             if(nextPlayer!=null) {
-                System.out.println(nextPlayer+"has won the longest army card. He won 2 victory points.");
+                vue.message(nextPlayer, "error", "card", 2);
                 nextPlayer.addCard(Card.LargestArmy);
                 nextPlayer.victoryPoint+=2;
             }
@@ -482,7 +496,6 @@ public class Game {
 */
     public void setColors(String[] playersColor) {
         for(int i=0; i<this.players.length; i++) {
-            System.out.println(playersColor[i]);
             this.players[i].setColor(playersColor[i]);
         }
     }

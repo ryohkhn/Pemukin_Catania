@@ -210,15 +210,13 @@ public class Cli implements Vues{
 
     @Override
     public void getAction(Player p) {
-        if(!p.isBot()) {
-            this.displayPlayer(p);
-            this.displayBoard(launcher.getGame());
-            System.out.println("\nPlease select an action : \n 0 - show board \n 1 - exchange ressources with bank"+
-                    " \n 2 - build a new colony\n"+" 3 - upgrade a colony into a city\n"+
-                    " 4 - build a road\n"+" 5 - buy development cards\n"+
-                    " 6 - play a development card\n"+" 7 - display player information\n"+" 8 - show building costs\n"+
-                    " 9 - show others players informations\n"+" 10 - end the round\n");
-        }
+        this.displayPlayer(p);
+        this.displayBoard(launcher.getGame());
+        System.out.println("\nPlease select an action : \n 0 - show board \n 1 - exchange ressources with bank"+
+                " \n 2 - build a new colony\n"+" 3 - upgrade a colony into a city\n"+
+                " 4 - build a road\n"+" 5 - buy development cards\n"+
+                " 6 - play a development card\n"+" 7 - display player information\n"+" 8 - show building costs\n"+
+                " 9 - show others players informations\n"+" 10 - end the round\n");
         controller.getAction(p);
     }
 
@@ -289,28 +287,6 @@ public class Cli implements Vues{
         System.out.println("Choisissez un port parmi cette liste pour faire une échange.");
     }
 
-/*
-    public Player choosePlayerFromColony(ArrayList<Colony> colonies){
-        scanner=new Scanner(System.in);
-        int compt=1;
-        for(Colony colony:colonies){
-            System.out.println(compt+" - "+colony.getPlayer().toString());
-            compt++;
-        }
-        try{
-            int choice=scanner.nextInt();
-            if(choice<1 || choice>compt){
-                throw new InputMismatchException();
-            }
-            return colonies.get(choice-1).getPlayer();
-        }catch(InputMismatchException e){
-            System.out.println("The number should be between 1 and "+compt);
-            return this.choosePlayerFromColony(colonies);
-        }
-    }
-
- */
-
     @Override
     public void setPlayers() {
         controller.setPlayers();
@@ -324,15 +300,11 @@ public class Cli implements Vues{
 
     @Override
     public void sevenAtDice(Player p, int quantity){
-        if(p.isBot()){
-            ((Bot)p).seventAtDice(quantity,this.launcher.getGame());
-        }else {
-            while(quantity>0) {
-                System.out.println(quantity+" to destroy");
-                System.out.println("Choose a resource you want to destroy among \"Clay, Ore, Wheat, Wood, Wool.\" ");
-                controller.destroy(p);
-                quantity--;
-            }
+        while(quantity>0) {
+            System.out.println(quantity+" to destroy");
+            System.out.println("Choose a resource you want to destroy among \"Clay, Ore, Wheat, Wood, Wool.\" ");
+            controller.destroy(p);
+            quantity--;
         }
     }
 
@@ -356,16 +328,12 @@ public class Cli implements Vues{
         Player playerOfColony;
         if(ownedColonies.size()!=0){
             if(ownedColonies.size()>1){
-                if(!p.isBot()) {
-                    System.out.println("Choose a player to steal the resource from.");
-                    for(int i=0; i<ownedColonies.size(); i++) {
-                        System.out.println(i+1+" "+ownedColonies.get(i).getPlayer());
-                    }
-                    System.out.println("choose a number between 1 and "+ownedColonies.size());
-                    playerOfColony=controller.choosePlayerFromColonies(ownedColonies, p);
-                }else{
-                    playerOfColony=ownedColonies.get(((Bot)p).getRand(ownedColonies.size())).getPlayer();
+                System.out.println("Choose a player to steal the resource from.");
+                for(int i=0; i<ownedColonies.size(); i++) {
+                    System.out.println(i+1+" "+ownedColonies.get(i).getPlayer());
                 }
+                System.out.println("choose a number between 1 and "+ownedColonies.size());
+                playerOfColony=controller.choosePlayerFromColonies(ownedColonies, p);
             }
             else{
                 playerOfColony=ownedColonies.get(0).getPlayer();
@@ -398,5 +366,74 @@ public class Cli implements Vues{
     public void victory(Player p) {
         System.out.println(p.toString() + "has won the game!");
         System.exit(0);
+    }
+
+    @Override
+    public void message(Player p, String type, String object, int error) {
+        if(!(p instanceof Bot)){
+            if(type.equals("error")){
+                if(object.equals("road")){
+                    switch(error) {
+                        case 0 -> System.out.println(p +" The road is already taken.");
+                        case 1 -> System.out.println(p +" You can't build a road here.");
+                        case 2 -> System.out.println(p +" You can't build a road, you have reached the maximum allowed quantity.");
+                        case 3 -> System.out.println(p +" You don't have enough resources to build a road.");
+                        case 4 -> System.out.println(p +" You cannot build a road here. Your city is not adjacent.");
+                    }
+                }else if(object.equals("city")){
+                    switch(error){
+                        case 0 -> System.out.println(p +" You don't own the colony, you can't build a city here.");
+                        case 1 -> System.out.println(p +" You cannot build a city, you have reached the maximum amount possible.");
+                        case 2 -> System.out.println(p +" You don't have enough resources to build a city.");
+                    }
+                }else if(object.equals("card")){
+                    switch(error){
+                        case 0 -> System.out.println(p +" You do not have sufficient resources to purchase a development card.");
+                        case 1 -> System.out.println(p +" You do not have card to play this turn.");
+                        case 2 -> System.out.println(p +" has lost the longest army card. He lost his two victory points.");
+                        case 3 -> System.out.println(p +" You have already played a card in this round.");
+
+
+                    }
+                }else if(object.equals("colony")){
+                    switch(error){
+                        case 0 -> System.out.println(p +" This colony already belongs to someone.");
+                        case 1 -> System.out.println(p +" You can't build a colony here.");
+                        case 2 -> System.out.println(p +" You can't build a colony, you have reached the maximum amount possible.");
+                        case 3 -> System.out.println(p +" You don't have enough resources to build a colony.");
+                        case 4 -> System.out.println(p +" You can't build a colony here, the distance rule is not respected.");
+
+                    }
+                }else if(object.equals("trade")){
+                    switch(error){
+                        case 0 -> System.out.println(p +" You do not have sufficient resources to make the trade.");
+                        case 1 -> System.out.println(p +" This port does not exchange this resource.");
+                    }
+                }
+            }if(type.equals("good")){
+                if(object.equals("road")){
+                    switch(error){
+                        case 0 -> System.out.println(p +" Road built.");
+                    }
+                }else if(object.equals("city")){
+                    switch(error){
+                        case 0 -> System.out.println(p + " Built city.");
+                    }
+                }else if(object.equals("card")){
+                    switch(error){
+                        case 0 -> System.out.println(p +" has won the longest army card. He won 2 victory points.");
+                    }
+                }else if(object.equals("colony")){
+                    switch(error){
+                        case 0 -> System.out.println(p + " Colony built.");
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void cardDrawn(Player p, Card randomCard) {
+        System.out.println(p + "you draw a " + randomCard.name());
     }
 }

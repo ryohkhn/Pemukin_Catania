@@ -13,6 +13,7 @@ public abstract class Player{
     protected HashMap<String,Integer> resources=Board.generateHashMapRessource();
     protected HashMap<String,Integer> propertiesCounter=new HashMap<>();
     protected HashMap<Card,Integer> cards=new HashMap<>();
+    protected HashMap<Card,Integer> cardsDrawnThisTurn=new HashMap<>();
     protected LinkedList<Port> ports=new LinkedList<>();
     protected int victoryPoint=0;
     protected int knightPlayed=0;
@@ -26,6 +27,7 @@ public abstract class Player{
         propertiesCounter.put("Road",0);
         for(Card card : Card.values()){
             cards.put(card,0);
+            cardsDrawnThisTurn.put(card,0);
         }
         setColor(color);
     }
@@ -187,7 +189,12 @@ public abstract class Player{
     }
 
     public boolean hasCard(){
-        for(Map.Entry<Card, Integer> entry : this.cards.entrySet()) if(entry.getValue()>0) return true;
+        for(Map.Entry<Card, Integer> entry : this.cards.entrySet()){ // pour toutes les cartes du joueur
+            if(entry.getValue()>this.cardsDrawnThisTurn.get(entry.getKey())){
+                // si le nombre de cartes de ce type dans la main du joueur > nombre de cartes de ce type dans les cartes achetées a ce tour
+                return true;
+            }
+        }
         return false;
     }
 }
