@@ -17,7 +17,6 @@ public class Game {
         this.vue=vue;
     }
 
-
     public Board getBoard() {
         return board;
     }
@@ -36,27 +35,32 @@ public class Game {
             System.out.println("La route est déjà occupée.");
             return false;
         }
-        int clayStock=player.resources.get("Clay");
-        int woodStock=player.resources.get("Wood");
-        if(clayStock>=1&&woodStock>=1) {
-            if(player.canBuildPropertie("Road", 15)) {
-                if(chosenRoad.isBuildable(player)) {
-                    chosenRoad.setPlayer(player);
-                    player.resources.merge("Clay", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-                    player.resources.merge("Wood", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-                    player.addPropertie("Road");
-                    System.out.println("Route construite.");
-                    return true;
-                } else {
-                    System.out.println("Vous ne pouvez pas constuire de route ici.");
-                }
+        if(player.canBuildPropertie("Road", 15)) {
+            if(chosenRoad.isBuildable(player)) {
+                chosenRoad.setPlayer(player);
+                player.resources.merge("Clay", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+                player.resources.merge("Wood", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+                player.addPropertie("Road");
+                System.out.println("Route construite.");
+                return true;
             } else {
-                System.out.println("Vous ne pouvez pas constuire de route, vous avez atteint la quantité maximum possible.");
+                System.out.println("Vous ne pouvez pas constuire de route ici.");
             }
         } else {
-            System.out.println("Vous n'avez pas la quantité suffisante de ressources pour constuire une route.");
+            System.out.println("Vous ne pouvez pas constuire de route, vous avez atteint la quantité maximum possible.");
         }
         return false;
+    }
+
+    // fonction qui vérife si le joueur a les ressources nécessaires pour construire une route
+    public boolean hasResourcesForRoad(Player player){
+       int clayStock=player.resources.get("Clay");
+       int woodStock=player.resources.get("Wood");
+       if(clayStock>=1&&woodStock>=1){
+           return true;
+       }
+       // message d'erreur
+       return false;
     }
 
     // fonction construisant une colonie pour un joueur
@@ -70,34 +74,39 @@ public class Game {
             System.out.println("Cette colonie appartient déjà à quelqu'un.");
             return false;
         }
+        if(player.canBuildPropertie("Colony", 5)) {
+            if(chosenColony.isBuildable(player)) {
+                if(chosenColony.isPort()) {
+                    player.addPort(chosenColony.getLinkedPort());
+                }
+                chosenColony.setPlayer(player);
+                player.resources.merge("Clay", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+                player.resources.merge("Wood", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+                player.resources.merge("Wheat", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+                player.resources.merge("Wool", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+                player.addPropertie("Colony");
+                player.addVictoryPoint(1);
+                System.out.println("Colonie construite.");
+                return true;
+            } else {
+                System.out.println("Vous ne pouvez pas constuire de colonie ici.");
+            }
+        } else {
+            System.out.println("Vous ne pouvez pas constuire de colonie, vous avez atteint la quantité maximum possible.");
+        }
+        return false;
+    }
+
+    // fonction qui vérife si le joueur a les ressources nécessaires pour construire une colonie
+    public boolean hasResourcesForColony(Player player){
         int clayStock=player.resources.get("Clay");
         int wheatStock=player.resources.get("Wheat");
         int woodStock=player.resources.get("Wood");
         int woolStock=player.resources.get("Wool");
-        if(clayStock>=1&&wheatStock>=1&&woodStock>=1&&woolStock>=1) {
-            if(player.canBuildPropertie("Colony", 5)) {
-                if(chosenColony.isBuildable(player)) {
-                    if(chosenColony.isPort()) {
-                        player.addPort(chosenColony.getLinkedPort());
-                    }
-                    chosenColony.setPlayer(player);
-                    player.resources.merge("Clay", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-                    player.resources.merge("Wood", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-                    player.resources.merge("Wheat", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-                    player.resources.merge("Wool", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-                    player.addPropertie("Colony");
-                    player.addVictoryPoint(1);
-                    System.out.println("Colonie construite.");
-                    return true;
-                } else {
-                    System.out.println("Vous ne pouvez pas constuire de colonie ici.");
-                }
-            } else {
-                System.out.println("Vous ne pouvez pas constuire de colonie, vous avez atteint la quantité maximum possible.");
-            }
-        } else {
-            System.out.println("Vous n'avez pas la quantité suffisante de ressources pour constuire une colonie.");
+        if(clayStock>=1&&wheatStock>=1&&woodStock>=1&&woolStock>=1){
+            return true;
         }
+        System.out.println("Vous n'avez pas la quantité suffisante de ressources pour constuire une colonie.");
         return false;
     }
 
@@ -111,24 +120,29 @@ public class Game {
             System.out.println("La colonie ne vous appartient pas, vous ne pouvez pas constuire de ville ici.");
             return false;
         }
+        if(player.canBuildPropertie("City", 4)) {
+            chosenColony.setAsCity();
+            player.resources.merge("Wheat",2,((initialValue, valueRemoved) -> initialValue-valueRemoved));
+            player.resources.merge("Ore",3,((initialValue, valueRemoved) -> initialValue-valueRemoved));
+            player.addPropertie("City");
+            player.removeColonyInCounter();
+            player.addVictoryPoint(2);
+            System.out.println("Ville construite.");
+            return true;
+        } else {
+            System.out.println("Vous ne pouvez pas constuire de ville, vous avez atteint la quantité maximum possible.");
+        }
+        return false;
+    }
+
+    // fonction qui vérife si le joueur a les ressources nécessaires pour construire une ville
+    public boolean hasResourcesForCity(Player player){
         int oreStock=player.resources.get("Ore");
         int wheatStock=player.resources.get("Wheat");
         if(wheatStock>=2&&oreStock>=3) {
-            if(player.canBuildPropertie("City", 4)) {
-                chosenColony.setAsCity();
-                player.resources.replace("Wheat", wheatStock-2);
-                player.resources.replace("Ore", oreStock-3);
-                player.addPropertie("City");
-                player.removeColonyInCounter();
-                player.addVictoryPoint(2);
-                System.out.println("Ville construite.");
-                return true;
-            } else {
-                System.out.println("Vous ne pouvez pas constuire de ville, vous avez atteint la quantité maximum possible.");
-            }
-        } else {
-            System.out.println("Vous n'avez pas la quantité suffisante de ressources pour constuire une ville.");
+            return true;
         }
+        System.out.println("Vous n'avez pas la quantité suffisante de ressources pour constuire une ville.");
         return false;
     }
 
@@ -167,25 +181,6 @@ public class Game {
         p.resources.merge(resource, 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
     }
 
-    // fonction dans le cas d'un 7 aux dés, on défausse les cartes des joueurs et on change l'emplacement du brigand
-    /*
-    public void sevenAtDice(String[] chosenResources){
-        for(Player player:this.players){
-            int quantity=player.resourceCount()/2;
-            if(quantity>7){
-                System.out.println(player+" you have to discard "+quantity+" cards of your hand.");
-                do{
-                    chosenResources=vueGenerale.ressourceToBeDiscarded(player,quantity);
-                }
-                while(!player.hasResources(chosenResources));
-                for(String resource:chosenResources){
-                    player.resources.merge(resource,1,(initialValue, valueRemoved)->initialValue-valueRemoved);
-                }
-            }
-        }
-        this.setThiefAndSteal(p);
-    }
-     */
     public void setThief(int[] placement) {
         int line=placement[0];
         int column=placement[1];
@@ -195,49 +190,6 @@ public class Game {
         chosenTile.setThief(true);
     }
 
-    // fonction pour réattribuer l'emplacement du brigand et voler les ressources de colonies présentes sur la nouvelle case
-    /*
-    public void setThiefAndSteal(Player player){
-        System.out.println(player+" you have to change the location of the thief, input the coordinates. You can then steal a resource from a player if one of his colonies are on the tile.");
-        // on set le voleur sur la nouvelle case
-        int[] placement=vueGenerale.getThiefPlacement();
-        int line=placement[0];
-        int column=placement[1];
-        Tile chosenTile=board.getTiles()[line][column];
-        board.getThiefTile().setThief(false);
-        board.setThiefTile(chosenTile);
-        chosenTile.setThief(true);
-
-        ArrayList<Colony> ownedColonies=new ArrayList<>();
-        for(Colony colony:chosenTile.getColonies()){
-            if(colony.getPlayer()!=null && colony.getPlayer()!=player && !ownedColonies.contains(colony)){
-                ownedColonies.add(colony);
-            }
-        }
-
-        // on vole une ressource à une colonie étant sur la case ou se trouve le voleur, s'il y a plusieurs colonies le joueur choisit laquelle
-        String resource;
-        Player playerOfColony;
-        if(ownedColonies.size()!=0){
-            if(ownedColonies.size()>1){
-                System.out.println("Choose a player to steal the resource from.");
-                playerOfColony=vueGenerale.choosePlayerFromColony(ownedColonies);
-            }
-            else{
-                playerOfColony=ownedColonies.get(0).getPlayer();
-            }
-            if(playerOfColony.resourceCount()>0){
-                do{
-                    resource=Board.generateRandomRessource();
-                }
-                while(playerOfColony.resources.get(resource)==0);
-                playerOfColony.resources.merge(resource,1,(initialValue, valueRemoved)->initialValue-valueRemoved);
-                player.resources.merge(resource,1,Integer::sum);
-                System.out.println(player+" stole 1 "+resource+" from "+playerOfColony);
-            }
-        }
-    }
-    */
 
     // TODO une carte achetée dans le round ne peut pas être jouée directement
     // fonction permettant d'acheter une carte de développement
@@ -286,23 +238,23 @@ public class Game {
     public void useCardProgressYearOfPlenty(Player turnPlayer, String[] resources) {
         turnPlayer.resources.merge(resources[0], 1, Integer::sum);
         turnPlayer.resources.merge(resources[1], 1, Integer::sum);
+        vue.displayYopGivenResources(resources[0],resources[1]);
         turnPlayer.removeCard(Card.ProgressYearOfPlenty);
         turnPlayer.alreadyPlayedCardThisTurn=true;
     }
 
-    public boolean useCardProgressRoadBuilding(Player turnPlayer, int[] placement) {
+    public void useCardProgressRoadBuilding(Player turnPlayer, int[] placement) {
         turnPlayer.resources.merge("Clay", 2, Integer::sum);
         turnPlayer.resources.merge("Wood", 2, Integer::sum);
         buildRoad(turnPlayer, placement);
         turnPlayer.removeCard(Card.ProgressRoadBuilding);
         turnPlayer.alreadyPlayedCardThisTurn=true;
-        return true;
     }
 
-    public boolean useCardProgressRoadBuildingSecondRound(Player turnPlayer, int[] placement){
+    public void useCardProgressRoadBuildingSecondRound(Player turnPlayer, int[] placement){
         turnPlayer.resources.merge("Clay", 2, Integer::sum);
         turnPlayer.resources.merge("Wood", 2, Integer::sum);
-        return buildRoad(turnPlayer, placement);
+        buildRoad(turnPlayer, placement);
     }
 
     public void useCardProgressMonopoly(Player turnPlayer, String[] resource) {
@@ -383,7 +335,7 @@ public class Game {
         int roadNumber=placement[2];
         Road chosenRoad=board.getTiles()[line][column].getRoads().get(roadNumber);
         if(chosenRoad.isOwned()) {
-            System.out.println("Cette route appartient deja a quelqu'un."); // TODO: 24/12/2021 mettre tous les messages dans une fonction error de la vue, avec en argument un int qui represente le message a afficher (par exemple 1 = cette route appartient deja a quelqu'un)
+            System.out.println("Cette route appartient deja a quelqu'un.");
             return false;
         }
         if(chosenRoad.isBuildableInitialization(colony)) {

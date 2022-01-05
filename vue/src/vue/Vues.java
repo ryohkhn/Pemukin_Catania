@@ -30,4 +30,5 @@ public interface Vues{
     void setThief();
     void steal(Player p, Tile thiefTile);
     void displayDiceProduction(HashMap<Player, List<String>> diceResultsProduction);
+    void displayYopGivenResources(String resource, String resource1);
 }

@@ -1,6 +1,7 @@
 package board;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
@@ -246,6 +247,16 @@ public class Board{
         res.put("Wheat",0);
         res.put("Wood",0);
         res.put("Wool",0);
+        return res;
+    }
+
+    public static ArrayList<String> generateListResource(){
+        ArrayList<String> res=new ArrayList<>();
+        res.add("Clay");
+        res.add("Ore");
+        res.add("Wheat");
+        res.add("Wood");
+        res.add("Wool");
         return res;
     }
 

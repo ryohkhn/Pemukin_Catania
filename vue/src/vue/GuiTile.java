@@ -134,7 +134,7 @@ public class GuiTile extends JPanel implements MouseInputListener{
                             buildLocation=3;
                         }
                     }
-                    case "RoadInitialization","Road"->{
+                    case "RoadInitialization","Road","RoadCard"->{
                         if(e.getY()<(this.getHeight()/4) && e.getX()>(this.getWidth()/4) && e.getX()<((this.getWidth()*3)/4)){
                             buildLocation=0;
                             System.out.println("route haut");
@@ -192,6 +192,13 @@ public class GuiTile extends JPanel implements MouseInputListener{
                         case "Road" ->{
                             if(game.buildRoad(player,new int[]{line,column,buildLocation})){
                                 // faire qq chose
+                                guiBoard.removeAllTileAsListener();
+                            }
+                        }
+                        case "RoadCard" ->{
+                            if(game.isRoadBuildable(new int[]{line,column,buildLocation},player)){
+                                game.useCardProgressRoadBuilding(player,new int[]{line,column,buildLocation});
+                                guiSideBar.buildRoadCardDone();
                                 guiBoard.removeAllTileAsListener();
                             }
                         }

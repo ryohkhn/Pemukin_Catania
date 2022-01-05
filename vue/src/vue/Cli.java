@@ -62,7 +62,6 @@ public class Cli implements Vues{
 
     @Override
     public void displayBoard(Game game) {
-        // TODO: 27/12/2021 ports qui n'affichent pas les bonnes valeurs régler l'affichage des routes
         Point thief=null;
         Port[] tab=new Port[8];
         int iter=0;
@@ -385,7 +384,13 @@ public class Cli implements Vues{
     }
 
     @Override
-    public void displayStolenResource(Player player,String resource,Player playerOfColony,int quantity){
+    public void displayYopGivenResources(String resource, String resource1){
+        System.out.println("You have one more "+resource);
+        System.out.println("You have one more "+resource1);
+    }
+
+    @Override
+    public void displayStolenResource(Player player, String resource, Player playerOfColony, int quantity){
         System.out.println(player+" stole "+quantity+" "+resource+" from "+playerOfColony);
     }
 

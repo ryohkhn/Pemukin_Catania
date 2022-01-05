@@ -17,13 +17,14 @@ import java.util.List;
 public class GuiSideBar extends JPanel implements Vues{
     private Game game;
     private GuiBoard guiBoard;
-    private Gui gui;
-    private Launcher launcher;
+    private final Gui gui;
+    private final Launcher launcher;
     private JPanel playerPanel;
     private JPanel mainPanel;
     private JPanel infoPanel;
     private JPanel infoPanelOtherPlayers;
     private int countInitialization;
+    private int countRoadBuildingCard;
 
     public GuiSideBar(Game game,Gui gui,Launcher launcher){
         this.game=game;
@@ -40,10 +41,10 @@ public class GuiSideBar extends JPanel implements Vues{
     public void setUpGui(){
         setLayout(new GridLayout(3,1));
         playerPanel=new JPanel(new GridLayout(5,1));
-        mainPanel=new JPanel(new GridLayout(5,1));
+        mainPanel=new JPanel(new GridLayout(5,1,5,5));
         infoPanel=new JPanel();
         infoPanel.setLayout(new GridLayout(1,2));
-        infoPanelOtherPlayers=new JPanel();
+        infoPanelOtherPlayers=new JPanel(new GridLayout(0,1));
         infoPanel.add(infoPanelOtherPlayers);
         this.add(playerPanel);
         this.add(mainPanel);
@@ -56,7 +57,7 @@ public class GuiSideBar extends JPanel implements Vues{
         JPanel gameNumberPanel=new JPanel();
         gameNumberPanel.add(new JLabel("Choose how many players you want in the game :"));
         String[] values={"1","3","4"};
-        JComboBox comboBox=new JComboBox(values);
+        JComboBox<String> comboBox=new JComboBox<>(values);
         JButton next=new JButton("Continue");
         gameNumberPanel.add(comboBox);
         gameNumberPanel.add(next);
@@ -79,9 +80,9 @@ public class GuiSideBar extends JPanel implements Vues{
         playerSelectionPanel.add(new JLabel("Select which player is Human or IA :"));
         int nbplayer=game.getPlayers().length;
         String[] values={"Human","IA"};
-        ArrayList<JComboBox> comboBoxList=new ArrayList<>();
+        ArrayList<JComboBox<String>> comboBoxList=new ArrayList<>();
         for(int i=0; i<nbplayer; i++){
-            comboBoxList.add(new JComboBox(values));
+            comboBoxList.add(new JComboBox<>(values));
             playerSelectionPanel.add(new JLabel("Player "+(i+1)+" :"));
             playerSelectionPanel.add(comboBoxList.get(i));
         }
@@ -173,12 +174,13 @@ public class GuiSideBar extends JPanel implements Vues{
             mainPanel.remove(button);
             refreshPanel(mainPanel);
             JLabel placingLabel=new JLabel("Placing...");
+            placingLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
             mainPanel.add(placingLabel);
             if(countInitialization%2==1){
-                guiBoard.setAllTileAsListener(false,false,false,false, false);
+                guiBoard.setAllTileAsListener("RoadInitialization");
             }
             else{
-                guiBoard.setAllTileAsListener(true,false,false,false, false);
+                guiBoard.setAllTileAsListener("ColonyInitialization");
             }
         });
         mainPanel.add(button);
@@ -239,7 +241,9 @@ public class GuiSideBar extends JPanel implements Vues{
     public void displayOtherPlayers(Player p, Game game){
         for(Player player:game.getPlayers()){
             if(player!=p){
-                infoPanelOtherPlayers.add(new JLabel("Player "+player+" : "+player.getVictoryPoint()+" Victory Points, "+player.getKnightPlayed()+" Knights Played, "+player.getNbCards()+" Cards."));
+                JLabel otherPlayerInfo=new JLabel("Player "+player+" : "+player.getVictoryPoint()+" Victory Points, "+player.getKnightPlayed()+" Knights Played, "+player.getNbCards()+" Cards.");
+                otherPlayerInfo.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+                infoPanelOtherPlayers.add(otherPlayerInfo);
             }
         }
         refreshPanel(infoPanelOtherPlayers);
@@ -291,9 +295,21 @@ public class GuiSideBar extends JPanel implements Vues{
     public void displayDiceProduction(HashMap<Player, List<String>> diceResultsProduction){
         for(Player player:diceResultsProduction.keySet()){
             for(String resource:diceResultsProduction.get(player)){
-                infoPanelOtherPlayers.add(new JLabel("Player "+player+" : "+resource));
+                JLabel diceProductionToPlayer=new JLabel("Player "+player+" : "+resource);
+                diceProductionToPlayer.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+                infoPanelOtherPlayers.add(diceProductionToPlayer);
             }
         }
+    }
+
+    @Override
+    public void displayYopGivenResources(String resource, String resource1){
+        JLabel firstResourceLabel=new JLabel("You have one more "+resource);
+        JLabel secondResourceLabel=new JLabel("You have one more "+resource1);
+        firstResourceLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+        secondResourceLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+        mainPanel.add(firstResourceLabel);
+        mainPanel.add(secondResourceLabel);
     }
 
     // fonction de la Vue qui affiche les buttons d'action pour le tour
@@ -304,9 +320,9 @@ public class GuiSideBar extends JPanel implements Vues{
         JButton useButton=new JButton("Use card");
         JButton endRoundButton=new JButton("End round");
         buildOrBuyButton.addActionListener(event->{
-
+            buyOrBuild();
         });
-        tradeButton.addActionListener(event->{
+        tradeButton.addActionListener(event-> {
             JOptionPane.showMessageDialog(this,"Not implemented yet !");
         });
         useButton.addActionListener(event->{
@@ -327,6 +343,58 @@ public class GuiSideBar extends JPanel implements Vues{
         refreshPanel(mainPanel);
     }
 
+    public void buyOrBuild(){
+        removeAndRefresh(false,true,false);
+        Player player=launcher.getCurrentPlayer();
+        JButton returnToMenu=new JButton("Go back to the menu");
+        returnToMenu.addActionListener(event->{
+            removeAndRefresh(false,true,false);
+            getAction(player);
+        });
+        JLabel placingLabel=new JLabel("Placing...");
+        placingLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+        JButton placeRoadLabel=new JButton("Place a road");
+        JButton placeColonyLabel=new JButton("Place a colony");
+        JButton placeCityLabel=new JButton("Place a city");
+        JButton buyCardLabel=new JButton("Buy a random card");
+        placeColonyLabel.addActionListener(event->{
+            removeAndRefresh(false,true,false);
+            if(game.hasResourcesForColony(player)){
+                mainPanel.add(placingLabel);
+                guiBoard.setAllTileAsListener("Colony");
+            }
+            else{
+                mainPanel.add(returnToMenu);
+            }
+        });
+        placeCityLabel.addActionListener(event->{
+            removeAndRefresh(false,true,false);
+            if(game.hasResourcesForCity(player)){
+
+            }
+            else{
+                mainPanel.add(returnToMenu);
+            }
+        });
+        placeRoadLabel.addActionListener(event->{
+            removeAndRefresh(false,true,true);
+            if(game.hasResourcesForRoad(player)){
+
+            }
+            else{
+                mainPanel.add(returnToMenu);
+            }
+        });
+        buyCardLabel.addActionListener(event->{
+            removeAndRefresh(false,true,false);
+            
+        });
+        mainPanel.add(placeRoadLabel);
+        mainPanel.add(placeColonyLabel);
+        mainPanel.add(placeCityLabel);
+        mainPanel.add(buyCardLabel);
+    }
+
     @Override
     public void portSelection(Player player){
 
@@ -344,7 +412,9 @@ public class GuiSideBar extends JPanel implements Vues{
 
     @Override
     public void displayStolenResource(Player player,String resource,Player playerOfColony,int quantity){
-        mainPanel.add(new JLabel("You stole "+quantity+" "+resource+" from player "+playerOfColony));
+        JLabel stolenResourceLabel=new JLabel("You stole "+quantity+" "+resource+" from player "+playerOfColony);
+        stolenResourceLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+        mainPanel.add(stolenResourceLabel);
     }
 
     @Override
@@ -361,13 +431,18 @@ public class GuiSideBar extends JPanel implements Vues{
     public void chooseCard(){
         removeAndRefresh(false,true,false);
         Player player=launcher.getCurrentPlayer();
+        JButton returnToMenu=new JButton("Go back to the menu");
+        returnToMenu.addActionListener(event->{
+            removeAndRefresh(false,true,false);
+            getAction(player);
+        });
         if(player.getNbCards()==0){
             // error message
             JLabel noCardsLabel=new JLabel("You don't have any card to use.");
             mainPanel.add(noCardsLabel);
         }
         else{
-            HashMap<Card,Integer> playerCards=player.getCards();
+            JLabel noCard=new JLabel("You don't have this card.");
             JButton useKnight=new JButton("Knight");
             JButton useMonopoly=new JButton("Monopoly");
             JButton useYOP=new JButton("Year of Plenty");
@@ -375,22 +450,60 @@ public class GuiSideBar extends JPanel implements Vues{
             JButton useVP=new JButton("Victory Point");
             useKnight.addActionListener(event->{
                 removeAndRefresh(false,true,false);
-                setThief();
+                if(game.hasChosenCard(player,Card.Knight)){
+                    setThief();
+                }
+                else{
+                    mainPanel.add(noCard);
+                    mainPanel.add(returnToMenu);
+                }
             });
             useMonopoly.addActionListener(event->{
                 removeAndRefresh(false,true,false);
-                chooseResource();
+                if(game.hasChosenCard(player,Card.ProgressMonopoly)){
+                    chooseResource();
+                }
+                else{
+                    mainPanel.add(noCard);
+                    mainPanel.add(returnToMenu);
+                }
             });
             useYOP.addActionListener(event->{
-
                 removeAndRefresh(false,true,true);
+                if(game.hasChosenCard(player,Card.ProgressYearOfPlenty)){
+                    chooseResourceYopCard(new int[]{2},new String[2]);
+                }
+                else{
+                    mainPanel.add(noCard);
+                    mainPanel.add(returnToMenu);
+                }
             });
             useRoadBuilding.addActionListener(event->{
-
+                removeAndRefresh(false,true,false);
+                if(game.hasChosenCard(player,Card.ProgressRoadBuilding)){
+                    this.countRoadBuildingCard=2;
+                    JLabel firstRoad=new JLabel("Build your first road");
+                    firstRoad.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+                    mainPanel.add(firstRoad);
+                    guiBoard.setAllTileAsListener("RoadCard");
+                }
+                else{
+                    mainPanel.add(noCard);
+                    mainPanel.add(returnToMenu);
+                }
             });
             useVP.addActionListener(event->{
-
-                game.useCardVP(player);
+                removeAndRefresh(false,true,false);
+                if(game.hasChosenCard(player,Card.VictoryPoint)){
+                    game.useCardVP(player);
+                    JLabel wonVP=new JLabel("You won a Victory Point !");
+                    wonVP.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+                    mainPanel.add(wonVP);
+                }
+                else{
+                    mainPanel.add(noCard);
+                }
+                mainPanel.add(returnToMenu);
             });
             mainPanel.add(useKnight);
             mainPanel.add(useMonopoly);
@@ -398,18 +511,15 @@ public class GuiSideBar extends JPanel implements Vues{
             mainPanel.add(useRoadBuilding);
             mainPanel.add(useVP);
         }
-        JButton returnToMenu=new JButton("Go back to the menu");
-        returnToMenu.addActionListener(event->{
-            removeAndRefresh(false,true,false);
-            getAction(player);
-        });
         mainPanel.add(returnToMenu);
     }
 
     @Override
     public void setThief(){
         JLabel placeThiefLabel=new JLabel("Place thief on the board");
-        guiBoard.setAllTileAsListener(false,false,false,false,true);
+        placeThiefLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+        mainPanel.add(placeThiefLabel);
+        guiBoard.setAllTileAsListener("Thief");
     }
 
     // fonction de la Vue pour voler une ressource à un joueur après avoir déplacé le voleur
@@ -447,25 +557,17 @@ public class GuiSideBar extends JPanel implements Vues{
                                     playerOfColony[0]=colony.getPlayer();
                                 }
                             }
+                            removeAndRefresh(false,true,false);
                             game.steal(p, playerOfColony[0]);
-                            JButton returnToMenu=new JButton("Go back to the menu");
-                            returnToMenu.addActionListener(event->{
-                                removeAndRefresh(false,true,false);
-                                getAction(p);
-                            });
+                            showBackToMenuButton(p);
                         }
                     }
-                    refreshPanel(this);
                 });
             }
             else{
                 playerOfColony[0]=ownedColonies.get(0).getPlayer();
                 game.steal(p, playerOfColony[0]);
-                JButton returnToMenu=new JButton("Go back to the menu");
-                returnToMenu.addActionListener(event->{
-                    removeAndRefresh(false,true,false);
-                    getAction(p);
-                });
+                showBackToMenuButton(p);
             }
         }
     }
@@ -478,9 +580,9 @@ public class GuiSideBar extends JPanel implements Vues{
         JButton next=new JButton("Continue");
         ButtonGroup buttonGroup=new ButtonGroup();
         ArrayList<JRadioButton> jRadioButtonList=new ArrayList<>();
-        HashMap<String,Integer> resources=Board.generateHashMapRessource();
+        ArrayList<String> resources=Board.generateListResource();
 
-        for(String resource: resources.keySet()){
+        for(String resource: resources){
             JRadioButton radioButton=new JRadioButton(resource);
             jRadioButtonList.add(radioButton);
             buttonGroup.add(radioButton);
@@ -491,16 +593,71 @@ public class GuiSideBar extends JPanel implements Vues{
         next.addActionListener(actionEvent -> {
             for(JRadioButton button : jRadioButtonList){
                 if(button.isSelected()){
+                    removeAndRefresh(false,true,false);
                     game.useCardProgressMonopoly(player, new String[]{button.getActionCommand()});
-                    JButton returnToMenu=new JButton("Go back to the menu");
-                    returnToMenu.addActionListener(event -> {
-                        removeAndRefresh(false, true, false);
-                        getAction(player);
-                    });
+                    showBackToMenuButton(player);
                 }
             }
-            refreshPanel(this);
         });
+    }
+
+    // fonction appelée lors de l'utilisation de la carte "Year Of Plenty" permettant au joueur de choisir deux ressources qu'il obtiendra par la suite
+    public void chooseResourceYopCard(int[] count,String[] resource){
+        removeAndRefresh(false,true,false);
+        JPanel colorSelectionPanel=new JPanel();
+        Player player=launcher.getCurrentPlayer();
+        if(count[0]==0){
+            game.useCardProgressYearOfPlenty(player,resource);
+            showBackToMenuButton(player);
+            return;
+        }
+        JButton next=new JButton("Continue");
+        ButtonGroup buttonGroup=new ButtonGroup();
+        mainPanel.add(new JLabel("Select the "+(count[0]==0?"first":"second")+" resource you want to get :"));
+        ArrayList<JRadioButton> jRadioButtonList=new ArrayList<>();
+        ArrayList<String> resources=Board.generateListResource();
+        for(String s:resources){
+            JRadioButton button=new JRadioButton(s);
+            jRadioButtonList.add(button);
+            buttonGroup.add(button);
+            mainPanel.add(button);
+        }
+        jRadioButtonList.get(0).setSelected(true);
+        next.addActionListener(actionEvent -> {
+            for(JRadioButton button:jRadioButtonList){
+                if(button.isSelected()){
+                    resource[count[0]-1]=button.getActionCommand();
+                }
+            }
+            count[0]--;
+            chooseResourceYopCard(count,resource);
+        });
+        mainPanel.add(next);
+    }
+
+    public void buildRoadCardDone(){
+        removeAndRefresh(false,true,false);
+        this.countRoadBuildingCard--;
+        if(this.countRoadBuildingCard==0){
+            JLabel allRoadBuilded=new JLabel("Your two roads are now builded");
+            allRoadBuilded.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+            mainPanel.add(allRoadBuilded);
+            showBackToMenuButton(launcher.getCurrentPlayer());
+            return;
+        }
+        JLabel roadBuilded=new JLabel("Build your second road");
+        roadBuilded.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+        mainPanel.add(roadBuilded);
+        guiBoard.setAllTileAsListener("RoadCard");
+    }
+
+    public void showBackToMenuButton(Player player){
+        JButton returnToMenu=new JButton("Go back to the menu");
+        returnToMenu.addActionListener(event -> {
+            removeAndRefresh(false, true, false);
+            getAction(player);
+        });
+        mainPanel.add(returnToMenu);
     }
 
     @Override
