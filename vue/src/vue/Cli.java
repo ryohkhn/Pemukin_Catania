@@ -433,7 +433,7 @@ public class Cli implements Vues{
     }
 
     @Override
-    public void cardDrawn(Player p, Card randomCard) {
+    public void displayDrawnCard(Player p, Card randomCard) {
         System.out.println(p + "you draw a " + randomCard.name());
     }
 }

@@ -314,12 +314,13 @@ public class GuiSideBar extends JPanel implements Vues{
 
     @Override
     public void message(Player p, String type, String object, int error) {
-
+        // TODO faire les messages
     }
 
-    @Override
-    public void cardDrawn(Player p, Card randomCard) {
-
+    public void displayDrawnCard(Player player,Card randomCard){
+        JLabel drawnCardLabel=new JLabel("Player "+player+" you draw a "+randomCard);
+        drawnCardLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+        mainPanel.add(drawnCardLabel);
     }
 
     // fonction de la Vue qui affiche les buttons d'action pour le tour
@@ -337,7 +338,7 @@ public class GuiSideBar extends JPanel implements Vues{
         });
         useButton.addActionListener(event->{
             if(player.alreadyPlayedCardThisTurn){
-                // error message
+                JOptionPane.showMessageDialog(this,"You already played a card this round.");
             }
             else{
                 chooseCard();
@@ -354,6 +355,7 @@ public class GuiSideBar extends JPanel implements Vues{
     }
 
     public void buyOrBuild(){
+        // TODO Ajouter bouton pour annuler le placement
         removeAndRefresh(false,true,false);
         Player player=launcher.getCurrentPlayer();
         JButton returnToMenu=new JButton("Go back to the menu");
@@ -362,7 +364,9 @@ public class GuiSideBar extends JPanel implements Vues{
             getAction(player);
         });
         JLabel placingLabel=new JLabel("Placing...");
+        JLabel noResources=new JLabel("You don't have enough resources for this");
         placingLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+        noResources.setHorizontalAlignment(SwingConstants.HORIZONTAL);
         JButton placeRoadLabel=new JButton("Place a road");
         JButton placeColonyLabel=new JButton("Place a colony");
         JButton placeCityLabel=new JButton("Place a city");
@@ -374,35 +378,48 @@ public class GuiSideBar extends JPanel implements Vues{
                 guiBoard.setAllTileAsListener("Colony");
             }
             else{
+                mainPanel.add(noResources);
                 mainPanel.add(returnToMenu);
             }
         });
         placeCityLabel.addActionListener(event->{
             removeAndRefresh(false,true,false);
             if(game.hasResourcesForCity(player)){
-
+                mainPanel.add(placingLabel);
+                getCityPlacement();
             }
             else{
+                mainPanel.add(noResources);
                 mainPanel.add(returnToMenu);
             }
         });
         placeRoadLabel.addActionListener(event->{
-            removeAndRefresh(false,true,true);
+            removeAndRefresh(false,true,false);
             if(game.hasResourcesForRoad(player)){
-
+                mainPanel.add(placingLabel);
+                getRoadPlacement();
             }
             else{
+                mainPanel.add(noResources);
                 mainPanel.add(returnToMenu);
             }
         });
         buyCardLabel.addActionListener(event->{
             removeAndRefresh(false,true,false);
-            
+            if(game.hasResourcesForCard(player)){
+                game.buyCard(player);
+                mainPanel.add(returnToMenu);
+            }
+            else{
+                mainPanel.add(noResources);
+                mainPanel.add(returnToMenu);
+            }
         });
         mainPanel.add(placeRoadLabel);
         mainPanel.add(placeColonyLabel);
         mainPanel.add(placeCityLabel);
         mainPanel.add(buyCardLabel);
+        mainPanel.add(returnToMenu);
     }
 
     @Override
@@ -427,14 +444,16 @@ public class GuiSideBar extends JPanel implements Vues{
         mainPanel.add(stolenResourceLabel);
     }
 
+    // fonction qui active toutes les cases en tant que Listener pour récupérer les coordonées de construction de la route
     @Override
     public void getRoadPlacement(){
-
+        guiBoard.setAllTileAsListener("Road");
     }
 
+    // fonction qui active toutes les cases en tant que Listener pour récupérer les coordonées de construction de la ville
     @Override
     public void getCityPlacement(){
-
+        guiBoard.setAllTileAsListener("City");
     }
 
     @Override
@@ -659,6 +678,17 @@ public class GuiSideBar extends JPanel implements Vues{
         roadBuilded.setHorizontalAlignment(SwingConstants.HORIZONTAL);
         mainPanel.add(roadBuilded);
         guiBoard.setAllTileAsListener("RoadCard");
+    }
+
+    public void buildDone(String typeOfBuild){
+        removeAndRefresh(true,true,false);
+        Player player=launcher.getCurrentPlayer();
+        JLabel buildDoneLabel=new JLabel("Your "+typeOfBuild+" has been laid on the board.");
+        buildDoneLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+        mainPanel.add(buildDoneLabel);
+        displayBoard(game);
+        displayPlayer(player);
+        showBackToMenuButton(player);
     }
 
     public void showBackToMenuButton(Player player){

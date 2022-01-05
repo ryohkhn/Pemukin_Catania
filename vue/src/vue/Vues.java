@@ -14,10 +14,10 @@ public interface Vues{
     void getCityPlacement();
     void chooseCard();
     void displayStolenResource(Player player, String resource, Player stolenPlayer,int quantity);
-    void victory(Player p);
+    void victory(Player player);
     void displayBoard(Game game);
-    void displayPlayer(Player p);
-    void displayOtherPlayers(Player p,Game game);
+    void displayPlayer(Player player);
+    void displayOtherPlayers(Player player,Game game);
     void displayDiceNumber(int diceNumber);
     void showBuildCost();
     void chooseNbPlayers();
@@ -27,13 +27,13 @@ public interface Vues{
     void portSelection(Player player);
     void chooseResource();
     void getPortResource();
-    void sevenAtDice(Player p,int quantity);
+    void sevenAtDice(Player player,int quantity);
     void setThief();
-    void steal(Player p, Tile thiefTile);
+    void steal(Player player, Tile thiefTile);
     void displayDiceProduction(HashMap<Player, List<String>> diceResultsProduction);
     void displayYopGivenResources(String resource, String resource1);
-    void message(Player p, String type, String object, int error);
-    void cardDrawn(Player p, Card randomCard);
+    void message(Player player, String type, String object, int error);
+    void displayDrawnCard(Player player, Card randomCard);
 
     //message template for the gui
     /*

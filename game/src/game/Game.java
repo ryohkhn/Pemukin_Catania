@@ -62,7 +62,7 @@ public class Game {
     public boolean hasResourcesForRoad(Player player){
        int clayStock=player.resources.get("Clay");
        int woodStock=player.resources.get("Wood");
-       if(clayStock>=1&&woodStock>=1){
+       if(clayStock>=1 && woodStock>=1){
            return true;
        }
        // message d'erreur
@@ -118,7 +118,7 @@ public class Game {
         int wheatStock=player.resources.get("Wheat");
         int woodStock=player.resources.get("Wood");
         int woolStock=player.resources.get("Wool");
-        if(clayStock>=1&&wheatStock>=1&&woodStock>=1&&woolStock>=1){
+        if(clayStock>=1 && wheatStock>=1 && woodStock>=1 && woolStock>=1){
             return true;
         }
         System.out.println("Vous n'avez pas la quantité suffisante de ressources pour constuire une colonie.");
@@ -156,7 +156,7 @@ public class Game {
     public boolean hasResourcesForCity(Player player){
         int oreStock=player.resources.get("Ore");
         int wheatStock=player.resources.get("Wheat");
-        if(wheatStock>=2&&oreStock>=3) {
+        if(wheatStock>=2 && oreStock>=3) {
             return true;
         }
         vue.message(player, "error", "city", 2);
@@ -207,24 +207,26 @@ public class Game {
         chosenTile.setThief(true);
     }
 
-    // TODO une carte achetée dans le round ne peut pas être jouée directement, modif faite dans cli, ne pas oublier la gui
-    // TODO: 05/01/2022 a tester dans cli
-    // fonction permettant d'acheter une carte de développement
-    public void buyCard(Player player) {
+    public boolean hasResourcesForCard(Player player){
         int oreStock=player.resources.get("Ore");
         int woolStock=player.resources.get("Wool");
         int wheatStock=player.resources.get("Wheat");
-        if(oreStock>=1&&woolStock>=1&&wheatStock>=1) {
-            player.resources.merge("Ore", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-            player.resources.merge("Wool", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-            player.resources.merge("Wheat", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-            Card randomCard=Card.randomCard();
-            vue.cardDrawn(player,randomCard);
-            player.cards.merge(Card.randomCard(), 1, Integer::sum);
-            player.cardsDrawnThisTurn.merge(Card.randomCard(),1,Integer::sum);
-        } else {
-            vue.message(player, "error", "card", 0);
+        if(oreStock>=1 && woolStock>=1 && wheatStock>=1) {
+            return true;
         }
+        vue.message(player, "error", "card", 0);
+        return false;
+    }
+
+    // TODO une carte achetée dans le round ne peut pas être jouée directement
+    // fonction permettant d'acheter une carte de développement
+    public void buyCard(Player player) {
+        player.resources.merge("Ore", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+        player.resources.merge("Wool", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+        player.resources.merge("Wheat", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+        Card randomCard=Card.randomCard();
+        vue.displayDrawnCard(player,randomCard);
+        player.cards.merge(randomCard, 1, Integer::sum);
     }
 
     public boolean hasChosenCard(Player p, Card chosenCard){
