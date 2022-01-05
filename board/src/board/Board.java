@@ -249,6 +249,7 @@ public class Board{
         return res;
     }
 
+    // fonction permettant de générer une liste avec les ressources présentent dans le jeu
     public static LinkedList<String> generateListResource(){
         LinkedList<String> res=new LinkedList<>();
         res.add("Clay");

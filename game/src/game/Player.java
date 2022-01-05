@@ -129,11 +129,7 @@ public abstract class Player{
     }
 
     public String getRessourcesToString() {
-        String res="";
-        for(Map.Entry<String ,Integer> entry: this.resources.entrySet()) {
-            res+=entry.getKey() + " : "+ entry.getValue()+ " ; ";
-        }
-        return res;
+        return ("Clay : "+resources.get("Clay")+" ; Ore :"+resources.get("Ore")+" ; Wheat : "+resources.get("Wheat")+" ; Wood : "+resources.get("Wood")+" ; Wool : "+resources.get("Wool")+" ;");
     }
 
     public String firstLetter() {
@@ -201,7 +197,7 @@ public abstract class Player{
     // TODO à enlever utile pour les test
     public void setMaxResources(){
         for(String resource:resources.keySet()){
-            resources.merge(resource,2,Integer::sum);
+            resources.merge(resource,10,Integer::sum);
         }
     }
 

@@ -65,7 +65,7 @@ public class Game {
        if(clayStock>=1 && woodStock>=1){
            return true;
        }
-       // message d'erreur
+       vue.message(player,"error","road", 3 );
        return false;
     }
 
@@ -121,7 +121,7 @@ public class Game {
         if(clayStock>=1 && wheatStock>=1 && woodStock>=1 && woolStock>=1){
             return true;
         }
-        System.out.println("Vous n'avez pas la quantité suffisante de ressources pour constuire une colonie.");
+        vue.message(player,"error","colony", 3 );
         return false;
     }
 
@@ -151,7 +151,6 @@ public class Game {
         return false;
     }
 
-    // TODO: 05/01/2022 verifier hasResourcesForCity() avant d'appeler la contruction dans cli/controller ET dans bot
     // fonction qui vérife si le joueur a les ressources nécessaires pour construire une ville
     public boolean hasResourcesForCity(Player player){
         int oreStock=player.resources.get("Ore");
@@ -230,15 +229,11 @@ public class Game {
     }
 
     public boolean hasChosenCard(Player p, Card chosenCard){
-        if(p.cards.get(chosenCard)>0) return true;
-        return false;
-        /*if(p.cards.get(chosenCard)>p.cardsDrawnThisTurn.get(chosenCard)) {
-            vue.message(p, "error", "card", 1);
-            return false;
+        if(p.cards.get(chosenCard)>p.cardsDrawnThisTurn.getOrDefault(chosenCard,0)){
+            return true;
         }
-        return true;
-
-         */
+        vue.message(p, "error", "card", 1);
+        return false;
     }
 
     // fonction permettant d'utiliser une carte point de victoire
@@ -361,51 +356,10 @@ public class Game {
             player.addPropertie("Road");
             return true;
         } else {
-            vue.message(player, "error", "road", 0);
+            vue.message(player, "error", "road", 1);
         }
         return false;
     }
-
-    // fonction d'initialisation: tous les joueurs construisent deux colonies et deux routes
-    // on donne ensuite les ressources des cases autour des colonies construites aux joueurs
-    /*
-    public void initialization(){
-        Colony buildedColony;
-        boolean buildedRoad;
-        HashMap<Colony,Player> secondRoundBuildedColonies=new HashMap<>();
-        for(int i=0; i<players.length; i++){
-            this.vueGenerale.displayPlayer(players[i]);
-            this.vueGenerale.displayBoard(this);
-            do{
-                buildedColony=buildColonyInitialization(players[i]);
-            }
-            while(buildedColony==null);
-            this.vueGenerale.displayPlayer(players[i]);
-            this.vueGenerale.displayBoard(this);
-            do{
-                buildedRoad=buildRoadInitialization(players[i], buildedColony);
-            }
-            while(!buildedRoad);
-        }
-        for(int i=players.length-1; i>=0; i--){
-            this.vueGenerale.displayPlayer(players[i]);
-            this.vueGenerale.displayBoard(this);
-            do{
-                buildedColony=buildColonyInitialization(players[i]);
-            }
-            while(buildedColony==null);
-            secondRoundBuildedColonies.put(buildedColony,players[i]);
-            this.vueGenerale.displayPlayer(players[i]);
-            this.vueGenerale.displayBoard(this);
-            do{
-                buildedRoad=buildRoadInitialization(players[i], buildedColony);
-            }
-            while(!buildedRoad);
-        }
-        coloniesProduction(secondRoundBuildedColonies);
-    }
-
-     */
 
     // fonction qui parcourt le tableau et donne les ressources aux joueurs de toutes les cases autour des colonies
     public void coloniesProduction() {
@@ -471,7 +425,7 @@ public class Game {
                 playerOwningCard.victoryPoint-=2;
             }
             if(nextPlayer!=null) {
-                vue.message(nextPlayer, "error", "card", 2);
+                vue.message(nextPlayer, "good", "card", 0);
                 nextPlayer.addCard(Card.LargestArmy);
                 nextPlayer.victoryPoint+=2;
             }
@@ -486,18 +440,7 @@ public class Game {
             }
         }
     }
-/*
-    public void botsGetColor(HashMap<String, Boolean> color) {
-        for(int i=0; i<this.players.length; i++) {
-            if(this.getPlayers()[i] instanceof Bot) {
-                if(color.replace("blue", false, true)) ((Bot) this.players[i]).setColor("blue");
-                else if(color.replace("green", false, true)) ((Bot) this.players[i]).setColor("green");
-                else if(color.replace("yellow", false, true)) ((Bot) this.players[i]).setColor("yellow");
-                else if(color.replace("orange", false, true)) ((Bot) this.players[i]).setColor("orange");
-            }
-        }
-    }
-*/
+
     public void setColors(String[] playersColor) {
         for(int i=0; i<this.players.length; i++) {
             this.players[i].setColor(playersColor[i]);
@@ -541,7 +484,7 @@ public class Game {
 
 /*
 
-Tentative de calcul de la route la plus longue, je laisse au cas ou on en ait encore besoin.
+Tentative de calcul de la route la plus longue
 
 
     public void addPointsForLongestRoad(Player p){

@@ -2,13 +2,14 @@ package vue;
 
 import board.Board;
 import board.Colony;
+import board.Port;
 import board.Tile;
 import game.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class GuiSideBar extends JPanel implements Vues{
     private Game game;
@@ -19,10 +20,12 @@ public class GuiSideBar extends JPanel implements Vues{
     private JPanel mainPanel;
     private JPanel infoPanel;
     private JPanel infoPanelOtherPlayers;
+
     private int countInitialization;
     private int countRoadBuildingCard;
     private LinkedHashMap<Player,Integer> playersDiscardingQuantity;
     private LinkedList<Player> playersDiscarding;
+    private String chosenPort;
 
     public GuiSideBar(Game game,Gui gui,Launcher launcher){
         this.game=game;
@@ -207,9 +210,6 @@ public class GuiSideBar extends JPanel implements Vues{
     // On lance la fonction de Game pour générer les ressources de la fin d'initialisation et on affiche les informations nécessaires sur les JPanels
     public void startGame(){
         game.coloniesProduction();
-        for(Player player:game.getPlayers()){
-            player.setMaxResources();
-        }
         removeAndRefresh(true,true,false);
         refreshPanel(this);
         displayPlayer(launcher.getCurrentPlayer());
@@ -322,7 +322,52 @@ public class GuiSideBar extends JPanel implements Vues{
 
     @Override
     public void message(Player p, String type, String object, int error) {
-        // TODO faire les messages
+        if(!(p instanceof Bot)){
+            if(type.equals("error")){
+                JLabel noResources=new JLabel("You don't have enough resources for this");
+                noResources.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+                if(object.equals("road")){
+                    switch(error){
+                        case 0 -> JOptionPane.showMessageDialog(this,"The road is already taken.");
+                        case 1 ->JOptionPane.showMessageDialog(this,"You can't build a road here.");
+                        case 2 ->JOptionPane.showMessageDialog(this,"You can't build a road, you have reached the maximum allowed quantity.");
+                        case 3 -> mainPanel.add(noResources);
+                        case 4 -> JOptionPane.showMessageDialog(this," You cannot build a road here. Your city is not adjacent.");
+                    }
+                }else if(object.equals("city")){
+                    switch(error){
+                        case 0 -> JOptionPane.showMessageDialog(this," You don't own the colony, you can't build a city here.");
+                        case 1 -> JOptionPane.showMessageDialog(this," You cannot build a city, you have reached the maximum amount possible.");
+                        case 2 -> mainPanel.add(noResources);
+                    }
+                }else if(object.equals("card")){
+                    switch(error){
+                        case 0 -> mainPanel.add(noResources);
+                        case 2 -> JOptionPane.showMessageDialog(this,"Player "+p+" has lost the longest army card. He lost his two victory points.");
+                    }
+                }else if(object.equals("colony")){
+                    switch(error){
+                        case 0 -> JOptionPane.showMessageDialog(this," This colony already belongs to someone.");
+                        case 1 -> JOptionPane.showMessageDialog(this," You can't build a colony here.");
+                        case 2 -> JOptionPane.showMessageDialog(this," You can't build a colony, you have reached the maximum amount possible.");
+                        case 3 -> mainPanel.add(noResources);
+                        case 4 -> JOptionPane.showMessageDialog(this," You can't build a colony here, the distance rule is not respected.");
+
+                    }
+                }else if(object.equals("trade")){
+                    switch(error){
+                        case 0 -> JOptionPane.showMessageDialog(this," You do not have sufficient resources to make the trade.");
+                        case 1 -> JOptionPane.showMessageDialog(this," This port does not exchange this resource.");
+                    }
+                }
+            }if(type.equals("good")){
+                if(object.equals("card")){
+                    switch(error){
+                        case 0 -> JOptionPane.showMessageDialog(this," has won the longest army card. He won 2 victory points.");
+                    }
+                }
+            }
+        }
     }
 
     public void displayDrawnCard(Player player,Card randomCard){
@@ -342,7 +387,7 @@ public class GuiSideBar extends JPanel implements Vues{
             buyOrBuild();
         });
         tradeButton.addActionListener(event-> {
-            JOptionPane.showMessageDialog(this,"Not implemented yet !");
+            portSelection(player);
         });
         useButton.addActionListener(event->{
             if(player.alreadyPlayedCardThisTurn){
@@ -393,7 +438,6 @@ public class GuiSideBar extends JPanel implements Vues{
                 guiBoard.setAllTileAsListener("Colony");
             }
             else{
-                mainPanel.add(noResources);
                 mainPanel.add(returnToMenu);
             }
         });
@@ -405,7 +449,6 @@ public class GuiSideBar extends JPanel implements Vues{
                 getCityPlacement();
             }
             else{
-                mainPanel.add(noResources);
                 mainPanel.add(returnToMenu);
             }
         });
@@ -417,7 +460,6 @@ public class GuiSideBar extends JPanel implements Vues{
                 getRoadPlacement();
             }
             else{
-                mainPanel.add(noResources);
                 mainPanel.add(returnToMenu);
             }
         });
@@ -428,7 +470,6 @@ public class GuiSideBar extends JPanel implements Vues{
                 mainPanel.add(returnToMenu);
             }
             else{
-                mainPanel.add(noResources);
                 mainPanel.add(returnToMenu);
             }
         });
@@ -441,12 +482,114 @@ public class GuiSideBar extends JPanel implements Vues{
 
     @Override
     public void portSelection(Player player){
+        removeAndRefresh(false,true,false);
+        if(player.getPorts().size()>0){
+            JLabel choosePortLabel=new JLabel("Please choose a port");
+            choosePortLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+            mainPanel.add(choosePortLabel);
+            JButton next=new JButton("Continue");
+            ButtonGroup buttonGroup=new ButtonGroup();
+            ArrayList<JRadioButton> jRadioButtonList=new ArrayList<>();
+            JRadioButton noPortButton=new JRadioButton("Port 4:1");
+            jRadioButtonList.add(noPortButton);
+            buttonGroup.add(noPortButton);
+            mainPanel.add(noPortButton);
 
+            for(Port port: player.getPorts()){
+                JRadioButton radioButton=new JRadioButton("Port "+port.toString());
+                jRadioButtonList.add(radioButton);
+                buttonGroup.add(radioButton);
+                mainPanel.add(radioButton);
+            }
+            jRadioButtonList.get(0).setSelected(true);
+            mainPanel.add(next);
+            next.addActionListener(actionEvent -> {
+                for(JRadioButton button : jRadioButtonList){
+                    if(button.isSelected()){
+                        chosenPort=button.getActionCommand();
+                        getPortResource();
+                    }
+                }
+            });
+        }
+        else{
+            chosenPort="Port 4:1";
+            getPortResource();
+        }
     }
 
     @Override
     public void getPortResource(){
+        removeAndRefresh(false,true,false);
+        Player player=launcher.getCurrentPlayer();
+        Port playerPort=null;
+        if(!chosenPort.equals("Port 4:1")){
+            for(Port port : player.getPorts()){
+                if(("Port "+port.toString()).equals(chosenPort)){
+                    playerPort=port;
+                }
+            }
+        }
+        if(playerPort!=null && playerPort.getRate()==2){
+            getPortGivenResource(playerPort,playerPort.getRessource());
+            return;
+        }
+        JLabel chooseResourceLabel=new JLabel("Please choose the resource you will exchange");
+        chooseResourceLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+        mainPanel.add(chooseResourceLabel);
+        JButton next=new JButton("Continue");
+        ButtonGroup buttonGroup=new ButtonGroup();
+        ArrayList<JRadioButton> jRadioButtonList=new ArrayList<>();
+        LinkedList<String> resources=Board.generateListResource();
 
+        for(String resource: resources){
+            JRadioButton radioButton=new JRadioButton(resource);
+            jRadioButtonList.add(radioButton);
+            buttonGroup.add(radioButton);
+            mainPanel.add(radioButton);
+        }
+        jRadioButtonList.get(0).setSelected(true);
+        mainPanel.add(next);
+        Port finalPlayerPort=playerPort;
+        next.addActionListener(actionEvent -> {
+            for(JRadioButton button : jRadioButtonList){
+                if(button.isSelected()){
+                    removeAndRefresh(false,true,false);
+                    getPortGivenResource(finalPlayerPort,button.getActionCommand());
+                }
+            }
+        });
+    }
+
+    public void getPortGivenResource(Port port,String portResource){
+        removeAndRefresh(false,true,false);
+        Player player=launcher.getCurrentPlayer();
+        JLabel chooseResourceLabel=new JLabel("Please choose the resource you will receive");
+        chooseResourceLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+        mainPanel.add(chooseResourceLabel);
+        JButton next=new JButton("Continue");
+        ButtonGroup buttonGroup=new ButtonGroup();
+        ArrayList<JRadioButton> jRadioButtonList=new ArrayList<>();
+        LinkedList<String> resources=Board.generateListResource();
+
+        for(String resource: resources){
+            JRadioButton radioButton=new JRadioButton(resource);
+            jRadioButtonList.add(radioButton);
+            buttonGroup.add(radioButton);
+            mainPanel.add(radioButton);
+        }
+        jRadioButtonList.get(0).setSelected(true);
+        mainPanel.add(next);
+        next.addActionListener(actionEvent -> {
+            for(JRadioButton button : jRadioButtonList){
+                if(button.isSelected()){
+                    removeAndRefresh(false,true,false);
+                    game.trade(player,port,portResource,new String[]{button.getActionCommand()});
+                    showBackToMenuButton(player);
+                    refreshPanel(mainPanel);
+                }
+            }
+        });
     }
 
     public void startSevenAtDice(){
@@ -495,7 +638,7 @@ public class GuiSideBar extends JPanel implements Vues{
             mainPanel.add(resourceNameLabel);
         }
         final int[] resourceChoice=new int[5];
-        final int[] total={0};
+        final int[] total=new int[1];
         next.addActionListener(actionEvent -> {
             for(int i=0; i<comboBoxList.size(); i++){
                 resourceChoice[i]=(Integer)comboBoxList.get(i).getSelectedItem();
@@ -504,17 +647,18 @@ public class GuiSideBar extends JPanel implements Vues{
             if(total[0]==quantity){
                 playersDiscarding.remove(player);
                 playersDiscardingQuantity.remove(player);
+                game.removeResourcesFromPlayer(player,resourceChoice);
                 if(playersDiscarding.size()==0){
                     removeAndRefresh(false,true,false);
                     setThief();
                 }
                 else{
-                    game.removeResourcesFromPlayer(player,resourceChoice);
                     Player nextPlayer=playersDiscarding.get(0);
-                    sevenAtDice(nextPlayer,playersDiscardingQuantity.get(nextPlayer));
+                    sevenAtDice(nextPlayer,playersDiscardingQuantity.get(nextPlayer)/2);
                 }
             }
             else{
+                total[0]=0;
                 JOptionPane.showMessageDialog(this,"You have to discard "+quantity+" resources.");
             }
         });
@@ -550,17 +694,13 @@ public class GuiSideBar extends JPanel implements Vues{
             displayPlayer(player);
             getAction(player);
         });
-        /*
         JButton cancelButton=new JButton("Cancel");
         cancelButton.addActionListener(event->{
-            guiBoard.removeAllTileAsListener();
             removeAndRefresh(false,true,false);
+            guiBoard.removeAllTileAsListener();
             getAction(player);
         });
-
-         */
         if(player.getNbCards()==0){
-            // error message
             JLabel noCardsLabel=new JLabel("You don't have any card to use.");
             mainPanel.add(noCardsLabel);
         }
@@ -609,6 +749,7 @@ public class GuiSideBar extends JPanel implements Vues{
                     firstRoad.setHorizontalAlignment(SwingConstants.HORIZONTAL);
                     mainPanel.add(firstRoad);
                     guiBoard.setAllTileAsListener("RoadCard");
+                    mainPanel.add(cancelButton);
                 }
                 else{
                     mainPanel.add(noCard);
@@ -639,6 +780,7 @@ public class GuiSideBar extends JPanel implements Vues{
 
     @Override
     public void setThief(){
+        mainPanel.setLayout(new GridLayout(5,1,5,5));
         JLabel placeThiefLabel=new JLabel("Place thief on the board");
         placeThiefLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
         mainPanel.add(placeThiefLabel);
@@ -660,6 +802,8 @@ public class GuiSideBar extends JPanel implements Vues{
         if(ownedColonies.size()!=0){
             if(ownedColonies.size()>1){
                 JLabel choosePlayer=new JLabel("Choose a player to steal a random resource from");
+                choosePlayer.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+                mainPanel.add(choosePlayer);
                 JButton next=new JButton("Continue");
                 ButtonGroup buttonGroup=new ButtonGroup();
                 ArrayList<JRadioButton> jRadioButtonList=new ArrayList<>();
