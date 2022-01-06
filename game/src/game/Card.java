@@ -8,11 +8,13 @@ public enum Card{
 
     private static final Random random=new Random();
 
+    // fonction qui renvoie une carte aléatoire parmi l'enum ci-dessus
     public static Card randomCard(){
         int index=random.nextInt(Card.values().length-1);
         return Card.values()[index];
     }
 
+    @Override
     public String toString(){
         String res="";
         switch(this){

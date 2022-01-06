@@ -59,6 +59,7 @@ public class Bot extends Player{
             verif=quantity==0;
         }
     }
+
     // renvoie un tableau de placement aléatoire pour le voleur
     public void setThief(Game game) {
         int[] placement=new int[2];
@@ -181,19 +182,6 @@ public class Bot extends Player{
         }
     }
 
-    //renvoie le placement de la route
-    private int[] getRoadPlacement() {
-        int x=rand.nextInt(buildableRoads.size());
-        int[] res=new int[3];
-        int i=0;
-        for(Map.Entry<Road,int[]> entry : buildableRoads.entrySet()){
-            if(i==x){
-                res= entry.getValue();
-            }
-            i++;
-        }
-        return res;
-    }
     //fait une hashmap avec toutes les colonies constructibles
     private void setBuildableColonies(Game game) {
         for(int x=0;x<3;x++){
@@ -207,6 +195,28 @@ public class Bot extends Player{
             }
         }
 
+    }
+
+    // renvoie une case aléatoire
+    private int[] getTilePlacement() {
+        int[] placement=new int[2];
+        placement[0]=rand.nextInt(4);
+        placement[1]=rand.nextInt(4);
+        return placement;
+    }
+
+    //renvoie le placement de la route
+    private int[] getRoadPlacement() {
+        int x=rand.nextInt(buildableRoads.size());
+        int[] res=new int[3];
+        int i=0;
+        for(Map.Entry<Road,int[]> entry : buildableRoads.entrySet()){
+            if(i==x){
+                res= entry.getValue();
+            }
+            i++;
+        }
+        return res;
     }
 
     // renvoie le placement de la colonie
@@ -223,6 +233,7 @@ public class Bot extends Player{
         return res;
     }
 
+    // renvoie le placement de la ville
     private int[] getCityPlacement() {
         int x;
         boolean verify=false;
@@ -242,6 +253,7 @@ public class Bot extends Player{
         return res;
     }
 
+    // vérifie si le bot n'a que des villes.
     private boolean isFullCity() {
         for(Map.Entry<Colony,int[]> entry: colonies.entrySet()){
             if(!entry.getKey().isCity()) return false;
@@ -249,6 +261,7 @@ public class Bot extends Player{
         return true;
     }
 
+    // choisi une carte aléatoire que le bot possède
     private Card chooseCard() {
         Card chosenCard;
         boolean verify=false;
@@ -261,6 +274,7 @@ public class Bot extends Player{
         return chosenCard;
     }
 
+    // renvoie un tableau de taille i de ressources
     private String[] chooseResource(int i) {
         String[] resources=new String[i];
         String[] resourcesList={"Clay","Wood","Wool","Wheat","Ore"};
@@ -270,10 +284,5 @@ public class Bot extends Player{
         return resources;
     }
 
-    private int[] getTilePlacement() {
-        int[] placement=new int[2];
-        placement[0]=rand.nextInt(4);
-        placement[1]=rand.nextInt(4);
-        return placement;
-    }
+
 }

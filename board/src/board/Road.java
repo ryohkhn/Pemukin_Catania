@@ -13,22 +13,6 @@ public class Road {
         this.player=null;
     }
 
-    @Override
-    public String toString() {
-        String res="";
-        int x=0;
-        for(Road t : this.adjacentRoads){
-            res+=" Road n°" + x;
-            x++;
-        }
-        res+="\n";
-        x=0;
-        for(Colony c : this.adjacentColonies){
-            res+=" Colony n°" + x;
-            x++;
-        }
-        return res;
-    }
     public Player getPlayer() {
         return player;
     }
@@ -57,10 +41,8 @@ public class Road {
         this.player=player;
     }
 
-    /*
-            Fonction qui remplit l'ArrayList de road correspondant a ses voisins,
-            de manière à pouvoir vérifier s'il y a bien une route voisine appartenant au joueur lors de la création d'une route.
-        */
+    // Fonction qui remplit l'ArrayList de road correspondant a ses voisins,
+    // de manière à pouvoir vérifier s'il y a bien une route voisine appartenant au joueur lors de la création d'une route.
     public void addAdjacentRoads(Tile[][] t,int x, int y) {
         if(x==0) { //ligne du haut
             if(y==0) { //coin gauche
@@ -108,7 +90,7 @@ public class Road {
                     this.adjacentRoads.add(t[x+1][y-1].roads.get(0));
                 }
             }
-            else { // //reste ligne haut
+            else { //reste ligne haut
                 if(t[x][y].roads.get(0)==this){
                     this.adjacentRoads.add(t[x][y].roads.get(1));
                     this.adjacentRoads.add(t[x][y].roads.get(3));
@@ -238,6 +220,7 @@ public class Road {
         }
     }
 
+    // fonction vérifiant si une route peut-être construite à cet endroit
     public boolean isBuildable(Player player){
         if(isOwned()){
             return false;
@@ -251,6 +234,7 @@ public class Road {
         return false;
     }
 
+    // fonction vérifiant si une route peut-être construite à cet endroit lors de l'initialisation
     public boolean isBuildableInitialization(Colony linkedColony){
         for(Colony colony:adjacentColonies){
             if(colony==linkedColony) return true;

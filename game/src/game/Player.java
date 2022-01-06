@@ -18,7 +18,6 @@ public abstract class Player{
     protected int victoryPoint=0;
     protected int knightPlayed=0;
     public boolean alreadyPlayedCardThisTurn=false;
-    public boolean longestRoad;
 
     // constructeur qui initialise
     public Player(String color){
@@ -31,8 +30,10 @@ public abstract class Player{
         }
         setColor(color);
     }
+
     public abstract boolean isBot();
 
+// setter, getter, toString ->
     public int getKnightPlayed() {
         return knightPlayed;
     }
@@ -47,60 +48,20 @@ public abstract class Player{
         return res;
     }
 
-    // fonction qui incrémente les points de victoire d'un joueur en fonction de l'entier en argument
-    public void addVictoryPoint(int point){
-        this.victoryPoint+=point;
-    }
-
-    // fonction qui incrémente le compteur de construction de joueur en fonction du type de construction en argument
-    public void addPropertie(String propertie){
-        this.propertiesCounter.merge(propertie,1,Integer::sum);
-    }
-
-    // fonction qui diminue le compteur de colonie du joueur
-    public void removeColonyInCounter(){
-        this.propertiesCounter.merge("Colony",1,(a,b)->a-b);
-    }
-
-    // fonction qui vérifie si le joueur n'a pas dépassé la quantité maximum possible
-    public boolean canBuildPropertie(String propertie,int maxQuantity){
-        if(propertiesCounter.get(propertie)<maxQuantity){
-            return true;
-        }
-        return false;
-    }
-
-    public void addPort(Port port){
-        if(!this.ports.contains(port)){
-            this.ports.add(port);
-        }
-    }
-
-    public int resourceCount() {
-        int compt=0;
-        for(Map.Entry<String,Integer> entry : resources.entrySet()){
-            if(entry.getKey().equals("Clay") || entry.getKey().equals("Wool") || entry.getKey().equals("Wheat") || entry.getKey().equals("Ore") || entry.getKey().equals("Wood")){
-                compt+=entry.getValue();
-            }
-        }
-        return compt;
-    }
-
-    public boolean hasWin(){
-        if(this.victoryPoint>=10) return true;
-        return false;
-    }
-
-    public void removeCard(Card card) {
-        this.cards.merge(card, 1, (initialValue, decreasedValue) -> initialValue-decreasedValue);
-    }
-
-    public void addCard(Card card){
-        this.cards.merge(card,1,Integer::sum);
-    }
-
     public Color getColor() {
         return color;
+    }
+
+    public int getVictoryPoint() {
+        return victoryPoint;
+    }
+
+    public HashMap<String, Integer> getResources(){
+        return resources;
+    }
+
+    public LinkedList<Port> getPorts(){
+        return ports;
     }
 
     public void setColor(String color){
@@ -112,10 +73,6 @@ public abstract class Player{
                 case "yellow" ->this.color=new Color(0xEEEE00);
             }
         }
-    }
-
-    public int getVictoryPoint() {
-        return victoryPoint;
     }
 
     public String getCardsToString() {
@@ -145,10 +102,66 @@ public abstract class Player{
         };
     }
 
-    public LinkedList<Port> getPorts(){
-        return ports;
+//fin setter, getter, toString
+
+    // fonction qui incrémente les points de victoire d'un joueur en fonction de l'entier en argument
+    public void addVictoryPoint(int point){
+        this.victoryPoint+=point;
     }
 
+    // fonction qui incrémente le compteur de construction de joueur en fonction du type de construction en argument
+    public void addPropertie(String propertie){
+        this.propertiesCounter.merge(propertie,1,Integer::sum);
+    }
+
+    // fonction qui diminue le compteur de colonie du joueur
+    public void removeColonyInCounter(){
+        this.propertiesCounter.merge("Colony",1,(a,b)->a-b);
+    }
+
+    // fonction qui vérifie si le joueur n'a pas dépassé la quantité maximum possible
+    public boolean canBuildPropertie(String propertie,int maxQuantity){
+        if(propertiesCounter.get(propertie)<maxQuantity){
+            return true;
+        }
+        return false;
+    }
+
+    // fonction qui ajoute un port dans les ports du joueur
+    public void addPort(Port port){
+        if(!this.ports.contains(port)){
+            this.ports.add(port);
+        }
+    }
+
+    // fonction qui renvoie la quantité de ressources du joueur
+    public int resourceCount() {
+        int compt=0;
+        for(Map.Entry<String,Integer> entry : resources.entrySet()){
+            if(entry.getKey().equals("Clay") || entry.getKey().equals("Wool") || entry.getKey().equals("Wheat") || entry.getKey().equals("Ore") || entry.getKey().equals("Wood")){
+                compt+=entry.getValue();
+            }
+        }
+        return compt;
+    }
+
+    // fonction qui vérifie si le joueur a 10 VP
+    public boolean hasWin(){
+        if(this.victoryPoint>=10) return true;
+        return false;
+    }
+
+    // fonction qui supprime une carte dans la hashmap correspondante
+    public void removeCard(Card card) {
+        this.cards.merge(card, 1, (initialValue, decreasedValue) -> initialValue-decreasedValue);
+    }
+
+    // fonction qui ajoute une carte dans la hashmap correspondante
+    public void addCard(Card card){
+        this.cards.merge(card,1,Integer::sum);
+    }
+
+    // fonction qui vérifie si le joueur a les ressources en argument
     public boolean hasResources(String[] resources){
         int clayCount=0,oreCount=0,wheatCount=0,woodCount=0,woolCount=0;
         for(String resource:resources){
@@ -182,18 +195,6 @@ public abstract class Player{
         return true;
     }
 
-    public boolean hasCard(){
-        for(Map.Entry<Card, Integer> entry : this.cards.entrySet()){ // pour toutes les cartes du joueur
-            System.out.println(entry.getKey() + " : " + entry.getValue() + " card draw this turn : " + this.cardsDrawnThisTurn.getOrDefault(entry.getKey(), 0));
-            if(entry.getValue()>this.cardsDrawnThisTurn.getOrDefault(entry.getKey(), 0)) {
-                System.out.println("je return true");
-                // si le nombre de cartes de ce type dans la main du joueur > nombre de cartes de ce type dans les cartes achetées a ce tour
-                return true;
-            }
-        }
-        return false;
-    }
-
     // TODO à enlever utile pour les test
     public void setMaxResources(){
         for(String resource:resources.keySet()){
@@ -201,10 +202,16 @@ public abstract class Player{
         }
     }
 
-    public HashMap<String, Integer> getResources(){
-        return resources;
+    // fonction qui vérifie si le joueur a une carte(quelconque) à jouer.
+    public boolean hasCard(){
+        for(Map.Entry<Card, Integer> entry : this.cards.entrySet()){ // pour toutes les cartes du joueur
+            if(entry.getValue()>this.cardsDrawnThisTurn.getOrDefault(entry.getKey(), 0)) {
+                // si le nombre de cartes de ce type dans la main du joueur > nombre de cartes de ce type dans les cartes achetées a ce tour
+                return true;
+            }
+        }
+        return false;
     }
-
 
     public void cardsDrawnThisTurnReset() {
         this.cardsDrawnThisTurn.clear();

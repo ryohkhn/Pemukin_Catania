@@ -93,8 +93,10 @@ public class Controller{
                                 } else {
                                     game.useCardVP(player);
                                 }
+                            }else {
+                                cli.message(player, "error", "card", 1);
                             }
-                        } else {
+                        }else {
                             cli.message(player, "error", "card", 1);
                         }
                     }

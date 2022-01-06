@@ -58,7 +58,7 @@ public class Game {
         return false;
     }
 
-    // fonction qui vérife si le joueur a les ressources nécessaires pour construire une route
+    // fonction qui vérifie si le joueur a les ressources nécessaires pour construire une route
     public boolean hasResourcesForRoad(Player player){
        int clayStock=player.resources.get("Clay");
        int woodStock=player.resources.get("Wood");
@@ -112,7 +112,7 @@ public class Game {
         return false;
     }
 
-    // fonction qui vérife si le joueur a les ressources nécessaires pour construire une colonie
+    // fonction qui vérifie si le joueur a les ressources nécessaires pour construire une colonie
     public boolean hasResourcesForColony(Player player){
         int clayStock=player.resources.get("Clay");
         int wheatStock=player.resources.get("Wheat");
@@ -151,7 +151,7 @@ public class Game {
         return false;
     }
 
-    // fonction qui vérife si le joueur a les ressources nécessaires pour construire une ville
+    // fonction qui vérifie si le joueur a les ressources nécessaires pour construire une ville
     public boolean hasResourcesForCity(Player player){
         int oreStock=player.resources.get("Ore");
         int wheatStock=player.resources.get("Wheat");
@@ -193,10 +193,12 @@ public class Game {
         vue.displayDiceProduction(diceResultsProduction);
     }
 
-    public void destroy(Player p, String resource) {
-        p.resources.merge(resource, 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
+    // fonction détruisant une ressource (en argument) pour le joueur (en argument)
+    public void destroy(Player player, String resource) {
+        player.resources.merge(resource, 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
     }
 
+    // fonction qui déplace le voleur aux coordonnées en argument
     public void setThief(int[] placement) {
         int line=placement[0];
         int column=placement[1];
@@ -206,6 +208,7 @@ public class Game {
         chosenTile.setThief(true);
     }
 
+    // fonction qui vérifie si le joueur a les ressources nécessaires pour acheter une carte
     public boolean hasResourcesForCard(Player player){
         int oreStock=player.resources.get("Ore");
         int woolStock=player.resources.get("Wool");
@@ -217,24 +220,27 @@ public class Game {
         return false;
     }
 
-    // TODO une carte achetée dans le round ne peut pas être jouée directement fait dans cli a faire dans gui
-    // TODO: 05/01/2022 tester dans cli et dans gui.
+    // TODO: 06/01/2022 verfier dans cli qu'on ne peut pas les jouer dans le même tour
     // fonction permettant d'acheter une carte de développement
     public void buyCard(Player player) {
+        // On supprime les ressources nécessaires à l'achat d'une carte
         player.resources.merge("Ore", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
         player.resources.merge("Wool", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
         player.resources.merge("Wheat", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
         Card randomCard=Card.randomCard();
         vue.displayDrawnCard(player,randomCard);
-        player.cardsDrawnThisTurn.merge(randomCard, 1, Integer::sum);
-        player.cards.merge(randomCard, 1, Integer::sum);
+        if(!randomCard.name().equals("VictoryPoint")) { //si la carte n'est pas une carte VP,
+            player.cardsDrawnThisTurn.merge(randomCard, 1, Integer::sum); // on l'ajoute à la hashmap de stockage des cartes achetées dans le tour.
+        }
+        player.cards.merge(randomCard, 1, Integer::sum); //on ajoute la carte à la hashmap de stockage des cartes du joueur.
     }
 
-    public boolean hasChosenCard(Player p, Card chosenCard){
-        if(p.cards.get(chosenCard)>p.cardsDrawnThisTurn.getOrDefault(chosenCard,0)){
+    // fonction qui vérifie que le joueur (en argument) a la carte (en argument)
+    public boolean hasChosenCard(Player player, Card chosenCard){
+        if(player.cards.get(chosenCard)>player.cardsDrawnThisTurn.getOrDefault(chosenCard,0)){
             return true;
         }
-        vue.message(p, "error", "card", 1);
+        vue.message(player, "error", "card", 1);
         return false;
     }
 
@@ -245,10 +251,12 @@ public class Game {
         turnPlayer.alreadyPlayedCardThisTurn=true;
     }
 
-    public boolean isRoadBuildable(int[] placement,Player p){
-        return this.board.getTiles()[placement[0]][placement[1]].getRoads().get(placement[2]).isBuildable(p);
+    // fonction qui vérifie qu'une route est constructible
+    public boolean isRoadBuildable(int[] placement,Player player){
+        return this.board.getTiles()[placement[0]][placement[1]].getRoads().get(placement[2]).isBuildable(player);
     }
 
+    // fonction permettant d'utiliser une carte Chevalier
     public void useCardKnight(Player turnPlayer,int[] placement) {
         turnPlayer.knightPlayed+=1;
         this.setThief(placement);
@@ -256,6 +264,7 @@ public class Game {
         turnPlayer.alreadyPlayedCardThisTurn=true;
     }
 
+    // fonction permettant d'utiliser une carte Invention
     public void useCardProgressYearOfPlenty(Player turnPlayer, String[] resources) {
         turnPlayer.resources.merge(resources[0], 1, Integer::sum);
         turnPlayer.resources.merge(resources[1], 1, Integer::sum);
@@ -264,6 +273,7 @@ public class Game {
         turnPlayer.alreadyPlayedCardThisTurn=true;
     }
 
+    // fonction permettant d'utiliser une carte Construction de routes et de construire la 1ere route
     public void useCardProgressRoadBuilding(Player turnPlayer, int[] placement) {
         turnPlayer.resources.merge("Clay", 2, Integer::sum);
         turnPlayer.resources.merge("Wood", 2, Integer::sum);
@@ -272,10 +282,11 @@ public class Game {
         turnPlayer.alreadyPlayedCardThisTurn=true;
     }
 
+    // fonction permettant de construire la 2ᵉ route d'une carte Construction de routes.
     public void useCardProgressRoadBuildingSecondRound(Player turnPlayer, int[] placement){
         buildRoad(turnPlayer, placement);
     }
-
+    // fonction permettant d'utiliser une carte Monopole
     public void useCardProgressMonopoly(Player turnPlayer, String[] resource) {
         for(Player player : players) {
             if(player.resources.get(resource[0])>0 && player!=turnPlayer) {
@@ -289,16 +300,16 @@ public class Game {
         turnPlayer.alreadyPlayedCardThisTurn=true;
     }
 
-    // fonction qui permet de faire une échange avec un le port si le joueur en possède un
+    // fonction qui permet de faire un échange avec un le port si le joueur en possède un
     public void trade(Player player, Port chosenPort, String portResource, String[] playerResource) {
-        if(chosenPort==null) {
+        if(chosenPort==null) { // échange en 4:1
             if(player.resources.get(portResource)>=4) {
                 player.resources.merge(portResource, 4, (initialValue, valueRemoved) -> initialValue-valueRemoved);
                 player.resources.merge(playerResource[0], 1, Integer::sum);
             } else {
                 vue.message(player, "error", "trade", 0);
             }
-        } else if(chosenPort.getRate()==2) {
+        } else if(chosenPort.getRate()==2) { // cas où le port échange en 2:1
             if(player.resources.get(playerResource[0])>=2) {
                 if(chosenPort.getRessource().equals(portResource)) {
                     player.resources.merge(portResource, 2, (initialValue, valueRemoved) -> initialValue-valueRemoved);
@@ -309,7 +320,7 @@ public class Game {
             } else {
                 vue.message(player, "error", "trade", 0);
             }
-        } else { //cas ou le port echange en 3:1
+        } else { // cas où le port échange en 3:1
             if(player.resources.get(portResource)>=3) {
                 player.resources.merge(portResource, 3, (initialValue, valueRemoved) -> initialValue-valueRemoved);
                 player.resources.merge(playerResource[0], 1, Integer::sum);
@@ -319,6 +330,7 @@ public class Game {
         }
     }
 
+    // fonction construisant une colonie lors de l'initialisation
     public Colony buildColonyInitialization(Player player, int[] placement) {
         int line=placement[0];
         int column=placement[1];
@@ -328,7 +340,7 @@ public class Game {
             vue.message(player, "error", "colony", 0);
             return null;
         }
-        if(chosenColony.isBuildableInitialization(player)) {
+        if(chosenColony.isBuildableInitialization()) {
             if(chosenColony.isPort()) {
                 player.addPort(chosenColony.getLinkedPort());
             }
@@ -343,7 +355,7 @@ public class Game {
         return null;
     }
 
-    // fonction construisant une route pour un joueur
+    // fonction construisant une route lors de l'initialisation
     public boolean buildRoadInitialization(Player player, Colony colony, int[] placement) {
         int line=placement[0];
         int column=placement[1];
@@ -394,6 +406,7 @@ public class Game {
         });
     }
 
+    // fonction vérifiant quel joueur a la plus grande armée (et la carte qui va avec)
     public void checkLongestArmy() {
         boolean cardOwned=false;
         int knightPlayedCount=0;
@@ -434,6 +447,7 @@ public class Game {
         }
     }
 
+    // fonction qui défini si le joueur est humain ou une IA
     public void setPlayers(String[] playersType) {
         for(int i=0; i<this.players.length; i++) {
             switch(playersType[i]) {
@@ -443,13 +457,15 @@ public class Game {
         }
     }
 
+    // fonction qui défini la couleur des joueurs
     public void setColors(String[] playersColor) {
         for(int i=0; i<this.players.length; i++) {
             this.players[i].setColor(playersColor[i]);
         }
     }
 
-    public void steal(Player p, Player playerOfColony) {
+    // fonction qui permet le vol d'une ressource d'un joueur a un autre joueur lors du 7 aux dés
+    public void steal(Player player, Player playerOfColony) {
         String resource;
         if(playerOfColony.resourceCount()>0) {
             do {
@@ -457,13 +473,14 @@ public class Game {
             }
             while(playerOfColony.resources.get(resource)==0);
             playerOfColony.resources.merge(resource, 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
-            p.resources.merge(resource, 1, Integer::sum);
-            vue.displayStolenResource(p,resource,playerOfColony,1);
+            player.resources.merge(resource, 1, Integer::sum);
+            vue.displayStolenResource(player,resource,playerOfColony,1);
         }else{
-            vue.message(p,"error","trade", 2);
+            vue.message(player,"error","trade", 2);
         }
     }
 
+    // fonction qui return la seconde colonie du joueur
     public Colony getColonyFromPlayer(Player player){
         for(Colony colony:secondRoundBuildedColonies.keySet()){
             if(secondRoundBuildedColonies.get(colony)==player){
@@ -473,11 +490,13 @@ public class Game {
         return null;
     }
 
+    // fonction simulant le lancé des deux dés
     public int generateDiceNumber(){
         Random rand=new Random();
         return(rand.nextInt(6)+1+rand.nextInt(6)+1);
     }
 
+    // fonction qui supprime uen quantité d'une ressource d'un joueur
     public void removeResourcesFromPlayer(Player player,int[] quantity){
         LinkedList<String> resources=Board.generateListResource();
         for(int i=0; i<resources.size(); i++){

@@ -18,6 +18,7 @@ public class Tile{
             thief=true;
         }
     }
+// getter,setter ->
 
     public boolean isPort() {
         return port!=null;
@@ -38,6 +39,7 @@ public class Tile{
     public void setThief(boolean thief){
         this.thief=thief;
     }
+
     public boolean isThief(){
         return thief;
     }

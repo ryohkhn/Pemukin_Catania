@@ -17,6 +17,11 @@ public class Board{
         addPorts();
     }
 
+// getter, setter
+    public Tile[][] getTiles() {
+        return tiles;
+    }
+
     public Tile getThiefTile(){
         return thiefTile;
     }
@@ -24,6 +29,7 @@ public class Board{
     public void setThiefTile(Tile thiefTile){
         this.thiefTile=thiefTile;
     }
+// fin getter, setter
 
     // ajoute les Road et Colony adjacentes pour les Colony et les Road de toutes les cases du plateau
     public void addAdjacentRoadAndColony(){
@@ -40,10 +46,6 @@ public class Board{
                 }
             }
         }
-    }
-
-    public Tile[][] getTiles() {
-        return tiles;
     }
 
     // fonction qui crée chaque case et remplit le tableau tiles avec son identifiant respectif ainsi que la ressource attribuée
@@ -94,7 +96,7 @@ public class Board{
     }
 
     // fonction qui vérifie dans le hashmap d'entier les valeurs des cases et si on a atteint la limite pour cette valeur (nombre d'apparitions sur le plateau)
-    // si oui on return false, sinon on incrémente la valeur et on return true
+    // si oui elle retourne false, sinon elle incrémente la valeur et elle retourne true
     private boolean generateTileId(int key,HashMap<Integer,Integer> tilesId){
         switch(key){
             case 2,3,4,11,12 ->{

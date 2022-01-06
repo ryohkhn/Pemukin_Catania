@@ -1,9 +1,12 @@
 package game;
 
 public class Human extends Player{
+
     public Human(String color){
         super(color);
     }
+
+// getter
 
     @Override
     public boolean isBot() {

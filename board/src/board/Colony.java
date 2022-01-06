@@ -16,7 +16,7 @@ public class Colony{
         this.player=null;
         this.linkedPort=null;
     }
-
+//getter, setter
     public boolean isCity(){
         return this.city;
     }
@@ -46,9 +46,14 @@ public class Colony{
         return this.linkedPort!=null;
     }
 
+    public void setLinkedPort(Port linkedPort){
+        this.linkedPort=linkedPort;
+    }
+
     public Port getLinkedPort(){
         return this.linkedPort;
     }
+// fin getter, setter
 
     // fonction permettant d'ajouter à chaque colonie ses colonies adjacentes et les routes adjacentes à la colonie
     public void addAdjacentColonyAndRoad(Tile[][] t,int x,int y){
@@ -81,10 +86,6 @@ public class Colony{
         }
     }
 
-    public void setLinkedPort(Port linkedPort){
-        this.linkedPort=linkedPort;
-    }
-
     // fonction vérifiant si une colonie peut-être construite à cet endroit
     public boolean isBuildable(Player player){
         for(Colony colony:adjacentColonies){
@@ -100,7 +101,8 @@ public class Colony{
         return false;
     }
 
-    public boolean isBuildableInitialization(Player player){
+    // fonction vérifiant si une colonie peut-être construite à cet endroit lors de l'initialisation
+    public boolean isBuildableInitialization(){
         for(Colony colony:adjacentColonies){
             if(colony.isOwned()){
                 return false;

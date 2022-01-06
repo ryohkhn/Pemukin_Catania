@@ -13,15 +13,13 @@ public class Launcher {
     private Vues vue;
 
     public static void main(String[] args){
-
         Launcher launcher=new Launcher();
-        Gui gui=new Gui(launcher);
-        launcher.vue=gui.getGuiSideBar();
         System.out.println("If you want to play on GUI, type 1.\nElse you'll play on console.");
         Scanner sc2=new Scanner(System.in);
         String input=sc2.nextLine();
         if(input.equals("1")){
-            //Gui gui=new Gui(launcher);
+            Gui gui=new Gui(launcher);
+            launcher.vue=gui.getGuiSideBar();
         }else{
             Cli cli=new Cli(launcher);
             launcher.vue=cli;
