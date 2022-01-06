@@ -1,5 +1,6 @@
 package board;
 
+import game.Bot;
 import game.Player;
 
 import java.util.HashSet;

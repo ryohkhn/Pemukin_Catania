@@ -38,12 +38,16 @@ public class Launcher {
         while(!hasWon){
             if(game!=null){
                 for(Player p : game.getPlayers()){
+                    if(!p.isBot()) {
+                        vue.displayBoard(game);
+                        vue.displayPlayer(p);
+                    }
                     int diceNumber=game.generateDiceNumber();
                     vue.displayDiceNumber(diceNumber);
                     if(diceNumber==7) this.seven(p, vue);
                     game.diceProduction(diceNumber);
-                    if(!p.isBot()) vue.getAction(p);
-                    else ((Bot)p).getAction(game);
+                    if(!p.isBot())vue.getAction(p);
+                    else((Bot)p).getAction(game);
                     game.checkLongestArmy();
                     if(p.hasWin()){
                         vue.victory(p);
@@ -54,23 +58,23 @@ public class Launcher {
         }
     }
 
-    private void seven(Player p,Vues vue) {
-        for(Player player: game.getPlayers()) {
-            int quantity=player.resourceCount()/2;
+    private void seven(Player player,Vues vue) {
+        for(Player playerDestroying: game.getPlayers()) {
+            int quantity=playerDestroying.resourceCount()/2;
             if(quantity>7) {
-                if(!p.isBot()) {
-                    vue.sevenAtDice(player, quantity);
+                if(!playerDestroying.isBot()) {
+                    vue.sevenAtDice(playerDestroying, quantity);
                 }else{
-                    ((Bot)p).seventAtDice(quantity,game);
+                    ((Bot)playerDestroying).sevenAtDice(quantity,game);
                 }
             }
         }
-        if(!p.isBot()){
+        if(!player.isBot()){
             vue.setThief();
-            vue.steal(p,game.getBoard().getThiefTile());
+            vue.steal(player,game.getBoard().getThiefTile());
         }else{
-            ((Bot)p).setThief(game);
-            ((Bot)p).steal(game.getBoard().getThiefTile(),game);
+            ((Bot)player).setThief(game);
+            ((Bot)player).steal(game.getBoard().getThiefTile(),game);
         }
 
     }

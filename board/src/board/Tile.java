@@ -46,16 +46,10 @@ public class Tile{
         return thief;
     }
 
-    @Override
-    public String toString() { // TODO supprimer quand plus nécessaire
-        return "Tile{"+
-                "id="+id+
-                '}';
-    }
-
-    public LinkedList<Road> getRoads() { //todo supprimer quand plus tile : sert a tester les fonctions
+    public LinkedList<Road> getRoads() {
         return roads;
     }
+
     public LinkedList<Colony> getColonies(){
         return colonies;
     }

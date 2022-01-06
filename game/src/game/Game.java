@@ -217,7 +217,8 @@ public class Game {
         return false;
     }
 
-    // TODO une carte achetée dans le round ne peut pas être jouée directement
+    // TODO une carte achetée dans le round ne peut pas être jouée directement fait dans cli a faire dans gui
+    // TODO: 05/01/2022 tester dans cli et dans gui.
     // fonction permettant d'acheter une carte de développement
     public void buyCard(Player player) {
         player.resources.merge("Ore", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
@@ -225,6 +226,7 @@ public class Game {
         player.resources.merge("Wheat", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
         Card randomCard=Card.randomCard();
         vue.displayDrawnCard(player,randomCard);
+        player.cardsDrawnThisTurn.merge(randomCard, 1, Integer::sum);
         player.cards.merge(randomCard, 1, Integer::sum);
     }
 
@@ -457,6 +459,8 @@ public class Game {
             playerOfColony.resources.merge(resource, 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
             p.resources.merge(resource, 1, Integer::sum);
             vue.displayStolenResource(p,resource,playerOfColony,1);
+        }else{
+            vue.message(p,"error","trade", 2);
         }
     }
 

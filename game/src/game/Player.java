@@ -47,10 +47,6 @@ public abstract class Player{
         return res;
     }
 
-    public HashMap<Card, Integer> getCards(){
-        return cards;
-    }
-
     // fonction qui incrémente les points de victoire d'un joueur en fonction de l'entier en argument
     public void addVictoryPoint(int point){
         this.victoryPoint+=point;
@@ -82,8 +78,10 @@ public abstract class Player{
 
     public int resourceCount() {
         int compt=0;
-        for(int value : resources.values()) {
-            compt+=value;
+        for(Map.Entry<String,Integer> entry : resources.entrySet()){
+            if(entry.getKey().equals("Clay") || entry.getKey().equals("Wool") || entry.getKey().equals("Wheat") || entry.getKey().equals("Ore") || entry.getKey().equals("Wood")){
+                compt+=entry.getValue();
+            }
         }
         return compt;
     }
@@ -186,7 +184,9 @@ public abstract class Player{
 
     public boolean hasCard(){
         for(Map.Entry<Card, Integer> entry : this.cards.entrySet()){ // pour toutes les cartes du joueur
-            if(entry.getValue()>this.cardsDrawnThisTurn.get(entry.getKey())){
+            System.out.println(entry.getKey() + " : " + entry.getValue() + " card draw this turn : " + this.cardsDrawnThisTurn.getOrDefault(entry.getKey(), 0));
+            if(entry.getValue()>this.cardsDrawnThisTurn.getOrDefault(entry.getKey(), 0)) {
+                System.out.println("je return true");
                 // si le nombre de cartes de ce type dans la main du joueur > nombre de cartes de ce type dans les cartes achetées a ce tour
                 return true;
             }
@@ -203,5 +203,13 @@ public abstract class Player{
 
     public HashMap<String, Integer> getResources(){
         return resources;
+    }
+
+
+    public void cardsDrawnThisTurnReset() {
+        this.cardsDrawnThisTurn.clear();
+        for(Card card : Card.values()){
+            cardsDrawnThisTurn.put(card,0);
+        }
     }
 }

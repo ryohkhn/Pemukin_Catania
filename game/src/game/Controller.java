@@ -25,94 +25,108 @@ public class Controller{
         }
     }
 
-    public void getAction(Player p) {
+    public void getAction(Player player) {
         scanner=new Scanner(System.in);
-        switch(scanner.nextInt()) {
-            case 0 -> {
-                cli.displayBoard(this.game);
-                cli.getAction(p);
-            }
-            case 1 -> {
-                game.trade(p, this.portSelection(p), this.getPortResource(), this.chooseResource(1));
-                cli.getAction(p);
-            }
-            case 2 -> {
-                game.buildColony(p, this.getCityPlacement());
-                cli.getAction(p);
-            }
-            case 3 -> {
-                game.buildCity(p, this.getCityPlacement());
-                cli.getAction(p);
-            }
-            case 4 -> {
-                game.buildRoad(p, this.getRoadPlacement());
-                cli.getAction(p);
-            }
-            case 5 -> {
-                game.buyCard(p);
-                cli.getAction(p);
-            }
-            case 6 -> {
-                if(p.alreadyPlayedCardThisTurn) {
-                    cli.message(p,"error", "card", 3);
-                } else {
-                    String card=this.chooseCard();
-                    Card chosenCard=Card.valueOf(card);
-                    if(p.hasCard()) {
-                        if(game.hasChosenCard(p, chosenCard)) {
-                            if(card.equals("ProgressYearOfPlenty")) {
-                                game.useCardProgressYearOfPlenty(p, this.chooseResource(2));
-                            } else if(card.equals("ProgressMonopoly")) {
-                                game.useCardProgressMonopoly(p, this.chooseResource(1));
-                            } else if(card.equals("ProgressRoadBuilding")) {
-                                int[] placement;
-                                boolean verify;
-                                do {
-                                    placement=this.getRoadPlacement();
-                                    verify=game.isRoadBuildable(placement, p);
-                                } while(!verify);
-                                game.useCardProgressRoadBuilding(p, placement);
-                                verify=false;
-                                do {
-                                    placement=this.getRoadPlacement();
-                                    verify=game.isRoadBuildable(placement, p);
-                                } while(!verify);
-                                game.useCardProgressRoadBuildingSecondRound(p, placement);
-                            } else if(card.equals("Knight")) {
-                                game.useCardKnight(p, this.getThiefPlacement());
-                                cli.steal(p, this.game.getBoard().getThiefTile());
-                            } else {
-                                game.useCardVP(p);
-                            }
-                        }
-                    }else{
-                        cli.message(p,"error", "card", 1);
-                    }
+        try{
+            switch(scanner.nextInt()) {
+                case 0 -> {
+                    cli.displayBoard(this.game);
+                    cli.getAction(player);
                 }
-                cli.getAction(p);
+                case 1 -> {
+                    game.trade(player, this.portSelection(player), this.getPortResource(), this.chooseResource(1));
+                    cli.getAction(player);
+                }
+                case 2 -> {
+                    if(game.hasResourcesForColony(player)) {
+                        game.buildColony(player, this.getCityPlacement());
+                    }
+                    cli.getAction(player);
+                }
+                case 3 -> {
+                    if(game.hasResourcesForCity(player)) {
+                        game.buildCity(player, this.getCityPlacement());
+                    }
+                    cli.getAction(player);
+                }
+                case 4 -> {
+                    if(game.hasResourcesForRoad(player)) {
+                        game.buildRoad(player, this.getRoadPlacement());
+                    }
+                    cli.getAction(player);
+                }
+                case 5 -> {
+                    if(game.hasResourcesForCard(player)) {
+                        game.buyCard(player);
+                    }
+                    cli.getAction(player);
+                }
+                case 6 -> {
+                    if(player.alreadyPlayedCardThisTurn) {
+                        cli.message(player, "error", "card", 3);
+                    } else {
+                        String card=this.chooseCard();
+                        Card chosenCard=Card.valueOf(card);
+                        if(player.hasCard()) {
+                            if(game.hasChosenCard(player, chosenCard)) {
+                                if(card.equals("ProgressYearOfPlenty")) {
+                                    game.useCardProgressYearOfPlenty(player, this.chooseResource(2));
+                                } else if(card.equals("ProgressMonopoly")) {
+                                    game.useCardProgressMonopoly(player, this.chooseResource(1));
+                                } else if(card.equals("ProgressRoadBuilding")) {
+                                    int[] placement;
+                                    boolean verify;
+                                    do {
+                                        placement=this.getRoadPlacement();
+                                        verify=game.isRoadBuildable(placement, player);
+                                    } while(!verify);
+                                    game.useCardProgressRoadBuilding(player, placement);
+                                    verify=false;
+                                    do {
+                                        placement=this.getRoadPlacement();
+                                        verify=game.isRoadBuildable(placement, player);
+                                    } while(!verify);
+                                    game.useCardProgressRoadBuildingSecondRound(player, placement);
+                                } else if(card.equals("Knight")) {
+                                    game.useCardKnight(player, this.getThiefPlacement());
+                                    cli.steal(player, this.game.getBoard().getThiefTile());
+                                } else {
+                                    game.useCardVP(player);
+                                }
+                            }
+                        } else {
+                            cli.message(player, "error", "card", 1);
+                        }
+                    }
+                    cli.getAction(player);
 
-            }
-            case 7 -> {
-                cli.displayPlayer(p);
-                cli.getAction(p);
+                }
+                case 7 -> {
+                    cli.displayPlayer(player);
+                    cli.getAction(player);
 
+                }
+                case 8 -> {
+                    cli.showBuildCost();
+                    cli.getAction(player);
+                }
+                case 9 -> {
+                    cli.displayOtherPlayers(player, game);
+                    cli.getAction(player);
+                }
+                case 10 -> { // end the turn
+                    player.cardsDrawnThisTurnReset();
+                    player.alreadyPlayedCardThisTurn=false;
+                }
+                default -> {
+                    System.out.println("Please enter an Integer between 0-10");
+                    cli.getAction(player);
+                }
             }
-            case 8 -> {
-                cli.showBuildCost();
-                cli.getAction(p);
-            }
-            case 9 -> {
-                cli.displayOtherPlayers(p, game);
-                cli.getAction(p);
-            }
-            case 10 -> { // end the turn
-                p.cardsDrawnThisTurn.clear();
-                p.alreadyPlayedCardThisTurn=false;
-            }
-            default -> {
-                System.out.println("Please enter an Integer between 0-10");
-                cli.getAction(p);
-            }
+
+        }catch (InputMismatchException e) {
+            System.out.println("Please enter an Integer between 0-10");
+            cli.getAction(player);
         }
     }
 
@@ -327,15 +341,16 @@ public class Controller{
         scanner=new Scanner(System.in);
         String resourceInput=scanner.next();
         if(!resourceInput.equals("Clay") && !resourceInput.equals("Ore") && !resourceInput.equals("Wheat") && !resourceInput.equals("Wood") && !resourceInput.equals("Wool")){
-            System.out.println(p.color +"---> Choose a resource you want to destroy among \"Clay, Ore, Wheat, Wood, Wool.\" ");
+            System.out.println(p +" Choose a resource you want to destroy among \"Clay, Ore, Wheat, Wood, Wool.\" ");
             destroy(p);
-        }
-        String[] res= new String[1];
-        res[0]=resourceInput;
-        if(p.hasResources(res)) game.destroy(p,resourceInput);
-        else {
-            System.out.println("You don't have this resource anymore.");
-            destroy(p);
+        }else {
+            String[] res=new String[1];
+            res[0]=resourceInput;
+            if(p.hasResources(res)) game.destroy(p, resourceInput);
+            else {
+                System.out.println("You don't have this resource anymore.");
+                destroy(p);
+            }
         }
     }
 
@@ -387,7 +402,7 @@ public class Controller{
         game.steal(p,playerOfColony);
     }
 
-    public Player choosePlayerFromColonies(ArrayList<Colony> ownedColonies, Player p) {
+    public Player choosePlayerFromColonies(ArrayList<Colony> ownedColonies) {
         scanner=new Scanner(System.in);
         try{
             int i= scanner.nextInt();
@@ -396,9 +411,8 @@ public class Controller{
             }
             return ownedColonies.get(i).getPlayer();
         }catch (InputMismatchException e) {
-            int x= ownedColonies.size()-1;
-            System.out.println("choose a number between 1 and " + x);
-            return choosePlayerFromColonies(ownedColonies,p);
+            System.out.println("choose a number between 0 and " + (ownedColonies.size()-1));
+            return choosePlayerFromColonies(ownedColonies);
         }
     }
 }

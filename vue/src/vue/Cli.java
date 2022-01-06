@@ -123,7 +123,7 @@ public class Cli implements Vues{
             System.out.print("- ");
             System.out.print(t.getColonies().get(2).isCity()?"C ":"c ");
         }
-        System.out.println("\n    e       f\n");
+        System.out.println("\n    f       e\n");
         System.out.println("On this 2nd table, the elements have been replaced by their owner when they have one.\n");
         System.out.println("        a       b");
         for(int i=0;i<4;i++){
@@ -209,15 +209,13 @@ public class Cli implements Vues{
     }
 
     @Override
-    public void getAction(Player p) {
-        this.displayPlayer(p);
-        this.displayBoard(launcher.getGame());
-        System.out.println("\nPlease select an action : \n 0 - show board \n 1 - exchange ressources with bank"+
+    public void getAction(Player player) {
+        System.out.println("\nPlease select an action " + player +": \n 0 - show board \n 1 - exchange ressources with bank"+
                 " \n 2 - build a new colony\n"+" 3 - upgrade a colony into a city\n"+
                 " 4 - build a road\n"+" 5 - buy development cards\n"+
                 " 6 - play a development card\n"+" 7 - display player information\n"+" 8 - show building costs\n"+
                 " 9 - show others players informations\n"+" 10 - end the round\n");
-        controller.getAction(p);
+        controller.getAction(player);
     }
 
     @Override
@@ -330,10 +328,10 @@ public class Cli implements Vues{
             if(ownedColonies.size()>1){
                 System.out.println("Choose a player to steal the resource from.");
                 for(int i=0; i<ownedColonies.size(); i++) {
-                    System.out.println(i+1+" "+ownedColonies.get(i).getPlayer());
+                    System.out.println(i+" "+ownedColonies.get(i).getPlayer());
                 }
-                System.out.println("choose a number between 1 and "+ownedColonies.size());
-                playerOfColony=controller.choosePlayerFromColonies(ownedColonies, p);
+                System.out.println("choose a number between 0 and "+ (ownedColonies.size()-1));
+                playerOfColony=controller.choosePlayerFromColonies(ownedColonies);
             }
             else{
                 playerOfColony=ownedColonies.get(0).getPlayer();
@@ -364,7 +362,7 @@ public class Cli implements Vues{
 
     @Override
     public void victory(Player p) {
-        System.out.println(p.toString() + "has won the game!");
+        System.out.println(p.toString() + " has won the game!");
         System.exit(0);
     }
 
@@ -408,6 +406,7 @@ public class Cli implements Vues{
                     switch(error){
                         case 0 -> System.out.println(p +" You do not have sufficient resources to make the trade.");
                         case 1 -> System.out.println(p +" This port does not exchange this resource.");
+                        case 2 -> System.out.println(p +" The player you chosen has no resource.");
                     }
                 }
             }if(type.equals("good")){
@@ -429,11 +428,11 @@ public class Cli implements Vues{
                     }
                 }
             }
-        }
+       }
     }
 
     @Override
     public void displayDrawnCard(Player p, Card randomCard) {
-        System.out.println(p + "you draw a " + randomCard.name());
+        System.out.println(p + " you draw a " + randomCard.name());
     }
 }

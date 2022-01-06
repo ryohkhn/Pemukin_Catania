@@ -392,8 +392,9 @@ public class GuiSideBar extends JPanel implements Vues{
         useButton.addActionListener(event->{
             if(player.alreadyPlayedCardThisTurn){
                 JOptionPane.showMessageDialog(this,"You already played a card this round.");
-            }
-            else{
+            }else if(!player.hasCard()){
+                JOptionPane.showMessageDialog(this,"You have no cards that you can play this round.");
+            }else{
                 chooseCard();
             }
         });
@@ -950,11 +951,6 @@ public class GuiSideBar extends JPanel implements Vues{
         mainPanel.add(returnToMenu);
     }
 
-    @Override
-    public void victory(Player p){
-
-    }
-
     // fonction de la Vue qui met à jour le plateau qui se trouve dans la classe guiBoard
     @Override
     public void displayBoard(Game game){
@@ -962,7 +958,8 @@ public class GuiSideBar extends JPanel implements Vues{
     }
 
     // fonction qui termine la partie
-    public void endGame(Player currentPlayer){
+    @Override
+    public void victory(Player currentPlayer){
         removeAndRefresh(true,true,false);
         JLabel playerWonLabel=new JLabel(currentPlayer+" has won the game !");
         playerWonLabel.setHorizontalAlignment(JLabel.CENTER);

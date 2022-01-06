@@ -46,12 +46,12 @@ public class Bot extends Player{
     }
 
     //supprime un nombre = quantity de ressources aléatoires
-    public void seventAtDice(int quantity, Game game) {
+    public void sevenAtDice(int quantity, Game game) {
         boolean verif=false;
         String resource="";
         String[] resources={"Clay","Wood","Wool","Wheat","Ore"};
         while(!verif){
-            resource=resources[rand.nextInt(4)];
+            resource=resources[rand.nextInt(5)];
             if(this.resources.get(resource)>0) {
                 game.destroy(this,resource);
                 quantity--;
@@ -59,78 +59,100 @@ public class Bot extends Player{
             verif=quantity==0;
         }
     }
-
+    // renvoie un tableau de placement aléatoire pour le voleur
     public void setThief(Game game) {
         int[] placement=new int[2];
-        boolean verify=false;
         placement[0]=rand.nextInt(4);
         placement[1]=rand.nextInt(4);
         game.setThief(placement);
     }
 
+    // renvoie un random
     public int getRand(int size) {
         return rand.nextInt(size);
     }
 
+    // Sélectionne une action aléatoire parmi les suivantes sans prendre en compte sa capacité à le faire (ressources/carte deja jouée pendant le tour, etc) :
+    // - construire une route/une ville/une colonie.
+    // - acheter/jouer une carte.
+    // - mettre fin au tour.
+    // Nous avons laissé la possibilité au bot (par l'aléatoire) de directement mettre fin a son tour sans rien construire.
+    // Ceci a été décidé dans un objectif d'équilibre. En effet, si un bot devait forcément construire quelque chose dans son tour (s'il a les ressources pour),
+    // alors il ferait des routes dès que possible (les routes étant les constructions les moins chères du jeu).
+    // Nous avons aussi décidé que le choix de l'action serait défini par un nombre entre 0 et 11. Puis attribué ces numéros aux 6 cases.
+    // (par exemple les numéros 4,5,6 correspondent tous à la construction d'une ville).
+    // Cela a aussi été fait dans un souci d'équilibre pour que les IA produisent des coups "gagnant" en priorité.
+    // Les coups gagnants sont les coups rapportant des points de victoire.
     public void getAction( Game game) {
-        switch(this.getRand(6)) {
-            case 0 -> {
-                this.setBuildableColonies(game);
-                if(this.buildableColonies.size()!=0) {
-                    game.buildColony(this, this.getColonyPlacement());
-                }
-                this.getAction(game);
-            }
-            case 1 -> {
-                if(!this.isFullCity()) {
-                    game.buildCity(this, this.getCityPlacement());
-                }
-                this.getAction(game);
-            }
-            case 2 -> {
+        switch(this.getRand(12)) {
+            case 0 -> { // construction d'une route
                 this.setBuildableRoads(game);
                 if(this.buildableRoads.size()!=0) {
-                    game.buildRoad(this, this.getRoadPlacement());
-                }
-                this.getAction(game);
-            }
-            case 3 -> {
-                game.buyCard(this);
-                this.getAction(game);
-            }
-            case 4 -> {
-                if(!this.alreadyPlayedCardThisTurn) {
-                    Card chosenCard;
-                    if(!this.hasCard()) this.getAction(game);
-                    chosenCard=this.chooseCard();
-                    if(chosenCard.toString().equals("ProgressYearOfPlenty")) {
-                        game.useCardProgressYearOfPlenty(this, this.chooseResource(2));
-                    } else if(chosenCard.toString().equals("ProgressMonopoly")) {
-                        game.useCardProgressMonopoly(this, this.chooseResource(1));
-                    } else if(chosenCard.toString().equals("ProgressRoadBuilding")) {
-                        game.useCardProgressRoadBuilding(this, this.getRoadPlacement());
-                        game.useCardProgressRoadBuildingSecondRound(this,this.getRoadPlacement());
-                    } else if(chosenCard.toString().equals("Knight")) {
-                        game.useCardKnight(this, this.getTilePlacement());
-                        Tile t=game.getBoard().getThiefTile();
-                        Colony c;
-                        do{
-                            c=t.getColonies().get(rand.nextInt(3));
-                        }while(c.isOwned() && c.getPlayer()!=this);
-                        game.steal(this,c.getPlayer());
-                    } else {
-                        game.useCardVP(this);
+                    if(game.hasResourcesForRoad(this)) {
+                        game.buildRoad(this, this.getRoadPlacement());
                     }
                 }
                 this.getAction(game);
             }
-            case 5 -> { // end the turn
-                this.cardsDrawnThisTurn.clear();
+            case 2,3 -> { // construction d'une colonie
+                this.setBuildableColonies(game);
+                if(this.buildableColonies.size()!=0) {
+                    if(game.hasResourcesForColony(this)) {
+                        game.buildColony(this, this.getColonyPlacement());
+                    }
+                }
+                this.getAction(game);
+            }
+            case 4,5,6 -> { // construction d'une ville
+                if(!this.isFullCity()) {
+                    if(game.hasResourcesForCity(this)) {
+                        game.buildCity(this, this.getCityPlacement());
+                    }
+                }
+                this.getAction(game);
+            }
+
+            case 7 -> { // acheter une carte
+                if(game.hasResourcesForCard(this)) {
+                    game.buyCard(this);
+                }
+                this.getAction(game);
+            }
+            case 8 -> { // jouer une carte
+                if(!this.alreadyPlayedCardThisTurn) {
+                    Card chosenCard;
+                    if(this.hasCard()) {
+                        chosenCard=this.chooseCard();
+                        if(chosenCard.toString().equals("ProgressYearOfPlenty")) {
+                            game.useCardProgressYearOfPlenty(this, this.chooseResource(2));
+                        } else if(chosenCard.toString().equals("ProgressMonopoly")) {
+                            game.useCardProgressMonopoly(this, this.chooseResource(1));
+                        } else if(chosenCard.toString().equals("ProgressRoadBuilding")) {
+                            game.useCardProgressRoadBuilding(this, this.getRoadPlacement());
+                            game.useCardProgressRoadBuildingSecondRound(this, this.getRoadPlacement());
+                        } else if(chosenCard.toString().equals("Knight")) {
+                            game.useCardKnight(this, this.getTilePlacement());
+                            Tile t=game.getBoard().getThiefTile();
+                            Colony c;
+                            do {
+                                c=t.getColonies().get(rand.nextInt(3));
+                            } while(c.isOwned()&&c.getPlayer()!=this);
+                            game.steal(this, c.getPlayer());
+                        } else {
+                            game.useCardVP(this);
+                        }
+                    }
+                }
+                this.getAction(game);
+            }
+            case 9,10,11 -> { // mettre fin au tour
+                this.cardsDrawnThisTurnReset();
                 this.alreadyPlayedCardThisTurn=false;
             }
         }
     }
 
+    // vole les ressources d'une ville/colonie sur la tuile du voleur
     public void steal(Tile thiefTile, Game game){
         ArrayList<Colony> ownedColonies=new ArrayList<>();
         for(Colony colony:thiefTile.getColonies()){
@@ -144,6 +166,7 @@ public class Bot extends Player{
             game.steal(this,playerOfColony);
         }
     }
+
     //fait une hashmap avec toutes les routes constructibles
     private void setBuildableRoads(Game game) {
         for(int x=0;x<3;x++){
@@ -156,7 +179,6 @@ public class Bot extends Player{
                 }
             }
         }
-        if(buildableRoads.size()>=15) buildableRoads.clear(); //max 5 routes
     }
 
     //renvoie le placement de la route
@@ -184,7 +206,7 @@ public class Bot extends Player{
                 }
             }
         }
-        if(buildableColonies.size()>=5) buildableColonies.clear(); //max 5 colonies
+
     }
 
     // renvoie le placement de la colonie
@@ -229,9 +251,13 @@ public class Bot extends Player{
 
     private Card chooseCard() {
         Card chosenCard;
+        boolean verify=false;
         do {
             chosenCard=Card.randomCard();
-        }while(this.cards.get(chosenCard)>this.cardsDrawnThisTurn.get(chosenCard));
+            if(this.cards.get(chosenCard)>this.cardsDrawnThisTurn.getOrDefault(chosenCard, 0)) {
+                verify=true;
+            }
+        }while(!verify);
         return chosenCard;
     }
 
