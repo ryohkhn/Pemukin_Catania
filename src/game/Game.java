@@ -310,7 +310,7 @@ public class Game {
                 vue.message(player, "error", "trade", 0);
             }
         } else if(chosenPort.getRate()==2) { // cas où le port échange en 2:1
-            if(player.resources.get(playerResource[0])>=2) {
+            if(player.resources.get(portResource)>=2) {
                 if(chosenPort.getRessource().equals(portResource)) {
                     player.resources.merge(portResource, 2, (initialValue, valueRemoved) -> initialValue-valueRemoved);
                     player.resources.merge(playerResource[0], 1, Integer::sum);

@@ -12,6 +12,7 @@ public class Launcher {
     private int indexCurrentPlayer;
     private Vues vue;
 
+    // main qui permet de lancer le jeu
     public static void main(String[] args){
         Launcher launcher=new Launcher();
         System.out.println("If you want to play on GUI, type 1.\nElse you'll play on console.");
