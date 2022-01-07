@@ -58,7 +58,7 @@ public class GuiSideBar extends JPanel implements Vues{
     public void chooseNbPlayers(){
         JPanel gameNumberPanel=new JPanel();
         gameNumberPanel.add(new JLabel("Choose how many players you want in the game :"));
-        String[] values={"1","3","4"};
+        String[] values={"3","4"};
         JComboBox<String> comboBox=new JComboBox<>(values);
         JButton next=new JButton("Continue");
         gameNumberPanel.add(comboBox);
