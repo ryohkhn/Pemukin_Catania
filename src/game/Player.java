@@ -196,7 +196,7 @@ public abstract class Player{
     // fonction qui vérifie si le joueur a une carte(quelconque) à jouer.
     public boolean hasCard(){
         for(Map.Entry<Card, Integer> entry : this.cards.entrySet()){ // pour toutes les cartes du joueur
-            if(entry.getValue()>this.cardsDrawnThisTurn.getOrDefault(entry.getKey(), 0)) {
+            if(entry.getValue()>this.cardsDrawnThisTurn.getOrDefault(entry.getKey(), 0) && entry.getKey()!=Card.LargestArmy) {
                 // si le nombre de cartes de ce type dans la main du joueur > nombre de cartes de ce type dans les cartes achetées a ce tour
                 return true;
             }
@@ -207,7 +207,9 @@ public abstract class Player{
     public void cardsDrawnThisTurnReset() {
         this.cardsDrawnThisTurn.clear();
         for(Card card : Card.values()){
-            cardsDrawnThisTurn.put(card,0);
+            if(card!=Card.LargestArmy) {
+                cardsDrawnThisTurn.put(card, 0);
+            }
         }
     }
 }

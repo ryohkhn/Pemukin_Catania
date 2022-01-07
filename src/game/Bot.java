@@ -3,7 +3,8 @@ package game;
 import board.Colony;
 import board.Road;
 import board.Tile;
-import vue.GuiSideBar;
+import jdk.swing.interop.SwingInterOpUtils;
+import vue.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -131,21 +132,17 @@ public class Bot extends Player{
                     Card chosenCard;
                     if(this.hasCard()) {
                         chosenCard=this.chooseCard();
-                        if(chosenCard.toString().equals("ProgressYearOfPlenty")) {
+                        System.out.println(this + "  " + chosenCard);
+                        if(chosenCard==Card.ProgressYearOfPlenty) {
                             game.useCardProgressYearOfPlenty(this, this.chooseResource(2));
-                        } else if(chosenCard.toString().equals("ProgressMonopoly")) {
+                        } else if(chosenCard==Card.ProgressMonopoly) {
                             game.useCardProgressMonopoly(this, this.chooseResource(1));
-                        } else if(chosenCard.toString().equals("ProgressRoadBuilding")) {
+                        } else if(chosenCard==Card.ProgressRoadBuilding) {
                             game.useCardProgressRoadBuilding(this, this.getRoadPlacement());
                             game.useCardProgressRoadBuildingSecondRound(this, this.getRoadPlacement());
-                        } else if(chosenCard.toString().equals("Knight")) {
+                        } else if(chosenCard==Card.Knight) {
                             game.useCardKnight(this, this.getTilePlacement());
-                            Tile t=game.getBoard().getThiefTile();
-                            Colony c;
-                            do {
-                                c=t.getColonies().get(rand.nextInt(3));
-                            } while(c.isOwned()&&c.getPlayer()!=this);
-                            game.steal(this, c.getPlayer());
+                            this.steal(game.getBoard().getThiefTile(),game);
                         }else {
                             game.useCardVP(this);
                         }
@@ -214,14 +211,17 @@ public class Bot extends Player{
 
     //renvoie le placement de la route
     private int[] getRoadPlacement() {
-        int x=rand.nextInt(buildableRoads.size());
         int[] res=new int[3];
-        int i=0;
-        for(Map.Entry<Road,int[]> entry : buildableRoads.entrySet()){
-            if(i==x){
-                res= entry.getValue();
+        if(buildableRoads.size()>0) {
+            int x=rand.nextInt(buildableRoads.size());
+
+            int i=0;
+            for(Map.Entry<Road, int[]> entry : buildableRoads.entrySet()) {
+                if(i==x) {
+                    res=entry.getValue();
+                }
+                i++;
             }
-            i++;
         }
         return res;
     }
@@ -274,7 +274,7 @@ public class Bot extends Player{
         boolean verify=false;
         do {
             chosenCard=Card.randomCard();
-            if(this.cards.get(chosenCard)>this.cardsDrawnThisTurn.getOrDefault(chosenCard, 0) && chosenCard!=Card.LargestArmy) {
+            if(this.cards.get(chosenCard)>this.cardsDrawnThisTurn.getOrDefault(chosenCard, 0)) {
                 verify=true;
             }
         }while(!verify);
@@ -286,7 +286,7 @@ public class Bot extends Player{
         String[] resources=new String[i];
         String[] resourcesList={"Clay","Wood","Wool","Wheat","Ore"};
         for(int x=0;x<i;x++){
-            resources[i]=resourcesList[rand.nextInt(5)];
+            resources[x]=resourcesList[rand.nextInt(5)];
         }
         return resources;
     }

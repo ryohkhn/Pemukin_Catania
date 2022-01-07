@@ -59,6 +59,7 @@ public class Launcher {
                     else((Bot)p).getAction(game);
                     game.checkLongestArmy();
                     if(p.hasWin()){
+                        vue.displayPlayer(p);
                         vue.victory(p);
                         hasWon=true;
                     }
