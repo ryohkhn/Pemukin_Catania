@@ -442,6 +442,8 @@ public class GuiSideBar extends JPanel implements Vues{
         refreshPanel(mainPanel);
     }
 
+    // fonction pour l'affichage général des boutons d'achat et de placement
+    // elles lancent ensuite les fonctions correspondante pour la suite de l'achat/placement
     public void buyOrBuild(){
         removeAndRefresh(false,true,false);
         Player player=launcher.getCurrentPlayer();
@@ -515,6 +517,8 @@ public class GuiSideBar extends JPanel implements Vues{
         mainPanel.add(returnToMenu);
     }
 
+    // fonction de la Vue pour la sélection des ports
+    // en fonction des ports que le joueur possède on lancera le choix de la ressource donnée et la ressource voulue ou seulement celui de la ressource voulue dans le cas dans le cas d'un port 2:1
     @Override
     public void portSelection(Player player){
         removeAndRefresh(false,true,false);
@@ -553,6 +557,7 @@ public class GuiSideBar extends JPanel implements Vues{
         }
     }
 
+    // fonction de la Vue pour sélectionner les ressources à donner
     @Override
     public void getPortResource(){
         removeAndRefresh(false,true,false);
@@ -596,6 +601,7 @@ public class GuiSideBar extends JPanel implements Vues{
         });
     }
 
+    // fonction pour sélectionner les ressources à récupérer par l'échange
     public void getPortGivenResource(Port port,String portResource){
         removeAndRefresh(false,true,false);
         Player player=launcher.getCurrentPlayer();
@@ -627,6 +633,7 @@ public class GuiSideBar extends JPanel implements Vues{
         });
     }
 
+    // fonction pour le lancement du cas des 7 aux dés, elle lancera sevenAtDice() avec le nombre de personnes à défausser
     public void startSevenAtDice(){
         mainPanel.setLayout(new GridLayout(12,2,5,5));
         playersDiscardingQuantity=new LinkedHashMap<>();
@@ -649,6 +656,7 @@ public class GuiSideBar extends JPanel implements Vues{
         }
     }
 
+    // fonction de la Vue pour récupérer les ressources à donner si on a plus de 7 cartes
     @Override
     public void sevenAtDice(Player player, int quantity){
         removeAndRefresh(false,true,false);
@@ -715,6 +723,7 @@ public class GuiSideBar extends JPanel implements Vues{
         mainPanel.add(next);
     }
 
+    // fonction de la Vue pour l'affichage des ressources volées
     @Override
     public void displayStolenResource(Player player,String resource,Player playerOfColony,int quantity){
         JLabel stolenResourceLabel=new JLabel("You stole "+quantity+" "+resource+" from player "+playerOfColony);
@@ -734,6 +743,7 @@ public class GuiSideBar extends JPanel implements Vues{
         guiBoard.setAllTileAsListener("City");
     }
 
+    // fonction de la Vue pour le panneau du choix d'utilisation des cartes de développement
     @Override
     public void chooseCard(){
         removeAndRefresh(false,true,false);
@@ -828,13 +838,14 @@ public class GuiSideBar extends JPanel implements Vues{
         mainPanel.add(returnToMenu);
     }
 
+    // fonction de la Vue pour le choix du placement du voleur
+    // si le joueur n'est pas un bot ça activera les cases de GuiTile en tant que Mouse Input Listener
     @Override
     public void setThief(){
         if(launcher.getCurrentPlayer() instanceof Bot){
             Player player=launcher.getCurrentPlayer();
             ((Bot)player).setThief(game);
             Tile thiefTile=game.getBoard().getThiefTile();
-            //guiBoard.botRemoveAndSetThief(thiefTile);
             displayBoard(game);
             ((Bot)player).steal(thiefTile,game);
             ((Bot)player).getAction(game);
@@ -908,6 +919,7 @@ public class GuiSideBar extends JPanel implements Vues{
         }
     }
 
+    // fonction de la Vue pour le choix de ressource à voler lors de l'utilisation de la arte Monopoly
     @Override
     public void chooseResource(){
         final Player[] resourceChoice=new Player[1];
@@ -974,6 +986,7 @@ public class GuiSideBar extends JPanel implements Vues{
         mainPanel.add(next);
     }
 
+    // fonction appelée à la fin de la construction d'une route lors de l'utilisation de la carte Road Building
     public void buildRoadCardDone(){
         removeAndRefresh(false,true,false);
         displayBoard(game);
@@ -991,6 +1004,7 @@ public class GuiSideBar extends JPanel implements Vues{
         guiBoard.setAllTileAsListener("RoadCardSecondBuild");
     }
 
+    // fonction appelée lorsqu'une construction est terminée pour afficher le résultat
     public void buildDone(String typeOfBuild){
         removeAndRefresh(true,true,false);
         Player player=launcher.getCurrentPlayer();
@@ -1002,6 +1016,7 @@ public class GuiSideBar extends JPanel implements Vues{
         showBackToMenuButton(player);
     }
 
+    // fonction pour afficher un bouton de retour au menu d'action
     public void showBackToMenuButton(Player player){
         JButton returnToMenu=new JButton("Go back to the menu");
         returnToMenu.addActionListener(event -> {
@@ -1047,11 +1062,13 @@ public class GuiSideBar extends JPanel implements Vues{
         }
     }
 
+    // fonction pour revalider un JPanel en argument
     public static void refreshPanel(JPanel jPanel){
         jPanel.revalidate();
         jPanel.repaint();
     }
 
+    // fonction appelée dans Bot pour retirer les images du voleur lors du placement du nouveau voleur
     public void botRemoveAndSetThiefInBoard(){
         this.guiBoard.botRemoveAndSetThief(game.getBoard().getThiefTile());
     }

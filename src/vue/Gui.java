@@ -56,7 +56,7 @@ public class Gui extends JFrame{
         guiSideBar.displayDiceNumber(diceNumber);
     }
 
-    // fonction de fin de tour
+    // fonction de fin de tour qui passe au joueur suivant
     public void endRound(){
         Player currentPlayer=launcher.getCurrentPlayer();
         currentPlayer.alreadyPlayedCardThisTurn=false;
@@ -71,6 +71,7 @@ public class Gui extends JFrame{
         }
     }
 
+    // getter
     public GuiBoard getGuiBoard(){
         return guiBoard;
     }

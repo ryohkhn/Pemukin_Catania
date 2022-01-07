@@ -69,9 +69,7 @@ public class Bot extends Player{
         placement[0]=rand.nextInt(4);
         placement[1]=rand.nextInt(4);
         game.setThief(placement);
-        System.out.println("added in bot");
         if(game.getVue() instanceof GuiSideBar){
-            System.out.println("removed in bot");
             GuiSideBar guiSideBar=(GuiSideBar) game.getVue();
             guiSideBar.botRemoveAndSetThiefInBoard();
         }

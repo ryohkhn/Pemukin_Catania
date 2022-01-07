@@ -46,6 +46,7 @@ public class GuiTile extends JPanel implements MouseInputListener{
         }
         setLayout(new GridLayout(3, 1));
         if(water){
+            // cas ou on traite les ports
             if(tile!=null){
                 JLabel portResource;
                 JLabel portRate;
@@ -59,8 +60,10 @@ public class GuiTile extends JPanel implements MouseInputListener{
                 }
             }
             setBackground(Color.blue);
+            // cas vide
         } else if(empty){
             setBackground(Color.WHITE);
+            // cas pour les cases de ressource
         } else{
             setBackground(switch(tile.getRessource()){
                 case "Clay" -> new Color(0xFF999999, true);
@@ -132,6 +135,7 @@ public class GuiTile extends JPanel implements MouseInputListener{
         if((!water || !empty) && isActiveMouseListener){
             int buildLocation=-1;
             switch(typeOfMove){
+                // récupération des coordonnées dépendant du type d'action
                 case "ColonyInitialization","ColonyInitializationSecondRound","Colony","City" -> {
                     if(e.getX()<(this.getWidth()/3) && e.getY()<(this.getWidth()/3)){
                         buildLocation=0;
@@ -163,6 +167,7 @@ public class GuiTile extends JPanel implements MouseInputListener{
             }
             if(buildLocation!=-1){
                 Player player=launcher.getCurrentPlayer();
+                // on lance différentes fonctions dépendant de la construction pour la terminer
                 switch(typeOfMove){
                     case "ColonyInitialization" -> {
                         Colony buildedColony=game.buildColonyInitialization(player, new int[]{line, column,buildLocation});
@@ -217,6 +222,7 @@ public class GuiTile extends JPanel implements MouseInputListener{
                     }
                 }
             }
+            // pour le voleur on met à jour l'image sur la plateau
             else if(typeOfMove.equals("Thief")){
                 game.setThief(new int[]{this.line,this.column});
                 guiSideBar.steal(launcher.getCurrentPlayer(),tile);
@@ -227,14 +233,15 @@ public class GuiTile extends JPanel implements MouseInputListener{
         }
     }
 
+    // fonction pour retirer l'image si la case la contient
     public void removeThiefImage(){
         if(picLabel!=null){
-            System.out.println("removed in board");
             remove(picLabel);
             picLabel=null;
         }
     }
 
+    // fonction pour attribuer l'image du voleur à la case
     public void setThiefImage(){
         try{
             BufferedImage thiefImage=ImageIO.read(new File("resources/thief_dot.png"));
@@ -263,6 +270,7 @@ public class GuiTile extends JPanel implements MouseInputListener{
     @Override
     public void mouseMoved(MouseEvent e){}
 
+    // fonction interne à la case pour dessiner les routes et colonies/villes avec des bordures
     public class GuiBorder extends AbstractBorder{
         Tile tile;
 

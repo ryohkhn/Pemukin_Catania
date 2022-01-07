@@ -27,10 +27,12 @@ public class GuiBoard extends JPanel{
         createBoard();
     }
 
+    // fonction pour revalider le plateau
     public void displayBoard(){
         this.repaint();
     }
 
+    // fonction de la creation du plateau avec chaque case représentée par un objet GuiTile
     public void createBoard(){
         for(int line=-2; line<tiles.length+2; line++){
             for(int column=-2; column<tiles.length+2; column++){
@@ -75,6 +77,7 @@ public class GuiBoard extends JPanel{
         }
     }
 
+    // fonction pour activer toutes les cases en tant que Mouse Input Listener
     public void setAllTileAsListener(String typeOfMove){
         for(Component component:this.getComponents()){
             if(component instanceof GuiTile){
@@ -85,6 +88,7 @@ public class GuiBoard extends JPanel{
         }
     }
 
+    // fonction pour désactiver toutes les cases Mouse Input Listener
     public void removeAllTileAsListener(){
         for(Component component:this.getComponents()){
             if(component instanceof GuiTile){
@@ -94,6 +98,7 @@ public class GuiBoard extends JPanel{
         }
     }
 
+    // fonction pour retirer toutes les images du voleur sur les GuiTile
     public void removeThiefImage(){
         for(Component component:this.getComponents()){
             if(component instanceof GuiTile){
@@ -103,23 +108,12 @@ public class GuiBoard extends JPanel{
         }
     }
 
-    public void removeImageTileNoThief(){
-        for(Component component:this.getComponents()){
-            if(component instanceof GuiTile){
-                GuiTile tile=(GuiTile)component;
-                if(tile.getTile()!=null && !tile.getTile().hasThief()){
-                    tile.removeThiefImage();
-                }
-            }
-        }
-    }
-
+    // fonction appelée dans le bot pour retirer l'image du voleur la ou elle ne doit plus être
     public void botRemoveAndSetThief(Tile thiefTile){
         for(Component component:this.getComponents()){
             if(component instanceof GuiTile){
                 GuiTile tile=(GuiTile)component;
                 if(!tile.getWater() && !tile.getEmpty() && tile.getTile()==thiefTile){
-                    System.out.println("added in board");
                     tile.setThiefImage();
                 }
                 else{
