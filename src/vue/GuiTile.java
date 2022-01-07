@@ -40,6 +40,7 @@ public class GuiTile extends JPanel implements MouseInputListener{
         this.column=column;
         this.game=game;
         this.isActiveMouseListener=false;
+        this.water=water;
         if(game!=null){
             this.tile=game.getBoard().getTiles()[line][column];
         }
@@ -112,6 +113,18 @@ public class GuiTile extends JPanel implements MouseInputListener{
 
     public void disableMouseListener(){
         this.isActiveMouseListener=false;
+    }
+
+    public Tile getTile(){
+        return tile;
+    }
+
+    public boolean getWater(){
+        return water;
+    }
+
+    public boolean getEmpty(){
+        return empty;
     }
 
     @Override
@@ -216,7 +229,9 @@ public class GuiTile extends JPanel implements MouseInputListener{
 
     public void removeThiefImage(){
         if(picLabel!=null){
+            System.out.println("removed in board");
             remove(picLabel);
+            picLabel=null;
         }
     }
 

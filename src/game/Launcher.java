@@ -10,7 +10,7 @@ public class Launcher {
     private Game game;
     private Player currentPlayer;
     private int indexCurrentPlayer;
-    private Vues vue;
+    private static Vues vue;
 
 
     public Game getGame() {
@@ -29,10 +29,10 @@ public class Launcher {
         String input=sc2.nextLine();
         if(input.equals("1")){
             Gui gui=new Gui(launcher);
-            launcher.vue=gui.getGuiSideBar();
+            vue=gui.getGuiSideBar();
         }else{
             Cli cli=new Cli(launcher);
-            launcher.vue=cli;
+            vue=cli;
             launcher.launch();
         }
 

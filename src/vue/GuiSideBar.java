@@ -41,7 +41,7 @@ public class GuiSideBar extends JPanel implements Vues{
     // elle permet de créer tout les panels pour l'objet et mettre en place les layout
     public void setUpGui(){
         setLayout(new GridLayout(3,1));
-        playerPanel=new JPanel(new GridLayout(5,1));
+        playerPanel=new JPanel(new GridLayout(6,1));
         mainPanel=new JPanel();
         mainPanel.setLayout(new GridLayout(5,1,5,5));
         infoPanel=new JPanel();
@@ -166,11 +166,15 @@ public class GuiSideBar extends JPanel implements Vues{
             startGame();
             return;
         }
+        if(currentPlayer instanceof Bot){
+            ((Bot) currentPlayer).iniBuild(game);
+            displayBoard(game);
+            roundInitializationDoneBot();
+            return;
+        }
         JLabel playerInfo=new JLabel("Player "+currentPlayer.toString()+" place your "+(countInitialization>(game.getPlayers().length*2)?"first":"second")+(countInitialization%2==1?" road.":" colony."));
         playerInfo.setHorizontalAlignment(SwingConstants.HORIZONTAL);
         playerPanel.add(playerInfo);
-        final int[] compt=new int[1];
-        compt[0]=nbPlayer;
         JButton button=new JButton("Place");
         button.addActionListener(actionEvent -> {
             mainPanel.remove(button);
@@ -194,6 +198,24 @@ public class GuiSideBar extends JPanel implements Vues{
         removeAndRefresh(true,true,false);
         refreshPanel(guiBoard);
         this.countInitialization-=1;
+        int nbPlayers=game.getPlayers().length*2;
+        if(countInitialization!=nbPlayers && countInitialization%2==0){
+            if(countInitialization>nbPlayers){
+                launcher.nextPlayer();
+            }
+            else{
+                launcher.prevPlayer();
+            }
+        }
+        initiateRoadsAndColonies(countInitialization,launcher.getCurrentPlayer());
+    }
+
+    // fonction appelée quand un bot a terminé de construire sa route et sa colonie
+    // on baisse directement de deux les tours au lieu de 1 dans le cas des joueurs
+    public void roundInitializationDoneBot(){
+        removeAndRefresh(true,true,false);
+        refreshPanel(guiBoard);
+        this.countInitialization-=2;
         int nbPlayers=game.getPlayers().length*2;
         if(countInitialization!=nbPlayers && countInitialization%2==0){
             if(countInitialization>nbPlayers){
@@ -276,6 +298,9 @@ public class GuiSideBar extends JPanel implements Vues{
         removeAndRefresh(true,true,false);
         displayPlayer(player);
         JButton diceRollButton=new JButton("Roll the dices !");
+        if(launcher.getCurrentPlayer() instanceof Bot){
+            mainPanel.add(new JLabel("This player is an IA, please launch his turn."));
+        }
         diceRollButton.addActionListener(event->{
             JLabel diceRollLabel=new JLabel("Dice roll : " + diceNumber);
             mainPanel.add(diceRollLabel);
@@ -310,6 +335,7 @@ public class GuiSideBar extends JPanel implements Vues{
         }
     }
 
+    // fonction de la Vue qui affiche le résultat des ressources données après l'utilisation de la carte Year Of Plenty
     @Override
     public void displayYopGivenResources(String resource, String resource1){
         JLabel firstResourceLabel=new JLabel("You have one more "+resource);
@@ -320,6 +346,7 @@ public class GuiSideBar extends JPanel implements Vues{
         mainPanel.add(secondResourceLabel);
     }
 
+    // fonction de la Vue pour différents messages d'erreur et autre
     @Override
     public void message(Player p, String type, String object, int error) {
         if(!(p instanceof Bot)){
@@ -370,6 +397,7 @@ public class GuiSideBar extends JPanel implements Vues{
         }
     }
 
+    // fonction pour afficher le résultat de l'achat de carte
     public void displayDrawnCard(Player player,Card randomCard){
         JLabel drawnCardLabel=new JLabel("You draw a "+randomCard);
         drawnCardLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
@@ -379,6 +407,12 @@ public class GuiSideBar extends JPanel implements Vues{
     // fonction de la Vue qui affiche les buttons d'action pour le tour
     @Override
     public void getAction(Player player){
+        if(player instanceof Bot){
+            removeAndRefresh(true,true,false);
+            ((Bot) player).getAction(game);
+            gui.endRound();
+            return;
+        }
         JButton buildOrBuyButton=new JButton("Build/Buy");
         JButton tradeButton=new JButton("Trade");
         JButton useButton=new JButton("Use card");
@@ -618,6 +652,21 @@ public class GuiSideBar extends JPanel implements Vues{
     @Override
     public void sevenAtDice(Player player, int quantity){
         removeAndRefresh(false,true,false);
+        if(player instanceof Bot){
+            removeAndRefresh(false,true,false);
+            ((Bot)player).sevenAtDice(playersDiscardingQuantity.get(player)/2,game);
+            playersDiscarding.remove(player);
+            playersDiscardingQuantity.remove(player);
+            if(playersDiscarding.size()==0){
+                removeAndRefresh(false,true,false);
+                setThief();
+            }
+            else{
+                Player nextPlayer=playersDiscarding.get(0);
+                sevenAtDice(nextPlayer,playersDiscardingQuantity.get(nextPlayer)/2);
+            }
+            return;
+        }
         JButton next=new JButton("Continue");
         JLabel resouceChoiceLabel=new JLabel("Player "+player+" select "+quantity+" resources you need to discard :");
         JLabel emptySpace=new JLabel(" ");
@@ -781,11 +830,23 @@ public class GuiSideBar extends JPanel implements Vues{
 
     @Override
     public void setThief(){
-        mainPanel.setLayout(new GridLayout(5,1,5,5));
-        JLabel placeThiefLabel=new JLabel("Place thief on the board");
-        placeThiefLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
-        mainPanel.add(placeThiefLabel);
-        guiBoard.setAllTileAsListener("Thief");
+        if(launcher.getCurrentPlayer() instanceof Bot){
+            Player player=launcher.getCurrentPlayer();
+            ((Bot)player).setThief(game);
+            Tile thiefTile=game.getBoard().getThiefTile();
+            //guiBoard.botRemoveAndSetThief(thiefTile);
+            displayBoard(game);
+            ((Bot)player).steal(thiefTile,game);
+            ((Bot)player).getAction(game);
+            gui.endRound();
+        }
+        else{
+            mainPanel.setLayout(new GridLayout(5, 1, 5, 5));
+            JLabel placeThiefLabel=new JLabel("Place thief on the board");
+            placeThiefLabel.setHorizontalAlignment(SwingConstants.HORIZONTAL);
+            mainPanel.add(placeThiefLabel);
+            guiBoard.setAllTileAsListener("Thief");
+        }
     }
 
     // fonction de la Vue pour voler une ressource à un joueur après avoir déplacé le voleur
@@ -989,5 +1050,9 @@ public class GuiSideBar extends JPanel implements Vues{
     public static void refreshPanel(JPanel jPanel){
         jPanel.revalidate();
         jPanel.repaint();
+    }
+
+    public void botRemoveAndSetThiefInBoard(){
+        this.guiBoard.botRemoveAndSetThief(game.getBoard().getThiefTile());
     }
 }

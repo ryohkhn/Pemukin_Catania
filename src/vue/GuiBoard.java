@@ -102,4 +102,30 @@ public class GuiBoard extends JPanel{
             }
         }
     }
+
+    public void removeImageTileNoThief(){
+        for(Component component:this.getComponents()){
+            if(component instanceof GuiTile){
+                GuiTile tile=(GuiTile)component;
+                if(tile.getTile()!=null && !tile.getTile().hasThief()){
+                    tile.removeThiefImage();
+                }
+            }
+        }
+    }
+
+    public void botRemoveAndSetThief(Tile thiefTile){
+        for(Component component:this.getComponents()){
+            if(component instanceof GuiTile){
+                GuiTile tile=(GuiTile)component;
+                if(!tile.getWater() && !tile.getEmpty() && tile.getTile()==thiefTile){
+                    System.out.println("added in board");
+                    tile.setThiefImage();
+                }
+                else{
+                    tile.removeThiefImage();
+                }
+            }
+        }
+    }
 }

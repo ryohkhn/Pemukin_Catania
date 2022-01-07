@@ -1,12 +1,14 @@
 package game;
 
 import board.Colony;
+import board.Road;
 import board.Tile;
+import vue.GuiSideBar;
 
-import java.util.*;
-
-
-import board.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 public class Bot extends Player{
     private final Random rand=new Random();
@@ -61,11 +63,18 @@ public class Bot extends Player{
     }
 
     // renvoie un tableau de placement aléatoire pour le voleur
-    public void setThief(Game game) {
+    // dans le cas ou la fonction est appelée après un lancement de carte, il faut enlever l'image du voleur de la case
+    public void setThief(Game game){
         int[] placement=new int[2];
         placement[0]=rand.nextInt(4);
         placement[1]=rand.nextInt(4);
         game.setThief(placement);
+        System.out.println("added in bot");
+        if(game.getVue() instanceof GuiSideBar){
+            System.out.println("removed in bot");
+            GuiSideBar guiSideBar=(GuiSideBar) game.getVue();
+            guiSideBar.botRemoveAndSetThiefInBoard();
+        }
     }
 
     // renvoie un random

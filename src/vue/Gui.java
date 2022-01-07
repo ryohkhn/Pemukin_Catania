@@ -70,4 +70,8 @@ public class Gui extends JFrame{
             startRound();
         }
     }
+
+    public GuiBoard getGuiBoard(){
+        return guiBoard;
+    }
 }
