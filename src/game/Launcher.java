@@ -12,6 +12,15 @@ public class Launcher {
     private int indexCurrentPlayer;
     private Vues vue;
 
+
+    public Game getGame() {
+        return game;
+    }
+
+    public Player getCurrentPlayer(){
+        return currentPlayer;
+    }
+
     // main qui permet de lancer le jeu
     public static void main(String[] args){
         Launcher launcher=new Launcher();
@@ -29,6 +38,7 @@ public class Launcher {
 
     }
 
+    // fonction de déroulement du jeu pour la version Cli
     public void launch(){
         vue.chooseNbPlayers();
         vue.setPlayers();
@@ -56,21 +66,21 @@ public class Launcher {
             }
         }
     }
-
+    // pour la cli : fonction du 7 aux dés
     private void seven(Player player,Vues vue) {
-        for(Player playerDestroying: game.getPlayers()) {
+        for(Player playerDestroying: game.getPlayers()) { // pour chaque joueur
             int quantity=playerDestroying.resourceCount()/2;
-            if(quantity>7) {
+            if(quantity>7) { // on vérifie qu'ils aient la quantité de ressource suffisante pour
                 if(!playerDestroying.isBot()) {
-                    vue.sevenAtDice(playerDestroying, quantity);
+                    vue.sevenAtDice(playerDestroying, quantity); // en supprimer la moitié
                 }else{
                     ((Bot)playerDestroying).sevenAtDice(quantity,game);
                 }
             }
         }
         if(!player.isBot()){
-            vue.setThief();
-            vue.steal(player,game.getBoard().getThiefTile());
+            vue.setThief(); // on déplace le voleur
+            vue.steal(player,game.getBoard().getThiefTile()); // on vole un joueur sur la nouvelle case du voleur
         }else{
             ((Bot)player).setThief(game);
             ((Bot)player).steal(game.getBoard().getThiefTile(),game);
@@ -78,20 +88,14 @@ public class Launcher {
 
     }
 
-    public Game getGame() {
-        return game;
-    }
-
+    // fonction qui crée la partie
     public Game createGame(int nbPlayers){
         Game game=new Game(nbPlayers,this.vue);
         this.game=game;
         return game;
     }
 
-    public Player getCurrentPlayer(){
-        return currentPlayer;
-    }
-
+    // pour la version gui : le joueur courant devient le joueur suivant
     public void nextPlayer() {
         if(indexCurrentPlayer==game.getPlayers().length-1){
             currentPlayer = game.getPlayers()[0];
@@ -103,6 +107,7 @@ public class Launcher {
         }
 	}
 
+    // pour la version gui : le joueur courant devient le joueur précédent
 	public void prevPlayer() {
         if(indexCurrentPlayer==0){
             currentPlayer = game.getPlayers()[game.getPlayers().length-1];
@@ -114,6 +119,7 @@ public class Launcher {
         }
 	}
 
+    // pour la version gui : défini le premier joueur
 	public void setFirstPlayer() {
 		currentPlayer = game.getPlayers()[0];
         indexCurrentPlayer=0;

@@ -13,7 +13,6 @@ public class Gui extends JFrame{
     private GuiBoard guiBoard;
     private GuiSideBar guiSideBar;
 
-
     public Gui(Launcher launcher){
         this.launcher=launcher;
         setTitle("Pemukin Catania");
@@ -29,7 +28,12 @@ public class Gui extends JFrame{
         guiSideBar.chooseNbPlayers();
     }
 
-    // fonction appeleé à la fin de l'initialisation pour mettre en place la Gui pour la partie
+    // getter
+    public GuiSideBar getGuiSideBar(){
+        return guiSideBar;
+    }
+
+    // fonction appelée à la fin de l'initialisation pour mettre en place la Gui pour la partie
     public void setUpGui(Game game){
         getContentPane().removeAll();
         getContentPane().revalidate();
@@ -46,11 +50,13 @@ public class Gui extends JFrame{
         guiBoard.setVisible(true);
     }
 
+    // fonction de début de tour
     public void startRound(){
         int diceNumber=game.generateDiceNumber();
         guiSideBar.displayDiceNumber(diceNumber);
     }
 
+    // fonction de fin de tour
     public void endRound(){
         Player currentPlayer=launcher.getCurrentPlayer();
         currentPlayer.alreadyPlayedCardThisTurn=false;
@@ -63,9 +69,5 @@ public class Gui extends JFrame{
             launcher.nextPlayer();
             startRound();
         }
-    }
-
-    public GuiSideBar getGuiSideBar(){
-        return guiSideBar;
     }
 }

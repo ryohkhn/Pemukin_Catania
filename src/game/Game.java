@@ -220,7 +220,6 @@ public class Game {
         return false;
     }
 
-    // TODO: 06/01/2022 verfier dans cli qu'on ne peut pas les jouer dans le même tour
     // fonction permettant d'acheter une carte de développement
     public void buyCard(Player player) {
         // On supprime les ressources nécessaires à l'achat d'une carte
@@ -229,7 +228,7 @@ public class Game {
         player.resources.merge("Wheat", 1, (initialValue, valueRemoved) -> initialValue-valueRemoved);
         Card randomCard=Card.randomCard();
         vue.displayDrawnCard(player,randomCard);
-        if(!randomCard.name().equals("VictoryPoint")) { //si la carte n'est pas une carte VP,
+        if(randomCard!=Card.VictoryPoint) { //si la carte n'est pas une carte VP,
             player.cardsDrawnThisTurn.merge(randomCard, 1, Integer::sum); // on l'ajoute à la hashmap de stockage des cartes achetées dans le tour.
         }
         player.cards.merge(randomCard, 1, Integer::sum); //on ajoute la carte à la hashmap de stockage des cartes du joueur.

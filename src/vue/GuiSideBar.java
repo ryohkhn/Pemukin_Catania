@@ -160,7 +160,7 @@ public class GuiSideBar extends JPanel implements Vues{
         initiateRoadsAndColonies(game.getPlayers().length,launcher.getCurrentPlayer());
     }
 
-    // fonction d'initilisation des routes et colonies, tant qu'il reste des tours à effectuer on active les Mouse Input Listener sur le plateau
+    // fonction initialisation des routes et colonies, tant qu'il reste des tours à effectuer on active les Mouse Input Listener sur le plateau
     public void initiateRoadsAndColonies(int nbPlayer, Player currentPlayer){
         if(nbPlayer==0){
             startGame();

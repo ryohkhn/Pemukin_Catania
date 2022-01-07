@@ -15,7 +15,12 @@ public class Controller{
         this.launcher=launcher;
         this.cli=cli;
     }
+// Les fonctions dans Controller sont des fonctions qui font appel à la classe Scanner de la bibliothèque Java
+// pour récupérer une réponse du joueur, à propos d'une ressource, de coordonnées, etc
 
+//le joueur :
+
+    // (qui initialise) choisit le nombre de joueurs de la partie
     public void chooseNbPlayers() { //launcher of cli version
         scanner=new Scanner(System.in);
         if(scanner.nextLine().equals("3")) {
@@ -25,6 +30,40 @@ public class Controller{
         }
     }
 
+    // (qui initialise) choisit la couleur des joueurs
+    public void setPlayers(){
+        scanner=new Scanner(System.in);
+        HashMap<String, Boolean> color=new HashMap<>();
+        color.put("blue", false);
+        color.put("yellow", false);
+        color.put("green", false);
+        color.put("orange", false);
+        String[] playersType=new String[game.getPlayers().length];
+        String[] playersColor=new String[game.getPlayers().length];
+        int i=0;
+        for(Player p : game.getPlayers()){
+            System.out.println("Type 1 to initialize a human player.\n Else this player will be a bot.");
+            playersType[i]=scanner.nextLine();
+            boolean verif=false;
+            while(!verif) {
+                System.out.println("please choose a color between :" + color);
+                String s=scanner.nextLine();
+                for(Map.Entry<String, Boolean> entry : color.entrySet()) {
+                    if(entry.getKey().equals(s)) {
+                        if(color.replace(s, false, true)) {
+                            playersColor[i]=entry.getKey();
+                            verif=true;
+                        }
+                    }
+                }
+            }
+            i++;
+        }
+        game.setPlayers(playersType);
+        game.setColors(playersColor);
+    }
+
+    // choisit son action
     public void getAction(Player player) {
         scanner=new Scanner(System.in);
         try{
@@ -132,6 +171,7 @@ public class Controller{
         }
     }
 
+    // choisit une carte
     private String chooseCard() {
         scanner=new Scanner(System.in);
         cli.chooseCard();
@@ -142,6 +182,7 @@ public class Controller{
         else return cardInput;
     }
 
+    // choisit les coordonnées d'une ville
     private int[] getCityPlacement(){
         scanner=new Scanner(System.in);
         cli.getCityPlacement();
@@ -171,6 +212,7 @@ public class Controller{
         }
     }
 
+    // choisit les coordonnées d'une route
     private int[] getRoadPlacement() {
         scanner=new Scanner(System.in);
         cli.getRoadPlacement();
@@ -200,6 +242,7 @@ public class Controller{
         }
     }
 
+    // choisit un nombre number de ressources
     public String[] chooseResource(int number) {
         scanner=new Scanner(System.in);
         int compt=0;
@@ -216,6 +259,7 @@ public class Controller{
         return res;
     }
 
+    // choisit la ressource à donner au port
     private String getPortResource() {
         scanner=new Scanner(System.in);
         cli.getPortResource();
@@ -226,6 +270,7 @@ public class Controller{
         return resourceInput;
     }
 
+    // choisit le port avec lequel il veut échanger
     private Port portSelection(Player p) {
         scanner=new Scanner(System.in);
         cli.portSelection(p);
@@ -244,6 +289,7 @@ public class Controller{
         }
     }
 
+    // choisit l'emplacement de sa premiere et 2ᵉ colonie
     public void getFirstColonyPlacement(Player p,Game game, Boolean secondRound) {
 
         System.out.println("To build a colony :");
@@ -277,6 +323,7 @@ public class Controller{
         }
     }
 
+    // choisit l'emplacement de sa premiere et 2ᵉ route
     public void getFirstRoadPlacement(Player p, Colony colony){
         System.out.println("To build a road :");
         scanner=new Scanner(System.in);
@@ -307,38 +354,7 @@ public class Controller{
 
     }
 
-    public void setPlayers(){
-        scanner=new Scanner(System.in);
-        HashMap<String, Boolean> color=new HashMap<>();
-        color.put("blue", false);
-        color.put("yellow", false);
-        color.put("green", false);
-        color.put("orange", false);
-        String[] playersType=new String[game.getPlayers().length];
-        String[] playersColor=new String[game.getPlayers().length];
-        int i=0;
-        for(Player p : game.getPlayers()){
-            System.out.println("Type 1 to initialize a human player.\n Else this player will be a bot.");
-            playersType[i]=scanner.nextLine();
-            boolean verif=false;
-            while(!verif) {
-                System.out.println("please choose a color between :" + color);
-                String s=scanner.nextLine();
-                for(Map.Entry<String, Boolean> entry : color.entrySet()) {
-                    if(entry.getKey().equals(s)) {
-                        if(color.replace(s, false, true)) {
-                            playersColor[i]=entry.getKey();
-                            verif=true;
-                        }
-                    }
-                }
-            }
-            i++;
-        }
-        game.setPlayers(playersType);
-        game.setColors(playersColor);
-    }
-
+    // choisit une ressource à détruire
     public void destroy(Player p) {
         scanner=new Scanner(System.in);
         String resourceInput=scanner.next();
@@ -356,6 +372,7 @@ public class Controller{
         }
     }
 
+    // choisit les coordonnées du voleur et le déplace
     public void setThief(){
         scanner=new Scanner(System.in);
         try{
@@ -378,6 +395,7 @@ public class Controller{
         }
     }
 
+    // choisit les coordonnées du voleur (mais retourne son placement)
     public int[] getThiefPlacement() {
         scanner=new Scanner(System.in);
         try{
@@ -400,10 +418,7 @@ public class Controller{
         }
     }
 
-    public void steal(Player p, Player playerOfColony) {
-        game.steal(p,playerOfColony);
-    }
-
+    // choisit un joueur à voler.
     public Player choosePlayerFromColonies(ArrayList<Colony> ownedColonies) {
         scanner=new Scanner(System.in);
         try{
@@ -416,5 +431,10 @@ public class Controller{
             System.out.println("choose a number between 0 and " + (ownedColonies.size()-1));
             return choosePlayerFromColonies(ownedColonies);
         }
+    }
+
+    // fonction à part qui appelle juste la fonction de game avec les deux joueurs concernés par le vol
+    public void steal(Player p, Player playerOfColony) {
+        game.steal(p,playerOfColony);
     }
 }

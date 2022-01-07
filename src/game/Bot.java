@@ -139,7 +139,7 @@ public class Bot extends Player{
                                 c=t.getColonies().get(rand.nextInt(3));
                             } while(c.isOwned()&&c.getPlayer()!=this);
                             game.steal(this, c.getPlayer());
-                        } else {
+                        }else {
                             game.useCardVP(this);
                         }
                     }
@@ -267,7 +267,7 @@ public class Bot extends Player{
         boolean verify=false;
         do {
             chosenCard=Card.randomCard();
-            if(this.cards.get(chosenCard)>this.cardsDrawnThisTurn.getOrDefault(chosenCard, 0)) {
+            if(this.cards.get(chosenCard)>this.cardsDrawnThisTurn.getOrDefault(chosenCard, 0) && chosenCard!=Card.LargestArmy) {
                 verify=true;
             }
         }while(!verify);

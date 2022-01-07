@@ -19,14 +19,12 @@ public abstract class Player{
     protected int knightPlayed=0;
     public boolean alreadyPlayedCardThisTurn=false;
 
-    // constructeur qui initialise
     public Player(String color){
         propertiesCounter.put("City",0);
         propertiesCounter.put("Colony",0);
         propertiesCounter.put("Road",0);
         for(Card card : Card.values()){
             cards.put(card,0);
-            cardsDrawnThisTurn.put(card,0);
         }
         setColor(color);
     }
@@ -193,13 +191,6 @@ public abstract class Player{
             }
         }
         return true;
-    }
-
-    // TODO à enlever utile pour les test
-    public void setMaxResources(){
-        for(String resource:resources.keySet()){
-            resources.merge(resource,10,Integer::sum);
-        }
     }
 
     // fonction qui vérifie si le joueur a une carte(quelconque) à jouer.

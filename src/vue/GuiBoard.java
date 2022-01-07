@@ -32,7 +32,6 @@ public class GuiBoard extends JPanel{
     }
 
     public void createBoard(){
-        int compt=0;
         for(int line=-2; line<tiles.length+2; line++){
             for(int column=-2; column<tiles.length+2; column++){
                 if(column==-2 || column==tiles.length+1 || line==-2 || line==tiles.length+1){
@@ -87,7 +86,6 @@ public class GuiBoard extends JPanel{
     }
 
     public void removeAllTileAsListener(){
-        int compt=0;
         for(Component component:this.getComponents()){
             if(component instanceof GuiTile){
                 GuiTile tile=(GuiTile)component;

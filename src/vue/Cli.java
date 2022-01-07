@@ -22,6 +22,8 @@ public class Cli implements Vues{
         this.controller=new Controller(launcher,this);
     }
 
+// Toutes les fonctions de CLI sont des fonctions de print qui parfois appellent des fonctions complémentaires dans controller
+
     @Override
     public void chooseNbPlayers() { //launcher of cli version
         System.out.println("If you want to be 3 players type 3. \nElse you'll be 4.");
