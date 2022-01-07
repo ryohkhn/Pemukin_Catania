@@ -43,7 +43,7 @@ public class Gui extends JFrame{
 
         this.game=game;
 
-        guiBoard=new GuiBoard(game,this,guiSideBar,launcher,game.getBoard(),game.getBoard().getTiles());
+        guiBoard=new GuiBoard(game,this,guiSideBar,launcher,game.getBoard().getTiles());
         guiSideBar.setGuiBoard(guiBoard);
         getContentPane().add(guiBoard);
         getContentPane().add(guiSideBar);

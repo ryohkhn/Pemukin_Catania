@@ -13,15 +13,13 @@ public class GuiBoard extends JPanel{
     private Gui gui;
     private GuiSideBar guiSideBar;
     private Launcher launcher;
-    private Board board;
     private Tile[][] tiles;
 
-    public GuiBoard(Game game,Gui gui,GuiSideBar guiSideBar,Launcher launcher, Board board, Tile[][] tiles){
+    public GuiBoard(Game game,Gui gui,GuiSideBar guiSideBar,Launcher launcher, Tile[][] tiles){
         this.game=game;
         this.gui=gui;
         this.guiSideBar=guiSideBar;
         this.launcher=launcher;
-        this.board=board;
         this.tiles=tiles;
         setLayout(new GridLayout(8,8));
         createBoard();

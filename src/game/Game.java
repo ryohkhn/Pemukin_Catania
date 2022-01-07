@@ -14,7 +14,6 @@ public class Game {
     public Game(int nb,Vues vue) {
         board=new Board();
         players=new Player[nb];
-        System.out.println(vue);
         this.vue=vue;
     }
 

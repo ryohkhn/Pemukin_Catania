@@ -132,7 +132,6 @@ public class Bot extends Player{
                     Card chosenCard;
                     if(this.hasCard()) {
                         chosenCard=this.chooseCard();
-                        System.out.println(this + "  " + chosenCard);
                         if(chosenCard==Card.ProgressYearOfPlenty) {
                             game.useCardProgressYearOfPlenty(this, this.chooseResource(2));
                         } else if(chosenCard==Card.ProgressMonopoly) {
